@@ -197,6 +197,26 @@
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 15px 40px rgba(255, 255, 255, 0.25);
         }
+        /* ==========================================
+           📱 MOBILE POLISH (LANDING PAGE)
+        ========================================== */
+        @media (max-width: 768px) {
+            nav { padding: 20px; }
+            .nav-links { display: none; } /* Hides the middle links to save space */
+            .giant-bg-text { font-size: 24vw; top: 35%; }
+            .hero-image-container { height: 60%; bottom: 15%; }
+            
+            /* Stacks the text and button vertically */
+            .hero-bottom {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                left: 20px; right: 20px; bottom: 30px;
+                gap: 20px;
+            }
+            .tagline { font-size: 1.6rem; max-width: 100%; }
+            .cta-btn { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 <body>

@@ -284,6 +284,15 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
    📱 MODERN MOBILE UI OVERRIDES
 ========================================= */
 @media (max-width: 768px) {
+    /* 🚨 THE FIX: Hide sidebars on mobile so the mic fits! */
+    .left-col, .right-col {
+        display: none !important; 
+    }
+    
+    .workspace {
+        padding: 0;
+        gap: 0;
+    }
     
     /* 1. The Cinematic Avatar Background */
     #mobile-avatar-placeholder,
@@ -296,6 +305,7 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
         z-index: 1;
         background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
     }
+  
 
     /* 2. The Glassmorphism Chat Sheet */
     .chat-container {
