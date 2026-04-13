@@ -514,11 +514,11 @@
             <p id="breathe-text" class="breathe-text">Ready?</p>
         </div>
     </div>
+ <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     
     <script>
         window.AVATAR_URL = "{{ url_for('static', filename='models/avatar.glb') }}";
         
-        // 🌟 NATIVE APP: Patched tab switching to safely support the new Account tab
         window.switchMobileTab = function(tabName) {
             document.body.classList.remove('mobile-tab-history', 'mobile-tab-chat', 'mobile-tab-tools', 'mobile-tab-account');
             document.body.classList.add('mobile-tab-' + tabName);
@@ -528,7 +528,6 @@
             if(activeBtn) activeBtn.classList.add('active');
         };
     </script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% endif %}
 </body>
 </html>
