@@ -254,12 +254,37 @@
             }
 
             /* 💬 NATIVE CHAT TAB */
-            body.mobile-tab-chat .left-col { display: flex !important; flex: none; height: 35vh; background: transparent !important; }
+          /* 💬 NATIVE CHAT TAB */
+            body.mobile-tab-chat .left-col { 
+                display: flex !important; 
+                flex: none; 
+                height: auto; 
+                padding: 20px 0 10px 0; 
+                background: transparent !important; 
+                align-items: center; /* Centers the glowing orb */
+            }
+            
+            /* 🌟 THE GLOWING ORB MASK */
+            body.mobile-tab-chat #desktop-avatar-container {
+                display: block !important;
+                width: 220px !important;
+                height: 220px !important;
+                min-height: 220px !important;
+                margin: 0 auto;
+                border-radius: 50%;
+                background: radial-gradient(circle at center, rgba(77, 224, 255, 0.1) 0%, transparent 70%);
+                box-shadow: 0 0 35px rgba(77, 224, 255, 0.25), inset 0 0 20px rgba(77, 224, 255, 0.15);
+                border: 2px solid rgba(77, 224, 255, 0.4);
+                overflow: hidden;
+                /* Crucial: Forces the 3D Canvas to cut into a circle */
+                -webkit-mask-image: -webkit-radial-gradient(white, black);
+                mask-image: radial-gradient(white, black);
+            }
+
             body.mobile-tab-chat .mobile-native-banner, body.mobile-tab-chat .mobile-action-grid { display: none !important; }
             body.mobile-tab-chat .history-container { display: none !important; }
-            body.mobile-tab-chat .center-col { display: flex !important; height: auto; margin-top: 10px; background: #080c14 !important;}
+            body.mobile-tab-chat .center-col { display: flex !important; height: auto; margin-top: 5px; background: #080c14 !important;}
             body.mobile-tab-chat .chat-box { padding: 15px; }
-
             body.mobile-tab-chat .msg { padding: 14px 18px; font-size: 0.95rem; line-height: 1.4; border-radius: 20px;}
             body.mobile-tab-chat .msg.user { 
                 background: #4de0ff !important;
