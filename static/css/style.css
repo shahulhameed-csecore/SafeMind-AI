@@ -1,0 +1,412 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@700;900&display=swap');
+
+:root {
+    --bg-dark: #050508;
+    --primary: #4A90E2; 
+    --secondary: #8b5cf6; 
+    --success: #6FCF97;
+    --danger: #e17070;
+    --text-light: #f8fafc;
+    --text-muted: rgba(255, 255, 255, 0.5);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+    font-family: 'Poppins', sans-serif; 
+    background: var(--bg-dark); 
+    color: var(--text-light);
+    height: 100vh; 
+    overflow: hidden;
+    position: relative;
+}
+
+/* Ambient Background Glow */
+.ambient-glow {
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 70vw; height: 70vh;
+    background: radial-gradient(circle, rgba(74, 144, 226, 0.15) 0%, rgba(139, 92, 246, 0.1) 40%, transparent 70%);
+    filter: blur(80px);
+    z-index: 0;
+    animation: pulseGlow 8s infinite alternate ease-in-out;
+}
+@keyframes pulseGlow {
+    0% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Global Glass Panel Style */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+/* ==========================================
+   💻 3-COLUMN DASHBOARD LAYOUT
+========================================== */
+.app-layout {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+}
+
+/* TOP HEADER */
+.top-header {
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+    flex-shrink: 0;
+}
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--text-light); }
+.logo span { color: var(--primary); }
+
+.header-right { display: flex; align-items: center; gap: 20px; }
+.user-status { font-size: 0.85rem; font-weight: 500; color: var(--success); display: flex; align-items: center; gap: 6px; }
+.nav-btn { background: rgba(255,255,255,0.05); color: var(--text-light); border: 1px solid var(--glass-border); padding: 8px 20px; border-radius: 100px; font-size: 0.85rem; cursor: pointer; text-decoration: none; transition: 0.3s; }
+.nav-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary); }
+.nav-btn.logout { border-color: rgba(225, 112, 112, 0.3); color: var(--danger); }
+.nav-btn.logout:hover { background: rgba(225, 112, 112, 0.1); border-color: var(--danger); }
+
+/* WORKSPACE (Left, Center, Right) */
+.workspace {
+    flex: 1;
+    display: flex;
+    gap: 20px;
+    min-height: 0; 
+}
+
+/* LEFT & RIGHT COLUMNS */
+.left-col, .right-col {
+    flex: 0 0 300px; 
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.right-col { padding: 25px; } /* Only right gets padding now, left is handled internally */
+
+.panel-title { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
+
+/* Left Col: Avatar & History */
+#avatar-stage { background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, transparent 70%); }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid transparent; border-radius: 12px; font-size: 0.85rem; transition: 0.2s; cursor: pointer; }
+.history-item:hover { background: rgba(255,255,255,0.05); border-color: var(--primary); }
+.history-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+.empty { text-align: center; color: var(--text-muted); font-size: 0.85rem; border: none; background: transparent; }
+
+/* Right Col: Tools */
+.breathe-trigger-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border: none; border-radius: 16px; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 25px; transition: 0.3s; box-shadow: 0 8px 25px rgba(74, 144, 226, 0.3); }
+.breathe-trigger-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(74, 144, 226, 0.5); }
+
+.tool-section { margin-bottom: 25px; }
+.mood-grid { display: flex; justify-content: space-between; }
+.mood-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 12px; border-radius: 16px; font-size: 1.2rem; cursor: pointer; transition: 0.2s; flex: 1; margin: 0 4px; }
+.mood-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--primary); transform: translateY(-3px); }
+
+/* Locks chart heights */
+.chart-container { position: relative; height: 120px; width: 100%; }
+.radar-container { height: 180px; }
+
+/* CENTER COL: CHAT */
+.center-col { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; }
+.chat-box { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+.msg { max-width: 80%; padding: 16px 24px; border-radius: 20px; font-size: 0.95rem; line-height: 1.6; animation: pop 0.3s; }
+@keyframes pop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.bot { align-self: flex-start; background: rgba(255, 255, 255, 0.05); color: var(--text-light); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
+.msg.user { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; box-shadow: 0 10px 25px rgba(74, 144, 226, 0.2); }
+
+.input-area { padding: 20px; border-top: 1px solid var(--glass-border); }
+.input-wrapper { display: flex; gap: 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); padding: 8px 8px 8px 24px; border-radius: 100px; transition: 0.3s; }
+.input-wrapper:focus-within { border-color: var(--primary); background: rgba(0,0,0,0.5); }
+input { flex: 1; border: none; background: transparent; outline: none; color: #fff; font-family: inherit; font-size: 0.95rem; }
+input::placeholder { color: var(--text-muted); }
+
+.send-btn { background: var(--primary); color: white; border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3); }
+.send-btn:hover { background: #3a7bc2; transform: scale(1.05); }
+
+.icon-btn { background: transparent; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: var(--text-muted); }
+.mic-btn { width: 44px; height: 44px; border-radius: 50%; }
+.mic-btn:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-light); }
+.stop-audio-btn { width: 44px; height: 44px; border-radius: 50%; color: var(--danger); }
+.stop-audio-btn:hover { background: rgba(225, 112, 112, 0.1); transform: scale(1.1); }
+.dots-btn:hover { color: var(--danger); transform: scale(1.1); }
+
+/* ==========================================
+   🔐 AUTH SCREENS & OVERLAYS 
+========================================== */
+body.auth-body { display: flex; justify-content: center; align-items: center; }
+.auth-container { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); padding: 50px; border-radius: 32px; box-shadow: 0 30px 60px rgba(0,0,0,0.4); width: 100%; max-width: 420px; text-align: center; z-index: 1; }
+.auth-container h2 { font-family: 'Space Grotesk', sans-serif; color: #fff; margin-bottom: 10px; font-size: 2.2rem; }
+.auth-container p { color: var(--text-muted); margin-bottom: 30px; font-size: 0.95rem; }
+.auth-container input { width: 100%; padding: 16px 20px; margin-bottom: 15px; border-radius: 16px; border: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.2); color: #fff; font-family: inherit; transition: 0.3s; }
+.auth-container input:focus { outline: none; border-color: var(--primary); background: rgba(0, 0, 0, 0.4); }
+.auth-btn { width: 100%; background: #fff; color: #000; padding: 16px; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+.auth-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(255, 255, 255, 0.2); }
+.auth-link { margin-top: 25px; font-size: 0.9rem; color: var(--text-muted); }
+.auth-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+/* ==========================================
+   🧘‍♀️ BREATHE MODAL (PERFECT CENTER + WAVES)
+========================================== */
+.breathe-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(15px); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s; }
+.breathe-modal.active { opacity: 1; pointer-events: all; }
+
+.close-breathe-btn { position: absolute; top: 40px; right: 50px; background: transparent; border: none; font-size: 2.5rem; color: var(--danger); cursor: pointer; transition: 0.2s; z-index: 20; }
+.close-breathe-btn:hover { transform: scale(1.1) rotate(90deg); }
+
+/* 🌟 THE FIX 1: Flexbox perfectly locks the container dead-center */
+.breathe-container { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+
+/* 🌟 THE FIX 2: Layered Box Shadows create the "Waves" */
+.breathe-circle { 
+    position: absolute; 
+    width: 140px; 
+    height: 140px; 
+    background: radial-gradient(circle, #4A90E2 0%, #8b5cf6 100%); 
+    border-radius: 50%; 
+    /* Base rings (invisible at rest) */
+    box-shadow: 
+        0 0 0 0 rgba(74, 144, 226, 0.6), 
+        0 0 0 0 rgba(139, 92, 246, 0.4), 
+        0 0 0 0 rgba(111, 207, 151, 0.2);
+    transition: box-shadow 4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Pushes the 3 rings outwards to create waves when breathing in */
+.breathe-circle.pulse { 
+    box-shadow: 
+        0 0 0 15px rgba(74, 144, 226, 0.4), 
+        0 0 0 30px rgba(139, 92, 246, 0.2), 
+        0 0 0 50px rgba(111, 207, 151, 0.1); 
+}
+
+/* 🌟 THE FIX 3: Text perfectly centered on top of the circle */
+.breathe-text { 
+    position: relative; 
+    z-index: 10; 
+    color: #fff; 
+    font-weight: 700; 
+    font-size: 2.5rem; 
+    text-align: center; 
+    text-shadow: 0 4px 15px rgba(0,0,0,0.6); 
+    margin: 0; 
+    pointer-events: none; 
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* 🌟 AI INSIGHT TEXT BOXES */
+        .insight-box {
+            background: rgba(74, 144, 226, 0.1);
+            border-left: 3px solid #4A90E2;
+            padding: 12px 15px;
+            border-radius: 0 8px 8px 0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 15px;
+            animation: popIn 0.5s ease forwards;
+        }
+        
+        .insight-icon {
+            font-size: 1.2rem;
+        }
+
+        .insight-box p {
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .insight-box strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+        /* 🌐 CUSTOM LANGUAGE SELECTOR */
+        .lang-selector {
+            appearance: none; /* Removes the ugly default browser arrow */
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px 12px;
+            padding-right: 32px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            outline: none;
+            transition: 0.3s;
+            margin-right: 8px;
+            
+            /* Custom sleek arrow icon */
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 10px auto;
+        }
+
+        .lang-selector:hover, .lang-selector:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: #4A90E2;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
+        }
+
+        /* Styles the actual dropdown menu items */
+        .lang-selector option {
+            background: #0f172a; /* Deep dark blue */
+            color: #f8fafc;
+            padding: 12px;
+            font-size: 0.9rem;
+        }
+        
+        /* =========================================
+   📱 MODERN MOBILE UI OVERRIDES
+========================================= */
+@media (max-width: 768px) {
+    
+    /* 1. The Cinematic Avatar Background */
+    #mobile-avatar-placeholder,
+    #avatar-stage {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 55vh !important; /* Locks her to the top half */
+        z-index: 1;
+        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    }
+
+    /* 2. The Glassmorphism Chat Sheet */
+    .chat-container {
+        position: fixed;
+        top: 45vh; /* Overlaps the avatar slightly for depth */
+        left: 0;
+        width: 100vw;
+        height: 55vh;
+        z-index: 10;
+        background: rgba(15, 23, 42, 0.7); /* Translucent dark mode */
+        backdrop-filter: blur(20px); /* The premium Apple-style blur */
+        -webkit-backdrop-filter: blur(20px);
+        border-top-left-radius: 35px;
+        border-top-right-radius: 35px;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 70px; /* Prevents overlap with bottom navigation */
+    }
+
+    /* 3. Sleek iMessage-Style Chat Bubbles */
+    #chat-box {
+        padding: 25px 20px;
+        flex-grow: 1;
+        overflow-y: auto;
+        scrollbar-width: none; /* Hides scrollbar for clean look */
+    }
+    
+    .msg {
+        max-width: 85%;
+        border-radius: 22px;
+        padding: 14px 18px;
+        font-size: 15px;
+        line-height: 1.5;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .msg.bot {
+        border-bottom-left-radius: 4px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+    }
+    
+    .msg.user {
+        border-bottom-right-radius: 4px;
+        background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+        color: white;
+    }
+
+    /* 4. The Floating Input Area */
+    .input-area {
+        background: transparent;
+        padding: 10px 20px 20px 20px;
+        border: none;
+    }
+    
+    #user-input {
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 30px;
+        padding: 14px 20px;
+        color: white;
+        font-size: 15px;
+    }
+
+    #user-input::placeholder {
+        color: rgba(255,255,255,0.4);
+    }
+}
+/* =========================================
+   🎙️ GLOWING PORTRAIT MASK (VOICE MODE)
+========================================= */
+
+/* 1. The Invisibility Fade (Hides the arms) */
+.voice-active #avatar-stage {
+    /* This creates a soft circle in the middle. Everything outside the circle (like her arms) is erased and fades into the dark background! */
+    -webkit-mask-image: radial-gradient(circle 200px at center, black 65%, transparent 100%);
+    mask-image: radial-gradient(circle 200px at center, black 65%, transparent 100%);
+}
+
+/* 2. The Holographic Glowing Ring */
+.voice-active #mobile-avatar-placeholder::after {
+    content: '';
+    position: absolute;
+    top: 50%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    border: 2px solid rgba(74, 144, 226, 0.5); /* Soft blue tech border */
+    box-shadow: 
+        0 0 50px rgba(74, 144, 226, 0.4),       /* Outer glow */
+        inset 0 0 30px rgba(74, 144, 226, 0.3); /* Inner glow */
+    pointer-events: none; /* Ensures the ring doesn't block you from clicking things */
+    z-index: 10;
+    animation: ai-ring-pulse 3s infinite alternate ease-in-out;
+}
+
+/* 3. Smooth Breathing Animation for the Ring */
+@keyframes ai-ring-pulse {
+    0% { 
+        transform: translate(-50%, -50%) scale(0.95); 
+        opacity: 0.6; 
+        box-shadow: 0 0 30px rgba(74, 144, 226, 0.2), inset 0 0 20px rgba(74, 144, 226, 0.2);
+    }
+    100% { 
+        transform: translate(-50%, -50%) scale(1.05); 
+        opacity: 1; 
+        box-shadow: 0 0 60px rgba(74, 144, 226, 0.6), inset 0 0 40px rgba(74, 144, 226, 0.4);
+    }
+}

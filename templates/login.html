@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | SafeMinds</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Base Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #050508, #13111C, #0F172A);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 🌟 THE HUGE 3D BACKGROUND TEXT */
+        .bg-3d-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 15vw; /* Massive text that scales with the window */
+            font-weight: 900;
+            text-transform: uppercase;
+            
+            /* Makes the inside of the text invisible, leaving only a glowing outline */
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255, 255, 255, 0.05); 
+            
+            /* 3D stacked shadow effect */
+            text-shadow:
+                5px 5px 0px rgba(74, 144, 226, 0.05),
+                10px 10px 0px rgba(139, 92, 246, 0.05),
+                15px 15px 30px rgba(0, 0, 0, 0.6);
+                
+            z-index: 0;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        /* 🌟 FLOATING GLOWING ORBS */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(70px);
+            z-index: 1;
+            animation: float 8s infinite alternate ease-in-out;
+        }
+        .orb-1 {
+            width: 350px; height: 350px;
+            background: rgba(74, 144, 226, 0.25); /* Blue glow */
+            top: -50px; left: 10%;
+        }
+        .orb-2 {
+            width: 450px; height: 450px;
+            background: rgba(139, 92, 246, 0.2); /* Purple glow */
+            bottom: -100px; right: 5%;
+            animation-delay: -4s; /* Makes them float out of sync */
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(50px) scale(1.1); }
+        }
+
+        /* 🌟 THE FROSTED GLASS LOGIN CARD */
+        .login-card {
+            position: relative;
+            z-index: 10;
+            background: rgba(20, 20, 30, 0.5); /* Semi-transparent dark */
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            padding: 50px 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            color: white;
+        }
+
+        .login-card h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .login-card p { color: #94a3b8; margin-bottom: 30px; font-size: 0.95rem; }
+
+        .login-card input {
+            width: 100%; padding: 14px 20px; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; color: white; font-size: 1rem; transition: 0.3s;
+        }
+        
+        .login-card input:focus {
+            outline: none; border-color: #4A90E2; background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.2);
+        }
+
+        .login-card button {
+            width: 100%; padding: 14px; margin-top: 10px; margin-bottom: 20px;
+            background: linear-gradient(135deg, #4A90E2, #8b5cf6);
+            color: white; border: none; border-radius: 12px; font-size: 1.05rem;
+            font-weight: 600; cursor: pointer; transition: 0.3s;
+        }
+        
+        .login-card button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4); 
+        }
+        
+        .login-card a { color: #4A90E2; text-decoration: none; font-weight: 500; transition: 0.2s; }
+        .login-card a:hover { color: #8b5cf6; }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="bg-3d-text" id="parallax-text">SAFEMINDS</div>
+
+    <div class="login-card">
+        <h1>SafeMinds-AI</h1>
+        <p>Your safe space to talk.</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="color: #e17070; margin-bottom: 15px; font-size: 0.9rem;">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Log In</button>
+        </form>
+        
+        <p style="font-size: 0.9rem; margin-top: 15px;">
+            New here? <a href="/register">Create an account</a>
+        </p>
+    </div>
+
+    <script>
+        document.addEventListener('mousemove', function(e) {
+            const x = (e.clientX - window.innerWidth / 2) * -0.05;
+            const y = (e.clientY - window.innerHeight / 2) * -0.05;
+            // Move the massive text away from the mouse
+            document.getElementById('parallax-text').style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        });
+    </script>
+</body>
+</html>

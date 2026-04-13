@@ -1,0 +1,10 @@
+Flask==3.0.0
+gunicorn==21.2.0
+python-dotenv==1.0.0
+gTTS==2.4.0
+langdetect==1.0.9
+chromadb==0.4.15
+psycopg2-binary==2.9.9
+textblob==0.17.1
+deep-translator==1.11.4
+google-genai==0.3.0
