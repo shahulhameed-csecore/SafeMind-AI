@@ -280,6 +280,11 @@
                 -webkit-mask-image: -webkit-radial-gradient(white, black);
                 mask-image: radial-gradient(white, black);
             }
+            /* 🚨 ZOOM FIX: Shrinks the avatar inside the circle without affecting desktop */
+            body.mobile-tab-chat #avatar-stage {
+                transform: scale(0.65) translateY(15%);
+                transform-origin: center center;
+            }
 
             body.mobile-tab-chat .mobile-native-banner, body.mobile-tab-chat .mobile-action-grid { display: none !important; }
             body.mobile-tab-chat .history-container { display: none !important; }
