@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 🌟 NEW: Initialize the Cloud AI (Gemini)
+# 🌟 INITIALIZE THE CLOUD AI (Gemini)
 try:
     gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 except Exception as e:
@@ -16,7 +16,7 @@ except Exception as e:
     gemini_client = None
 
 def analyze_deep_emotion(user_text):
-    # 🌟 100% OFFLINE EMOTION ENGINE (Perfect for free hosting)
+    # 🌟 100% OFFLINE EMOTION ENGINE
     text = user_text.lower()
     
     emotions = {
@@ -77,7 +77,7 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
     # 3. Define the universal empathetic persona
     system_prompt = "You are SafeMinds, a warm, highly empathetic mental health and well-being companion."
 
-    # 4. THE FIX: The Universal Guardrail Prompt
+    # 4. The Universal Guardrail Prompt
     enforced_input = f"""
     Past Conversation:
     {history_text}
@@ -96,13 +96,13 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
         if not gemini_client:
             raise ValueError("Gemini Client not initialized. API Key is missing.")
 
-        # 🌟 5. NEW: Get English reply from Google Cloud AI
+        # 🌟 5. Get English reply from Google Cloud AI (Replaces Ollama)
         response = gemini_client.models.generate_content(
             model='gemini-2.5-flash',
             contents=enforced_input,
             config=types.GenerateContentConfig(
                 system_instruction=system_prompt,
-                temperature=0.7 # Keeps the bot feeling warm and human
+                temperature=0.7 
             )
         )
         english_reply = response.text
