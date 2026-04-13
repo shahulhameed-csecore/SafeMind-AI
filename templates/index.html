@@ -280,10 +280,20 @@
                 -webkit-mask-image: -webkit-radial-gradient(white, black);
                 mask-image: radial-gradient(white, black);
             }
-            /* 🚨 ZOOM FIX: Shrinks the avatar inside the circle without affecting desktop */
+          
+            /* 🚨 NEW ZOOM FIX: Safely zooms out without breaking the 3D Canvas */
+            body.mobile-tab-chat #desktop-avatar-container {
+                position: relative;
+            }
+            
             body.mobile-tab-chat #avatar-stage {
-                transform: scale(0.65) translateY(15%);
-                transform-origin: center center;
+                width: 340px !important;
+                height: 340px !important;
+                position: absolute !important;
+                top: 50% !important;
+                left: 50% !important;
+                /* Centers her perfectly and pulls her down slightly so her hair isn't cut off */
+                transform: translate(-50%, -40%) !important; 
             }
 
             body.mobile-tab-chat .mobile-native-banner, body.mobile-tab-chat .mobile-action-grid { display: none !important; }
