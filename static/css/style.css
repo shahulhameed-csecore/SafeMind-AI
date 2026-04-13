@@ -358,19 +358,40 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     }
 
     /* 4. The Floating Input Area */
+/* 4. The Floating Input Area (RESCUED) */
     .input-area {
         background: transparent;
-        padding: 10px 20px 20px 20px;
+        /* Huge bottom padding to push the input UP and over your bottom navigation bar */
+        padding: 10px 15px 85px 15px; 
         border: none;
+        width: 100%;
+        box-sizing: border-box;
     }
     
+    .input-wrapper {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 6px 12px;
+        gap: 8px; /* Tighter spacing so buttons fit */
+        box-sizing: border-box;
+    }
+
     #user-input {
+        flex: 1; /* Tells the text box to take up space... */
+        min-width: 0; /* ...BUT forces it to shrink if the buttons need room! */
         background: rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 30px;
-        padding: 14px 20px;
+        padding: 12px 18px;
         color: white;
-        font-size: 15px;
+        /* 16px is crucial! It stops iPhones/Androids from forcibly zooming in when you type */
+        font-size: 16px; 
+    }
+
+    /* Locks the buttons in place so they can never be pushed off screen */
+    .icon-btn, .send-btn {
+        flex-shrink: 0; 
     }
 
     #user-input::placeholder {

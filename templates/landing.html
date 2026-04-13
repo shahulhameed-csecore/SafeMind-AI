@@ -200,22 +200,31 @@
         /* ==========================================
            📱 MOBILE POLISH (LANDING PAGE)
         ========================================== */
+       /* ==========================================
+           📱 MOBILE POLISH (LANDING PAGE)
+        ========================================== */
         @media (max-width: 768px) {
-            nav { padding: 20px; }
-            .nav-links { display: none; } /* Hides the middle links to save space */
-            .giant-bg-text { font-size: 24vw; top: 35%; }
-            .hero-image-container { height: 60%; bottom: 15%; }
+            /* Uses 'svh' (Small Viewport Height) to prevent phone menus from hiding the button */
+            .premium-frame { height: 92svh; } 
+            nav { padding: 15px 20px; }
+            .nav-links { display: none; } 
             
-            /* Stacks the text and button vertically */
+            /* Shrink the giant text so it fits perfectly on one line */
+            .giant-bg-text { font-size: 15vw; top: 30%; } 
+            
+            /* Shrink the hand and pull it up slightly */
+            .hero-image-container { height: 55%; bottom: 18%; } 
+            
+            /* Stack the text and pull the button safely into view */
             .hero-bottom {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                left: 20px; right: 20px; bottom: 30px;
-                gap: 20px;
+                left: 15px; right: 15px; bottom: 20px; 
+                gap: 15px;
             }
-            .tagline { font-size: 1.6rem; max-width: 100%; }
-            .cta-btn { width: 100%; justify-content: center; }
+            .tagline { font-size: 1.4rem; max-width: 100%; }
+            .cta-btn { width: 100%; justify-content: center; padding: 15px; }
         }
     </style>
 </head>
