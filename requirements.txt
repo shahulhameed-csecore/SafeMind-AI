@@ -8,3 +8,4 @@ psycopg2-binary==2.9.9
 textblob==0.17.1
 deep-translator==1.11.4
 google-genai==0.3.0
+groq==0.4.2
