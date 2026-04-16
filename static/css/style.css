@@ -441,3 +441,8 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
         box-shadow: 0 0 60px rgba(74, 144, 226, 0.6), inset 0 0 40px rgba(74, 144, 226, 0.4);
     }
 }
+
+@keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 30px rgba(77, 224, 255, 0.4), inset 0 0 15px rgba(77, 224, 255, 0.2); }
+            50% { box-shadow: 0 0 50px rgba(77, 224, 255, 0.7), inset 0 0 25px rgba(77, 224, 255, 0.4); }
+        }
