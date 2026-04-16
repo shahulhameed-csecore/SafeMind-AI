@@ -3,6 +3,7 @@ let currentSessionId = Date.now().toString(36) + Math.random().toString(36).subs
 let isSpeaking = false;
 const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
+
 document.addEventListener("DOMContentLoaded", async () => {
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
@@ -11,6 +12,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
+function toggleSpeakingGlow(isSpeaking) {
+    const logo = document.getElementById('sm-logo-circle');
+    if (!logo) return;
+    
+    if (isSpeaking) {
+        logo.classList.remove('avatar-idle');
+        logo.classList.add('avatar-speaking');
+    } else {
+        logo.classList.remove('avatar-speaking');
+        logo.classList.add('avatar-idle');
+    }
+}
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
     
@@ -77,10 +90,14 @@ function playCloudAudio(base64Audio) {
 
 function stopSpeech() {
     window.speechSynthesis.cancel(); 
-    if (currentCloudAudio) {
-        currentCloudAudio.pause();
-        currentCloudAudio.currentTime = 0;
+    function stopSpeech() {
+    if (window.currentAudio) {
+        window.currentAudio.pause();
+        window.currentAudio.currentTime = 0;
     }
+    // Turn off the waves if the user manually interrupts the AI!
+    toggleSpeakingGlow(false); 
+}
     isSpeaking = false; 
     const stopBtn = document.getElementById('stop-audio-btn');
     if(stopBtn) stopBtn.style.display = 'none';
@@ -228,9 +245,21 @@ async function sendMessage() {
         sessionMemory.push({ role: "SafeMinds", text: data.response });
         if (data.emotions) updateEmotionRadar(data.emotions);
         
-        if (data.audio) {
-            playCloudAudio(data.audio);
-        } else {
+       if (data.audio) {
+        let audio = new Audio("data:audio/mp3;base64," + data.audio);
+        
+        // 1. Turn ON the waves when the audio starts playing
+        audio.play();
+        toggleSpeakingGlow(true);
+        
+        // 2. Turn OFF the waves when the AI finishes speaking
+        audio.onended = function() {
+            toggleSpeakingGlow(false);
+        };
+        
+        // (Optional) Store audio in a global variable if you have a stop button
+        window.currentAudio = audio; 
+    } else {
             speakResponse(data.response);
         }
         
