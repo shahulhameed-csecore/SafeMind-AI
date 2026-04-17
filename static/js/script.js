@@ -3,7 +3,6 @@ let currentSessionId = Date.now().toString(36) + Math.random().toString(36).subs
 let isSpeaking = false;
 const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
-
 document.addEventListener("DOMContentLoaded", async () => {
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
@@ -24,6 +23,7 @@ function toggleSpeakingGlow(isSpeaking) {
         logo.classList.add('avatar-idle');
     }
 }
+
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
     
@@ -90,14 +90,11 @@ function playCloudAudio(base64Audio) {
 
 function stopSpeech() {
     window.speechSynthesis.cancel(); 
-    function stopSpeech() {
     if (window.currentAudio) {
         window.currentAudio.pause();
         window.currentAudio.currentTime = 0;
     }
-    // Turn off the waves if the user manually interrupts the AI!
     toggleSpeakingGlow(false); 
-}
     isSpeaking = false; 
     const stopBtn = document.getElementById('stop-audio-btn');
     if(stopBtn) stopBtn.style.display = 'none';
@@ -246,20 +243,14 @@ async function sendMessage() {
         if (data.emotions) updateEmotionRadar(data.emotions);
         
        if (data.audio) {
-        let audio = new Audio("data:audio/mp3;base64," + data.audio);
-        
-        // 1. Turn ON the waves when the audio starts playing
-        audio.play();
-        toggleSpeakingGlow(true);
-        
-        // 2. Turn OFF the waves when the AI finishes speaking
-        audio.onended = function() {
-            toggleSpeakingGlow(false);
-        };
-        
-        // (Optional) Store audio in a global variable if you have a stop button
-        window.currentAudio = audio; 
-    } else {
+            let audio = new Audio("data:audio/mp3;base64," + data.audio);
+            audio.play();
+            toggleSpeakingGlow(true);
+            audio.onended = function() {
+                toggleSpeakingGlow(false);
+            };
+            window.currentAudio = audio; 
+        } else {
             speakResponse(data.response);
         }
         
@@ -385,7 +376,7 @@ function stopBreathing() {
 }
 
 function switchMobileTab(tabName) {
-    document.body.classList.remove('mobile-tab-history', 'mobile-tab-chat', 'mobile-tab-tools');
+    document.body.classList.remove('mobile-tab-history', 'mobile-tab-chat', 'mobile-tab-tools', 'mobile-tab-account');
     document.body.classList.add('mobile-tab-' + tabName);
     document.querySelectorAll('.mobile-nav-item').forEach(el => { el.classList.remove('active'); });
     const selectedBtn = document.getElementById('nav-' + tabName);
@@ -397,7 +388,7 @@ function switchMobileTab(tabName) {
 }
 
 // ==========================================
-// 🧍‍♂️ 3D AVATAR ENGINE (FULLY FIXED)
+// 🧍‍♂️ 3D AVATAR ENGINE
 // ==========================================
 let scene, camera, renderer, avatar;
 let faceMesh = null, mouthMorphIndex = -1, fallbackHeadBone = null;
@@ -408,8 +399,6 @@ function init3DAvatar() {
     if (!stage) return;
 
     scene = new THREE.Scene();
-
-    // 🌟 PERFECT PORTRAIT CAMERA (Chest up, arms hidden)
     camera = new THREE.PerspectiveCamera(45, stage.clientWidth / stage.clientHeight, 0.1, 100); 
     camera.position.set(0, 1.4, 0.9); 
     camera.lookAt(new THREE.Vector3(0, 1.4, 0));
@@ -420,7 +409,6 @@ function init3DAvatar() {
     stage.innerHTML = ""; 
     stage.appendChild(renderer.domElement);
 
-    // 🌟 UPDATED LIGHTING (from your new code)
     scene.add(new THREE.AmbientLight(0xffffff, 1));
     const light1 = new THREE.DirectionalLight(0xffffff, 1);
     light1.position.set(0, 2, 2);
@@ -434,14 +422,11 @@ function init3DAvatar() {
 
     loader.load(modelPath, function (gltf) {
         avatar = gltf.scene; 
-        
-        // 🌟 HARDCODED SCALE AND POSITION (No more crazy Box3 math)
         avatar.scale.set(1.65, 1.65, 1.65); 
         const baseY = -1.2; 
         avatar.position.set(0, baseY, 0); 
         avatar.userData.baseY = baseY;
 
-        // 🌟 THE BULLETPROOF BONE DETECTOR
         avatar.traverse((child) => {
             if (child.isMesh && child.morphTargetDictionary) {
                 for (let key in child.morphTargetDictionary) {
@@ -469,11 +454,9 @@ function init3DAvatar() {
         const time = Date.now() * 0.001;
 
         if (avatar && avatar.userData.baseY !== undefined) {
-            // Subtle breathing effect
             const floatOffset = Math.sin(time * 2) * 0.02; 
             avatar.position.y = avatar.userData.baseY + (isNaN(floatOffset) ? 0 : floatOffset);
             
-            // Talking animation
             if (typeof isSpeaking !== 'undefined' && isSpeaking) {
                 const talkSpeed = 15; 
                 const mouthAmount = (Math.sin(time * talkSpeed) + 1) / 2;
@@ -484,27 +467,10 @@ function init3DAvatar() {
                 else if (fallbackHeadBone) fallbackHeadBone.rotation.x = 0;
             }
 
-            // 🌟 T-POSE FIX: Lock arms down just in case the camera zooms out
-            if (leftArmBone) {
-                leftArmBone.rotation.z = 1.35; 
-                leftArmBone.rotation.x = 0;
-                leftArmBone.rotation.y = 0;
-            }
-            if (rightArmBone) {
-                rightArmBone.rotation.z = -1.35; 
-                rightArmBone.rotation.x = 0;  
-                rightArmBone.rotation.y = 0;  
-            }
-            if (leftForearmBone) {
-                leftForearmBone.rotation.x = 0;
-                leftForearmBone.rotation.y = 0;
-                leftForearmBone.rotation.z = 0;
-            }
-            if (rightForearmBone) {
-                rightForearmBone.rotation.x = 0;
-                rightForearmBone.rotation.y = 0;
-                rightForearmBone.rotation.z = 0;
-            }
+            if (leftArmBone) { leftArmBone.rotation.set(0, 0, 1.35); }
+            if (rightArmBone) { rightArmBone.rotation.set(0, 0, -1.35); }
+            if (leftForearmBone) { leftForearmBone.rotation.set(0, 0, 0); }
+            if (rightForearmBone) { rightForearmBone.rotation.set(0, 0, 0); }
         }
         renderer.render(scene, camera);
     }

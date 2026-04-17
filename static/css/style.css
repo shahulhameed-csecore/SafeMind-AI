@@ -84,6 +84,7 @@ body {
 .workspace {
     flex: 1;
     display: flex;
+    flex-direction: row;
     gap: 20px;
     min-height: 0; 
 }
@@ -96,7 +97,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
 }
-.right-col { padding: 25px; } /* Only right gets padding now, left is handled internally */
+.right-col { padding: 25px; }
 
 .panel-title { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
 
@@ -169,44 +170,21 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
 .close-breathe-btn { position: absolute; top: 40px; right: 50px; background: transparent; border: none; font-size: 2.5rem; color: var(--danger); cursor: pointer; transition: 0.2s; z-index: 20; }
 .close-breathe-btn:hover { transform: scale(1.1) rotate(90deg); }
 
-/* 🌟 THE FIX 1: Flexbox perfectly locks the container dead-center */
 .breathe-container { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 
-/* 🌟 THE FIX 2: Layered Box Shadows create the "Waves" */
 .breathe-circle { 
     position: absolute; 
     width: 140px; 
     height: 140px; 
     background: radial-gradient(circle, #4A90E2 0%, #8b5cf6 100%); 
     border-radius: 50%; 
-    /* Base rings (invisible at rest) */
-    box-shadow: 
-        0 0 0 0 rgba(74, 144, 226, 0.6), 
-        0 0 0 0 rgba(139, 92, 246, 0.4), 
-        0 0 0 0 rgba(111, 207, 151, 0.2);
+    box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.6), 0 0 0 0 rgba(139, 92, 246, 0.4), 0 0 0 0 rgba(111, 207, 151, 0.2);
     transition: box-shadow 4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Pushes the 3 rings outwards to create waves when breathing in */
-.breathe-circle.pulse { 
-    box-shadow: 
-        0 0 0 15px rgba(74, 144, 226, 0.4), 
-        0 0 0 30px rgba(139, 92, 246, 0.2), 
-        0 0 0 50px rgba(111, 207, 151, 0.1); 
-}
+.breathe-circle.pulse { box-shadow: 0 0 0 15px rgba(74, 144, 226, 0.4), 0 0 0 30px rgba(139, 92, 246, 0.2), 0 0 0 50px rgba(111, 207, 151, 0.1); }
 
-/* 🌟 THE FIX 3: Text perfectly centered on top of the circle */
-.breathe-text { 
-    position: relative; 
-    z-index: 10; 
-    color: #fff; 
-    font-weight: 700; 
-    font-size: 2.5rem; 
-    text-align: center; 
-    text-shadow: 0 4px 15px rgba(0,0,0,0.6); 
-    margin: 0; 
-    pointer-events: none; 
-}
+.breathe-text { position: relative; z-index: 10; color: #fff; font-weight: 700; font-size: 2.5rem; text-align: center; text-shadow: 0 4px 15px rgba(0,0,0,0.6); margin: 0; pointer-events: none; }
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -214,268 +192,114 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
 /* 🌟 AI INSIGHT TEXT BOXES */
-        .insight-box {
-            background: rgba(74, 144, 226, 0.1);
-            border-left: 3px solid #4A90E2;
-            padding: 12px 15px;
-            border-radius: 0 8px 8px 0;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-top: 15px;
-            animation: popIn 0.5s ease forwards;
-        }
-        
-        .insight-icon {
-            font-size: 1.2rem;
-        }
+.insight-box {
+    background: rgba(74, 144, 226, 0.1);
+    border-left: 3px solid #4A90E2;
+    padding: 12px 15px;
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 15px;
+    animation: popIn 0.5s ease forwards;
+}
 
-        .insight-box p {
-            font-size: 0.85rem;
-            color: #e2e8f0;
-            margin: 0;
-            line-height: 1.4;
-        }
+.insight-icon { font-size: 1.2rem; }
+.insight-box p { font-size: 0.85rem; color: #e2e8f0; margin: 0; line-height: 1.4; }
+.insight-box strong { color: #ffffff; font-weight: 600; }
 
-        .insight-box strong {
-            color: #ffffff;
-            font-weight: 600;
-        }
-        /* 🌐 CUSTOM LANGUAGE SELECTOR */
-        .lang-selector {
-            appearance: none; /* Removes the ugly default browser arrow */
-            -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.05);
-            color: #e2e8f0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 8px 12px;
-            padding-right: 32px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            outline: none;
-            transition: 0.3s;
-            margin-right: 8px;
-            
-            /* Custom sleek arrow icon */
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px top 50%;
-            background-size: 10px auto;
-        }
+/* 🌐 CUSTOM LANGUAGE SELECTOR */
+.lang-selector {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px 12px;
+    padding-right: 32px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: 0.3s;
+    margin-right: 8px;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 10px auto;
+}
+.lang-selector:hover, .lang-selector:focus { background-color: rgba(255, 255, 255, 0.1); border-color: #4A90E2; box-shadow: 0 0 10px rgba(74, 144, 226, 0.2); }
+.lang-selector option { background: #0f172a; color: #f8fafc; padding: 12px; font-size: 0.9rem; }
 
-        .lang-selector:hover, .lang-selector:focus {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: #4A90E2;
-            box-shadow: 0 0 10px rgba(74, 144, 226, 0.2);
-        }
-
-        /* Styles the actual dropdown menu items */
-        .lang-selector option {
-            background: #0f172a; /* Deep dark blue */
-            color: #f8fafc;
-            padding: 12px;
-            font-size: 0.9rem;
-        }
-        
-        /* =========================================
+/* =========================================
    📱 MODERN MOBILE UI OVERRIDES
 ========================================= */
 @media (max-width: 768px) {
-    /* 🚨 THE FIX: Hide sidebars on mobile so the mic fits! */
-    .left-col, .right-col {
-        display: none !important; 
-    }
+    .left-col, .right-col { display: none !important; }
+    .workspace { padding: 0; gap: 0; flex-direction: column; }
     
-    .workspace {
-        padding: 0;
-        gap: 0;
+    #mobile-avatar-placeholder, #avatar-stage {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 55vh !important;
+        z-index: 1; background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
     }
-    
-    /* 1. The Cinematic Avatar Background */
-    #mobile-avatar-placeholder,
-    #avatar-stage {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 55vh !important; /* Locks her to the top half */
-        z-index: 1;
-        background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-    }
-  
 
-    /* 2. The Glassmorphism Chat Sheet */
     .chat-container {
-        position: fixed;
-        top: 45vh; /* Overlaps the avatar slightly for depth */
-        left: 0;
-        width: 100vw;
-        height: 55vh;
-        z-index: 10;
-        background: rgba(15, 23, 42, 0.7); /* Translucent dark mode */
-        backdrop-filter: blur(20px); /* The premium Apple-style blur */
-        -webkit-backdrop-filter: blur(20px);
-        border-top-left-radius: 35px;
-        border-top-right-radius: 35px;
-        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
-        display: flex;
-        flex-direction: column;
-        padding-bottom: 70px; /* Prevents overlap with bottom navigation */
+        position: fixed; top: 45vh; left: 0; width: 100vw; height: 55vh; z-index: 10;
+        background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-top-left-radius: 35px; border-top-right-radius: 35px;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4); border-top: 1px solid rgba(255, 255, 255, 0.15);
+        display: flex; flex-direction: column; padding-bottom: 70px;
     }
 
-    /* 3. Sleek iMessage-Style Chat Bubbles */
-    #chat-box {
-        padding: 25px 20px;
-        flex-grow: 1;
-        overflow-y: auto;
-        scrollbar-width: none; /* Hides scrollbar for clean look */
-    }
-    
-    .msg {
-        max-width: 85%;
-        border-radius: 22px;
-        padding: 14px 18px;
-        font-size: 15px;
-        line-height: 1.5;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    
-    .msg.bot {
-        border-bottom-left-radius: 4px;
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        color: #e2e8f0;
-    }
-    
-    .msg.user {
-        border-bottom-right-radius: 4px;
-        background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-        color: white;
-    }
+    #chat-box { padding: 25px 20px; flex-grow: 1; overflow-y: auto; scrollbar-width: none; }
+    .msg { max-width: 85%; border-radius: 22px; padding: 14px 18px; font-size: 15px; line-height: 1.5; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .msg.bot { border-bottom-left-radius: 4px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.05); color: #e2e8f0; }
+    .msg.user { border-bottom-right-radius: 4px; background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%); color: white; }
 
-    /* 4. The Floating Input Area */
-/* 4. The Floating Input Area (RESCUED) */
-    .input-area {
-        background: transparent;
-        /* Huge bottom padding to push the input UP and over your bottom navigation bar */
-        padding: 10px 15px 85px 15px; 
-        border: none;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .input-wrapper {
-        display: flex;
-        align-items: center;
-        width: 100%;
-        padding: 6px 12px;
-        gap: 8px; /* Tighter spacing so buttons fit */
-        box-sizing: border-box;
-    }
-
-    #user-input {
-        flex: 1; /* Tells the text box to take up space... */
-        min-width: 0; /* ...BUT forces it to shrink if the buttons need room! */
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 30px;
-        padding: 12px 18px;
-        color: white;
-        /* 16px is crucial! It stops iPhones/Androids from forcibly zooming in when you type */
-        font-size: 16px; 
-    }
-
-    /* Locks the buttons in place so they can never be pushed off screen */
-    .icon-btn, .send-btn {
-        flex-shrink: 0; 
-    }
-
-    #user-input::placeholder {
-        color: rgba(255,255,255,0.4);
-    }
+    .input-area { background: transparent; padding: 10px 15px 85px 15px; border: none; width: 100%; box-sizing: border-box; }
+    .input-wrapper { display: flex; align-items: center; width: 100%; padding: 6px 12px; gap: 8px; box-sizing: border-box; }
+    #user-input { flex: 1; min-width: 0; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 12px 18px; color: white; font-size: 16px; }
+    .icon-btn, .send-btn { flex-shrink: 0; }
+    #user-input::placeholder { color: rgba(255,255,255,0.4); }
 }
+
 /* =========================================
    🎙️ GLOWING PORTRAIT MASK (VOICE MODE)
 ========================================= */
-
-/* 1. The Invisibility Fade (Hides the arms) */
 .voice-active #avatar-stage {
-    /* This creates a soft circle in the middle. Everything outside the circle (like her arms) is erased and fades into the dark background! */
     -webkit-mask-image: radial-gradient(circle 200px at center, black 65%, transparent 100%);
     mask-image: radial-gradient(circle 200px at center, black 65%, transparent 100%);
 }
 
-/* 2. The Holographic Glowing Ring */
 .voice-active #mobile-avatar-placeholder::after {
-    content: '';
-    position: absolute;
-    top: 50%; 
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 320px;
-    height: 320px;
-    border-radius: 50%;
-    border: 2px solid rgba(74, 144, 226, 0.5); /* Soft blue tech border */
-    box-shadow: 
-        0 0 50px rgba(74, 144, 226, 0.4),       /* Outer glow */
-        inset 0 0 30px rgba(74, 144, 226, 0.3); /* Inner glow */
-    pointer-events: none; /* Ensures the ring doesn't block you from clicking things */
-    z-index: 10;
-    animation: ai-ring-pulse 3s infinite alternate ease-in-out;
+    content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 320px; height: 320px; border-radius: 50%; border: 2px solid rgba(74, 144, 226, 0.5);
+    box-shadow: 0 0 50px rgba(74, 144, 226, 0.4), inset 0 0 30px rgba(74, 144, 226, 0.3);
+    pointer-events: none; z-index: 10; animation: ai-ring-pulse 3s infinite alternate ease-in-out;
 }
 
-/* 3. Smooth Breathing Animation for the Ring */
 @keyframes ai-ring-pulse {
-    0% { 
-        transform: translate(-50%, -50%) scale(0.95); 
-        opacity: 0.6; 
-        box-shadow: 0 0 30px rgba(74, 144, 226, 0.2), inset 0 0 20px rgba(74, 144, 226, 0.2);
-    }
-    100% { 
-        transform: translate(-50%, -50%) scale(1.05); 
-        opacity: 1; 
-        box-shadow: 0 0 60px rgba(74, 144, 226, 0.6), inset 0 0 40px rgba(74, 144, 226, 0.4);
-    }
+    0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0.6; box-shadow: 0 0 30px rgba(74, 144, 226, 0.2), inset 0 0 20px rgba(74, 144, 226, 0.2); }
+    100% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; box-shadow: 0 0 60px rgba(74, 144, 226, 0.6), inset 0 0 40px rgba(74, 144, 226, 0.4); }
 }
 
-/* 🖥️ DESKTOP 3-COLUMN LAYOUT OVERRIDE */
-@media (min-width: 850px) {
-    /* 1. Force the main wrapper into a horizontal row */
-    .dashboard-container, 
-    .main-wrapper, 
-    .app-content {
+/* 🖥️ DESKTOP 3-COLUMN LAYOUT OVERRIDE (CORRECTED CLASSES) */
+@media (min-width: 951px) {
+    .workspace {
         display: flex !important;
         flex-direction: row !important;
         align-items: stretch !important;
-        height: calc(100vh - 80px); /* Keeps it from scrolling infinitely */
-        overflow: hidden;
     }
-
-    /* 2. Force the Left Panel (History) to stay on the left */
-    .left-sidebar, 
-    .history-panel {
+    .left-col, .right-col {
         display: flex !important;
-        width: 280px !important;
-        flex-shrink: 0;
+        flex: 0 0 300px !important;
+        height: 100% !important;
     }
-
-    /* 3. Force the Chat Area to take up the middle space */
-    .main-chat, 
-    .chat-container, 
-    .main-chat-area {
+    .center-col {
         display: flex !important;
-        flex: 1 !important; /* Expands to fill available middle space */
-    }
-
-    /* 4. Force the Right Panel (Mood Tracker) to stay on the right */
-    .right-sidebar, 
-    .tools-panel {
-        display: flex !important;
-        width: 320px !important;
-        flex-shrink: 0;
+        flex: 1 !important;
+        height: 100% !important;
     }
 }
