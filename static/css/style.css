@@ -442,3 +442,40 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     }
 }
 
+/* 🖥️ DESKTOP 3-COLUMN LAYOUT OVERRIDE */
+@media (min-width: 850px) {
+    /* 1. Force the main wrapper into a horizontal row */
+    .dashboard-container, 
+    .main-wrapper, 
+    .app-content {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: stretch !important;
+        height: calc(100vh - 80px); /* Keeps it from scrolling infinitely */
+        overflow: hidden;
+    }
+
+    /* 2. Force the Left Panel (History) to stay on the left */
+    .left-sidebar, 
+    .history-panel {
+        display: flex !important;
+        width: 280px !important;
+        flex-shrink: 0;
+    }
+
+    /* 3. Force the Chat Area to take up the middle space */
+    .main-chat, 
+    .chat-container, 
+    .main-chat-area {
+        display: flex !important;
+        flex: 1 !important; /* Expands to fill available middle space */
+    }
+
+    /* 4. Force the Right Panel (Mood Tracker) to stay on the right */
+    .right-sidebar, 
+    .tools-panel {
+        display: flex !important;
+        width: 320px !important;
+        flex-shrink: 0;
+    }
+}
