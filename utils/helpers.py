@@ -123,7 +123,7 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": enforced_input}
                 ],
-                model="llama3-8b-8192", # Using Meta's fast Llama 3 model
+               model="llama-3.1-8b-instant", # Using Meta's newest Llama 3.1 model, # Using Meta's newest Llama 3.1 model, # Using Meta's fast Llama 3 model
                 temperature=0.7,
                 max_tokens=60
             )
