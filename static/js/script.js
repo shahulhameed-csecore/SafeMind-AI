@@ -316,19 +316,31 @@ if (SpeechRecognition) {
 function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
     const avatarStage = document.getElementById('avatar-stage');
+    
+    // 🌟 NEW: Grab the fallback logo
+    const fallbackLogo = document.getElementById('avatar-fallback'); 
+    
     const desktopContainer = document.getElementById('desktop-avatar-container');
     const mobilePlaceholder = document.getElementById('mobile-avatar-placeholder');
 
     if (show) {
         voiceMode.classList.add('active');
         document.body.classList.add('voice-active');
+        
+        // 🌟 NEW: Move BOTH the fallback logo and the 3D stage to the voice screen
+        if (mobilePlaceholder && fallbackLogo) mobilePlaceholder.appendChild(fallbackLogo);
         if (mobilePlaceholder && avatarStage) mobilePlaceholder.appendChild(avatarStage);
+        
         setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     } else {
         voiceMode.classList.remove('active');
         document.body.classList.remove('voice-active');
         if (isListening) recognition.stop();
+        
+        // 🌟 NEW: Move BOTH of them back to the standard desktop container when done
+        if (desktopContainer && fallbackLogo) desktopContainer.appendChild(fallbackLogo);
         if (desktopContainer && avatarStage) desktopContainer.appendChild(avatarStage);
+        
         setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     }
 }
