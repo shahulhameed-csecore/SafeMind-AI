@@ -99,7 +99,7 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
 
     english_reply = ""
 
-    # 🚀 PLAN A: Try Gemini First
+    #  pLAN A: Try Gemini First
     try:
         if not gemini_client: raise ValueError("Gemini offline.")
         
@@ -114,7 +114,7 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
     except Exception as gemini_error:
         print(f"⚠️ Gemini Failed ({gemini_error}). Initiating Groq Failover...")
         
-        # 🚀 PLAN B: Gemini failed! Immediately try Groq.
+        #  PLAN B: Gemini failed! Immediately try Groq.
         try:
             if not groq_client: raise ValueError("Groq offline.")
             

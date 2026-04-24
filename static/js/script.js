@@ -285,7 +285,7 @@ document.getElementById("user-input")?.addEventListener("keypress", (e) => { if 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition; let isListening = false;
 if (SpeechRecognition) {
-    recognition = new SpeechRecognition(); recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+    recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
     
     recognition.onresult = (event) => {
         let transcript = '';
