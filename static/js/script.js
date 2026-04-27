@@ -244,10 +244,18 @@ async function sendMessage() {
         
        if (data.audio) {
             let audio = new Audio("data:audio/mp3;base64," + data.audio);
+            const stopBtn = document.getElementById('stop-audio-btn');
+            
             audio.play();
             toggleSpeakingGlow(true);
+            
+            // 🚨 THE FIX: Show the Stop button when playing!
+            if (stopBtn) stopBtn.style.display = 'flex'; 
+            
             audio.onended = function() {
                 toggleSpeakingGlow(false);
+                // 🚨 THE FIX: Hide the Stop button when done!
+                if (stopBtn) stopBtn.style.display = 'none';
             };
             window.currentAudio = audio; 
         } else {
@@ -317,7 +325,6 @@ function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
     const avatarStage = document.getElementById('avatar-stage');
     
-    // 🌟 NEW: Grab the fallback logo
     const fallbackLogo = document.getElementById('avatar-fallback'); 
     
     const desktopContainer = document.getElementById('desktop-avatar-container');
@@ -327,7 +334,6 @@ function toggleVoiceMode(show) {
         voiceMode.classList.add('active');
         document.body.classList.add('voice-active');
         
-        // 🌟 NEW: Move BOTH the fallback logo and the 3D stage to the voice screen
         if (mobilePlaceholder && fallbackLogo) mobilePlaceholder.appendChild(fallbackLogo);
         if (mobilePlaceholder && avatarStage) mobilePlaceholder.appendChild(avatarStage);
         
@@ -337,7 +343,6 @@ function toggleVoiceMode(show) {
         document.body.classList.remove('voice-active');
         if (isListening) recognition.stop();
         
-        // 🌟 NEW: Move BOTH of them back to the standard desktop container when done
         if (desktopContainer && fallbackLogo) desktopContainer.appendChild(fallbackLogo);
         if (desktopContainer && avatarStage) desktopContainer.appendChild(avatarStage);
         
