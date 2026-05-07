@@ -34,6 +34,7 @@ function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     }, 300);
 }
 
+// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
 function getThemeColors() {
     const mood = document.body.getAttribute('data-mood') || 'woods';
     const palettes = {
@@ -317,10 +318,14 @@ function clearChat() {
 
 document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
-/* 🎤 🚨 FIX: BULLETPROOF VOICE ENGINE 🚨 🎤 */
+
+/* ==========================================
+   🎤 🚨 FIX: BULLETPROOF VOICE ENGINE 🚨 🎤 
+========================================== */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition; 
 let isListening = false;
+let manualStop = false; // 🚨 NEW FLAG to track if the user intentionally clicked stop
 let finalTranscript = '';
 
 if (SpeechRecognition) {
@@ -330,10 +335,13 @@ if (SpeechRecognition) {
     
     recognition.onstart = () => {
         isListening = true;
+        manualStop = false; // Reset the flag
         finalTranscript = '';
+        
         document.getElementById("user-input").value = '';
         const liveTranscript = document.getElementById("live-transcript");
         if(liveTranscript) liveTranscript.innerText = "I'm listening...";
+        
         toggleVoiceMode(true);
         const voiceStatus = document.getElementById("voice-status");
         if (voiceStatus) voiceStatus.style.display = "block";
@@ -349,43 +357,55 @@ if (SpeechRecognition) {
             }
         }
         const displayText = finalTranscript + interimTranscript;
+        
         document.getElementById("user-input").value = displayText;
         const liveDisplay = document.getElementById("live-transcript");
         if(liveDisplay) liveDisplay.innerText = displayText || "I'm listening...";
     };
     
     recognition.onend = () => { 
-        // 🚨 AUTO-RESTART HACK: If the browser paused due to silence, but the user didn't explicitly hit stop, restart the mic!
-        if (isListening) {
-            try {
-                recognition.start();
-            } catch (e) {
-                // If it fails to restart, shut it down cleanly.
-                console.error("Mic restart failed", e);
-                isListening = false;
-                toggleVoiceMode(false);
-            }
+        // 🚨 CRITICAL FIX: If the user didn't click stop, but the browser paused due to silence:
+        if (!manualStop && isListening) {
+            // Use a 250ms delay before restarting to prevent the browser from crashing in a tight loop!
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Mic restart failed. Closing gracefully.", e);
+                    forceStopMic();
+                }
+            }, 250); 
         } else {
-            // User explicitly stopped it. Clean up and send the message.
-            document.body.classList.remove('voice-listening');
-            const voiceStatus = document.getElementById("voice-status");
-            if(voiceStatus) voiceStatus.style.display = "none"; 
-            toggleVoiceMode(false); 
-            
-            const inputText = document.getElementById("user-input").value.trim();
-            if (inputText.length > 0) { 
-                sendMessage(); 
-            }
+            // User intentionally clicked stop.
+            forceStopMic();
         }
     };
     
     recognition.onerror = (event) => { 
         console.error("Microphone Error:", event.error);
-        if (event.error !== 'no-speech') {
-            isListening = false;
-            toggleVoiceMode(false);
+        if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+            forceStopMic();
+            alert("Microphone access denied or not found. Please check site permissions.");
         }
+        // If it's just 'no-speech' (silence), let onend handle the gentle restart.
     };
+}
+
+function forceStopMic() {
+    isListening = false;
+    manualStop = true;
+    document.body.classList.remove('voice-listening');
+    
+    const voiceStatus = document.getElementById("voice-status");
+    if(voiceStatus) voiceStatus.style.display = "none"; 
+    
+    toggleVoiceMode(false); 
+    
+    // Only send message if there's actual text
+    const inputText = document.getElementById("user-input").value.trim();
+    if (inputText.length > 0) { 
+        sendMessage(); 
+    }
 }
 
 function toggleVoiceMode(show) {
@@ -408,14 +428,19 @@ function toggleListening() {
     }
     
     if (isListening) { 
-        // Setting flag to false prevents the auto-restart loop in onend
-        isListening = false;
+        // User clicked the mic button while it was actively listening
+        manualStop = true; 
         recognition.stop(); 
     } else { 
+        // Start listening fresh
         const langSelector = document.getElementById("mic-lang");
         recognition.lang = langSelector ? langSelector.value : 'en-US'; 
-        // The onstart handler sets isListening = true
-        recognition.start(); 
+        
+        try {
+            recognition.start(); 
+        } catch (e) {
+            console.error("Failed to start mic:", e);
+        }
     }
 }
 
