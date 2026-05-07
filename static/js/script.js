@@ -429,3 +429,50 @@ let faceMesh = null, mouthMorphIndex = -1, fallbackHeadBone = null;
 let leftArmBone = null, rightArmBone = null, leftForearmBone = null, rightForearmBone = null;
 
 function init3DAvatar() { }
+// ==========================================
+// 🎛️ SLIDING PANEL CONTROLS
+// ==========================================
+function closeAllPanels(clickedIcon) {
+    // Hide all panels
+    document.querySelectorAll('.side-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    
+    // Reset all icon colors
+    document.querySelectorAll('.side-nav-icons .icon-pill').forEach(icon => {
+        icon.classList.remove('active');
+    });
+
+    // If an icon was clicked (like the Chat icon), make it active
+    if (clickedIcon) {
+        clickedIcon.classList.add('active');
+    } else {
+        // If clicking the chat background, default to making Chat icon active
+        document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
+    }
+}
+
+function togglePanel(panelId, iconElement) {
+    const targetPanel = document.getElementById(panelId);
+    const isActive = targetPanel.classList.contains('active');
+    
+    // First, close everything
+    closeAllPanels(null);
+
+    // If it wasn't active before, open it and highlight its icon
+    if (!isActive) {
+        targetPanel.classList.add('active');
+        iconElement.classList.add('active');
+        
+        // Fix for Chart.js: Force graphs to redraw when panel becomes visible
+        if (panelId === 'panel-analytics') {
+            setTimeout(() => {
+                if (moodChartInstance) moodChartInstance.resize();
+                if (radarChartInstance) radarChartInstance.resize();
+            }, 300); // Wait for CSS slide animation to finish
+        }
+    } else {
+        // If it was already active, closing it drops us back to Chat mode
+        document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
+    }
+}
