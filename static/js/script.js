@@ -320,22 +320,22 @@ document.getElementById("user-input")?.addEventListener("keypress", (e) => { if 
 
 
 /* ==========================================
-   🎤 🚨 FIX: BULLETPROOF VOICE ENGINE 🚨 🎤 
+   🎤 🚨 DEFINITIVE VOICE ENGINE FIX 🚨 🎤 
 ========================================== */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition; 
+let recognition = null; 
 let isListening = false;
-let manualStop = false; // 🚨 NEW FLAG to track if the user intentionally clicked stop
 let finalTranscript = '';
+let ignoreOnEnd = false; // Flag to prevent empty messages from sending
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition(); 
-    recognition.continuous = true; 
-    recognition.interimResults = true; 
+    recognition.continuous = true; // Keeps the mic open continuously while speaking
+    recognition.interimResults = true; // Shows live words on screen
     
     recognition.onstart = () => {
         isListening = true;
-        manualStop = false; // Reset the flag
+        ignoreOnEnd = false;
         finalTranscript = '';
         
         document.getElementById("user-input").value = '';
@@ -343,8 +343,6 @@ if (SpeechRecognition) {
         if(liveTranscript) liveTranscript.innerText = "I'm listening...";
         
         toggleVoiceMode(true);
-        const voiceStatus = document.getElementById("voice-status");
-        if (voiceStatus) voiceStatus.style.display = "block";
     };
 
     recognition.onresult = (event) => {
@@ -358,54 +356,50 @@ if (SpeechRecognition) {
         }
         const displayText = finalTranscript + interimTranscript;
         
+        // Show live text
         document.getElementById("user-input").value = displayText;
         const liveDisplay = document.getElementById("live-transcript");
         if(liveDisplay) liveDisplay.innerText = displayText || "I'm listening...";
     };
     
+    // Handle Native Stop (User clicked button, or browser detected long silence)
     recognition.onend = () => { 
-        // 🚨 CRITICAL FIX: If the user didn't click stop, but the browser paused due to silence:
-        if (!manualStop && isListening) {
-            // Use a 250ms delay before restarting to prevent the browser from crashing in a tight loop!
-            setTimeout(() => {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error("Mic restart failed. Closing gracefully.", e);
-                    forceStopMic();
-                }
-            }, 250); 
-        } else {
-            // User intentionally clicked stop.
-            forceStopMic();
+        isListening = false;
+        closeVoiceUI();
+        
+        // If it errored out (like permission denied), do nothing.
+        if (ignoreOnEnd) {
+            return;
+        }
+        
+        // If they actually said something, send the message!
+        const inputText = document.getElementById("user-input").value.trim();
+        if (inputText.length > 0) { 
+            sendMessage(); 
         }
     };
     
     recognition.onerror = (event) => { 
         console.error("Microphone Error:", event.error);
-        if (event.error === 'not-allowed' || event.error === 'audio-capture') {
-            forceStopMic();
-            alert("Microphone access denied or not found. Please check site permissions.");
+        
+        // If the mic couldn't capture anything, or access was denied, don't send a blank message.
+        if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'not-allowed') {
+            ignoreOnEnd = true;
         }
-        // If it's just 'no-speech' (silence), let onend handle the gentle restart.
+        
+        if (event.error === 'not-allowed') {
+            alert("Microphone access denied. Please allow microphone permissions in your browser.");
+        }
+        
+        closeVoiceUI();
     };
 }
 
-function forceStopMic() {
-    isListening = false;
-    manualStop = true;
+function closeVoiceUI() {
     document.body.classList.remove('voice-listening');
-    
     const voiceStatus = document.getElementById("voice-status");
     if(voiceStatus) voiceStatus.style.display = "none"; 
-    
     toggleVoiceMode(false); 
-    
-    // Only send message if there's actual text
-    const inputText = document.getElementById("user-input").value.trim();
-    if (inputText.length > 0) { 
-        sendMessage(); 
-    }
 }
 
 function toggleVoiceMode(show) {
@@ -415,6 +409,8 @@ function toggleVoiceMode(show) {
     if (show) {
         voiceMode.classList.add('active'); 
         document.body.classList.add('voice-active');
+        const voiceStatus = document.getElementById("voice-status");
+        if(voiceStatus) voiceStatus.style.display = "block";
     } else {
         voiceMode.classList.remove('active'); 
         document.body.classList.remove('voice-active');
@@ -423,16 +419,16 @@ function toggleVoiceMode(show) {
 
 function toggleListening() {
     if (!SpeechRecognition) {
-        alert("Your browser doesn't support Voice Chat. Please use Google Chrome or Edge.");
+        alert("Your browser doesn't support Voice Chat. Please use Google Chrome, Edge, or Safari.");
         return;
     }
     
     if (isListening) { 
-        // User clicked the mic button while it was actively listening
-        manualStop = true; 
+        // User manually clicked the button to stop and send
+        ignoreOnEnd = false; 
         recognition.stop(); 
     } else { 
-        // Start listening fresh
+        // Start listening
         const langSelector = document.getElementById("mic-lang");
         recognition.lang = langSelector ? langSelector.value : 'en-US'; 
         
