@@ -6,7 +6,7 @@
     <title>SafeMinds-AI | Obsidian Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=17.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=19.0">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
@@ -73,15 +73,15 @@
                 <button class="header-nav-btn">Help</button>
             </div>
 
-          <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="icon-btn" onclick="toggleTheme()" style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--border-glass); width: 40px; height: 40px;">
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="icon-btn" onclick="toggleTheme()" style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--border-glass); width: 40px; height: 40px; border-radius: 50%;">
                     <svg id="theme-icon-sun" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
 
                 <button class="breathe-sos-btn" onclick="startBreathing()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 
-                    <span class="desktop-only-text">Breathe Now</span>
+                    <span>Breathe Now</span>
                 </button>
                 <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold;">
@@ -92,15 +92,11 @@
         </header>
 
         <div class="workspace">
-        <aside class="glass-panel side-nav-icons">
+            <aside class="glass-panel side-nav-icons">
                 <div class="icon-pill active" title="Chat" onclick="closeAllPanels(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>
-                
                 <div class="icon-pill" title="History" onclick="togglePanel('panel-history', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-                
                 <div class="icon-pill" title="Mood Tracker" onclick="togglePanel('panel-analytics', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
-                
                 <div class="icon-pill" title="Emotion Radar" onclick="togglePanel('panel-radar', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
-                
                 <div style="flex-grow:1"></div>
                 <a href="{{ url_for('logout') }}" class="icon-pill" style="color: var(--danger);" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></a>
             </aside>
@@ -110,7 +106,7 @@
                 <div id="history-list" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto;"></div>
             </div>
 
-           <div id="panel-analytics" class="glass-panel side-panel">
+            <div id="panel-analytics" class="glass-panel side-panel">
                 <div style="margin-top: 10px;">
                     <div class="panel-title">Mood Tracker</div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
@@ -136,7 +132,7 @@
             <main class="glass-panel center-col">
                 <div class="lungs-container" id="lungs-container">
                     <div id="sm-logo-circle" class="lungs-orb avatar-idle">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#020804" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                     </div>
                     <h2 class="lungs-title">Good Morning, {{ session['username'] }}!<br>How can I assist you?</h2>
                 </div>
@@ -182,13 +178,8 @@
             </button>
         </nav>
         <script>
-            // Only show bottom nav on mobile screens
-            if (window.innerWidth <= 768) {
-                document.getElementById('mobile-nav').style.display = 'flex';
-            }
-            window.addEventListener('resize', () => {
-                document.getElementById('mobile-nav').style.display = window.innerWidth <= 768 ? 'flex' : 'none';
-            });
+            if (window.innerWidth <= 768) { document.getElementById('mobile-nav').style.display = 'flex'; }
+            window.addEventListener('resize', () => { document.getElementById('mobile-nav').style.display = window.innerWidth <= 768 ? 'flex' : 'none'; });
         </script>
     </div> <div id="breathe-modal" class="breathe-modal">
         <button class="close-breathe-btn" onclick="stopBreathing()">✕</button>
@@ -213,12 +204,10 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=17.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=19.0"></script>
     <script>
-        // Smoothly fade out the Lungs orb when chatting begins
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
-        
         const observer = new MutationObserver(() => {
             if (chatBox.children.length > 0) {
                 lungsContainer.style.opacity = '0';
