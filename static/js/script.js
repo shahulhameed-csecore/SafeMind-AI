@@ -29,8 +29,8 @@ function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     document.getElementById('theme-menu').classList.remove('active');
     
     setTimeout(() => {
-        if(moodChartInstance) loadMoodChart(); 
-        if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
+        if(typeof moodChartInstance !== 'undefined' && moodChartInstance) loadMoodChart(); 
+        if(typeof radarChartInstance !== 'undefined' && radarChartInstance && typeof lastEmotionData !== 'undefined' && lastEmotionData) updateEmotionRadar(lastEmotionData);
     }, 300);
 }
 
@@ -318,23 +318,34 @@ function clearChat() {
 
 document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
-/* 🎤 🚨 FIX: REAL-TIME VOICE TRANSCRIPTION 🚨 🎤 */
+/* 🎤 🚨 FIX: BULLETPROOF VOICE ENGINE 🚨 🎤 */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition; let isListening = false;
+let recognition; 
+let isListening = false;
+let finalTranscript = '';
+
 if (SpeechRecognition) {
     recognition = new SpeechRecognition(); 
-    recognition.continuous = false; 
+    recognition.continuous = true; // Keeps listening even if user pauses
+    recognition.interimResults = true; // Shows live words 
     
-    // 🚨 THIS IS THE FIX: Shows words on screen instantly as you speak them!
-    recognition.interimResults = true; 
-    
-    recognition.lang = 'en-US';
-    
-    recognition.onresult = (event) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
+    recognition.onstart = () => {
+        isListening = true;
+        finalTranscript = '';
+        document.getElementById("user-input").value = '';
         
-        for (let i = 0; i < event.results.length; ++i) {
+        const liveTranscript = document.getElementById("live-transcript");
+        if(liveTranscript) liveTranscript.innerText = "I'm listening...";
+        
+        toggleVoiceMode(true);
+        document.body.classList.add('voice-listening');
+        const voiceStatus = document.getElementById("voice-status");
+        if (voiceStatus) voiceStatus.style.display = "block";
+    };
+
+    recognition.onresult = (event) => {
+        let interimTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
                 finalTranscript += event.results[i][0].transcript;
             } else {
@@ -342,66 +353,61 @@ if (SpeechRecognition) {
             }
         }
         
-        const displayTranscript = finalTranscript + interimTranscript;
+        const displayText = finalTranscript + interimTranscript;
         
-        // Put text in the input box AND the big voice mode screen
-        document.getElementById("user-input").value = displayTranscript;
-        const liveTranscript = document.getElementById("live-transcript");
-        if(liveTranscript) liveTranscript.innerText = displayTranscript || "I'm listening...";
+        // Show live text in both places
+        document.getElementById("user-input").value = displayText;
+        const liveDisplay = document.getElementById("live-transcript");
+        if(liveDisplay) liveDisplay.innerText = displayText || "I'm listening...";
     };
     
     recognition.onend = () => { 
         isListening = false; 
         document.body.classList.remove('voice-listening');
-        if(document.getElementById("voice-status")) document.getElementById("voice-status").style.display = "none"; 
+        const voiceStatus = document.getElementById("voice-status");
+        if(voiceStatus) voiceStatus.style.display = "none"; 
         
-        // Only send if they actually spoke words
+        toggleVoiceMode(false); 
+        
+        // Only trigger message send if text exists 
         const inputText = document.getElementById("user-input").value.trim();
         if (inputText.length > 0) { 
-            toggleVoiceMode(false); 
             sendMessage(); 
-        } else { 
-            toggleVoiceMode(false); 
         }
     };
     
-    // 🚨 THIS IS THE FIX: Prevent silent crashes when there's a 1-second pause
     recognition.onerror = (event) => { 
         console.error("Microphone Error:", event.error);
-        if(event.error !== 'no-speech') {
-            recognition.stop();
-        }
     };
 }
 
 function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
+    if (!voiceMode) return;
+    
     if (show) {
-        voiceMode.classList.add('active'); document.body.classList.add('voice-active');
+        voiceMode.classList.add('active'); 
+        document.body.classList.add('voice-active');
     } else {
-        voiceMode.classList.remove('active'); document.body.classList.remove('voice-active');
-        if (isListening) recognition.stop();
+        voiceMode.classList.remove('active'); 
+        document.body.classList.remove('voice-active');
     }
 }
 
 function toggleListening() {
-    if (!SpeechRecognition) return alert("Your browser doesn't support Voice Chat. Please use Google Chrome or Edge.");
+    if (!SpeechRecognition) {
+        alert("Your browser doesn't support Voice Chat. Please use Google Chrome or Edge.");
+        return;
+    }
     
     if (isListening) { 
-        recognition.stop(); document.body.classList.remove('voice-listening'); 
+        // Manually stopping it will trigger onend() which sends the message
+        recognition.stop(); 
     } else { 
-        document.getElementById("user-input").value = ""; 
-        document.getElementById("live-transcript").innerText = "I'm listening..."; 
-        
-        // Sync language with selector
-        const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
-        recognition.lang = selectedLang; 
-        
+        // Start listening
+        const langSelector = document.getElementById("mic-lang");
+        recognition.lang = langSelector ? langSelector.value : 'en-US'; 
         recognition.start(); 
-        isListening = true; 
-        toggleVoiceMode(true);
-        document.body.classList.add('voice-listening');
-        if (document.getElementById("voice-status")) document.getElementById("voice-status").style.display = "block"; 
     }
 }
 

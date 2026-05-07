@@ -127,13 +127,12 @@ body {
 }
 
 /* 🎨 PREMIUM FLOATING THEME SELECTOR */
-.theme-dropdown-container { position: relative; z-index: 100; }
+.theme-dropdown-container { position: relative; z-index: 9999; }
 
 .theme-toggle-btn {
     display: flex; align-items: center; gap: 8px;
     background: var(--surface-input); color: var(--text-main);
     border: 1px solid var(--border-soft); 
-    /* 💎 Little Glass Shine Edge */
     border-top: 1px solid rgba(255, 255, 255, 0.12); 
     padding: 8px 18px; border-radius: 100px; 
     font-family: inherit; font-size: 0.85rem; font-weight: 600;
@@ -149,26 +148,19 @@ body {
 
 .theme-menu {
     position: absolute; top: calc(100% + 15px); right: 0;
-    width: 260px; max-height: 60vh; overflow-y: auto;
-    
-    /* 💎 THE GLASSMORPHISM FIX */
-    background: var(--surface-input); /* Lower opacity to let the blur show */
+    width: 260px; max-height: 400px; overflow-y: auto;
+    background: var(--surface-panel);
     backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%); /* Crucial for Chrome/Safari */
-    
-    /* 💎 The Shining Aesthetic Edge */
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
     border: 1px solid var(--border-soft); 
     border-top: 1px solid rgba(255, 255, 255, 0.2); 
     border-left: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
-    padding: 12px; 
-    
-    /* Deep ambient shadow mixed with theme glow to lift it off the page */
+    border-radius: 20px; padding: 12px; 
     box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 40px var(--glow-1), inset 0 1px 0 rgba(255,255,255,0.1);
-    
     opacity: 0; pointer-events: none; transform: translateY(-15px) scale(0.95);
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex; flex-direction: column; gap: 6px;
+    z-index: 99999;
 }
 .theme-menu.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
 
@@ -182,7 +174,7 @@ body {
     overflow: hidden;
 }
 .theme-option:hover { 
-    background: rgba(255, 255, 255, 0.06); /* Subtle inner glass highlight */
+    background: rgba(255, 255, 255, 0.06); 
     transform: translateX(5px); 
     color: var(--primary); 
 }
@@ -289,7 +281,7 @@ body {
 .msg.bot { align-self: flex-start; background: var(--surface-input); color: var(--text-main); border: 1px solid var(--border-soft); border-bottom-left-radius: 6px; transition: 1s ease; }
 .msg.user { align-self: flex-end; background: var(--primary); color: var(--bg-base); border-bottom-right-radius: 6px; font-weight: 500; box-shadow: 0 10px 25px var(--glow-1); transition: 1s ease; }
 
-/* 🌟 SOFT DEPTH INPUT AREA */
+/* 🌟 SOFT DEPTH INPUT AREA & FIXED LANGUAGE DROPDOWN */
 .input-area { padding: 20px; display: flex; justify-content: center; z-index: 5; }
 .input-wrapper { 
     width: 85%; display: flex; gap: 10px; 
@@ -310,6 +302,23 @@ input::placeholder { color: var(--text-muted); }
 .mic-btn:hover { background: var(--glow-1); color: var(--text-main); transform: scale(1.1); }
 .stop-audio-btn { color: var(--danger); }
 .stop-audio-btn:hover { background: rgba(239, 68, 68, 0.1); transform: scale(1.1); }
+
+/* 🚨 FIXED: Beautiful Custom Language Selector */
+.lang-selector { 
+    appearance: none; -webkit-appearance: none; 
+    background-color: var(--surface-panel); 
+    color: var(--text-main); 
+    border: 1px solid var(--border-soft); 
+    border-radius: 12px; 
+    padding: 8px 30px 8px 12px; 
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 600; 
+    cursor: pointer; outline: none; transition: 0.3s ease; margin-right: 8px; 
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23ffffff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); 
+    background-repeat: no-repeat; background-position-x: 95%; background-position-y: center;
+}
+.lang-selector:hover, .lang-selector:focus { border-color: var(--primary); transform: translateY(-1px); }
+.lang-selector option { background: var(--bg-base); color: var(--text-main); }
+
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }

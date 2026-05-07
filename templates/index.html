@@ -6,7 +6,7 @@
     <title>SafeMind AI | Emotional Sanctuary</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=29.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
@@ -245,7 +245,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=29.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script>
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
