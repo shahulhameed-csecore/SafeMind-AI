@@ -1,7 +1,7 @@
 let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
-const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
+const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
     if (document.getElementById("history-list")) {
@@ -121,8 +121,16 @@ async function loadMoodChart() {
         if (moodChartInstance) moodChartInstance.destroy();
         moodChartInstance = new Chart(ctx, {
             type: 'line',
-            data: { labels: labels, datasets: [{ data: plotData, borderColor: '#4A90E2', backgroundColor: 'rgba(74, 144, 226, 0.1)', borderWidth: 2, tension: 0.4, fill: true, pointBackgroundColor: '#050508', pointBorderColor: '#6FCF97', pointBorderWidth: 2, pointRadius: 4 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0.5, max: 4.5, ticks: { stepSize: 1, color: 'rgba(255,255,255,0.5)', font: {size: 10} }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            data: { labels: labels, datasets: [{ 
+                data: plotData, 
+                borderColor: '#10b981', 
+                backgroundColor: 'rgba(16, 185, 129, 0.15)', 
+                borderWidth: 2, tension: 0.4, fill: true, 
+                pointBackgroundColor: '#020804', 
+                pointBorderColor: '#fcd34d', 
+                pointBorderWidth: 2, pointRadius: 4 
+            }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0.5, max: 4.5, ticks: { stepSize: 1, color: 'rgba(255,255,255,0.3)', font: {size: 10} }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
         });
         
         if (data.length > 0) {
@@ -164,8 +172,14 @@ function updateEmotionRadar(emotionData) {
     } else {
         radarChartInstance = new Chart(ctx, {
             type: 'radar',
-            data: { labels: labels, datasets: [{ data: dataPoints, backgroundColor: 'rgba(74, 144, 226, 0.2)', borderColor: '#4A90E2', pointBackgroundColor: '#6FCF97', borderWidth: 2 }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.05)' }, grid: { color: 'rgba(255,255,255,0.05)' }, pointLabels: { color: 'rgba(255,255,255,0.6)', font: { size: 9, family: 'Poppins' } }, ticks: { display: false, min: 0, max: 100 } } }, plugins: { legend: { display: false } } }
+            data: { labels: labels, datasets: [{ 
+                data: dataPoints, 
+                backgroundColor: 'rgba(16, 185, 129, 0.2)', 
+                borderColor: '#10b981', 
+                pointBackgroundColor: '#fcd34d', 
+                borderWidth: 2 
+            }] },
+            options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.05)' }, grid: { color: 'rgba(255,255,255,0.05)' }, pointLabels: { color: 'rgba(255,255,255,0.5)', font: { size: 9, family: 'Plus Jakarta Sans' } }, ticks: { display: false, min: 0, max: 100 } } }, plugins: { legend: { display: false } } }
         });
     }
 }
@@ -177,15 +191,15 @@ async function loadSidebarSessions() {
         const response = await fetch("/get_sessions");
         const sessions = await response.json();
         historyList.innerHTML = "";
-        if (sessions.length === 0) { historyList.innerHTML = '<div class="empty">No recent chats</div>'; return; }
+        if (sessions.length === 0) { historyList.innerHTML = '<div class="empty" style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No recent chats</div>'; return; }
         sessions.forEach(sess => {
             const div = document.createElement("div"); div.className = "history-item";
             
             div.onclick = () => loadChatThread(sess.session_id);
-            div.style.cursor = "pointer";
 
             const titleSpan = document.createElement("span"); titleSpan.className = "history-title"; titleSpan.innerText = sess.title; 
             const delBtn = document.createElement("button"); delBtn.className = "icon-btn dots-btn"; delBtn.innerHTML = icons.trash; 
+            delBtn.style.width = '24px'; delBtn.style.height = '24px';
             delBtn.onclick = (e) => { e.stopPropagation(); deleteEntireSession(sess.session_id); };
             
             div.appendChild(titleSpan); div.appendChild(delBtn); historyList.appendChild(div);
@@ -207,7 +221,7 @@ async function loadChatThread(sessionId) {
             if (chat.bot) { addMessage(chat.bot, "bot"); sessionMemory.push({ role: "SafeMinds", text: chat.bot }); }
         });
         setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
-    } catch (error) { chatBox.innerHTML = '<div class="msg bot" style="color: #e17070;">Error loading chat.</div>'; }
+    } catch (error) { chatBox.innerHTML = '<div class="msg bot" style="color: #ef4444;">Error loading chat.</div>'; }
 }
 
 async function sendMessage() {
@@ -249,12 +263,10 @@ async function sendMessage() {
             audio.play();
             toggleSpeakingGlow(true);
             
-            // 🚨 THE FIX: Show the Stop button when playing!
             if (stopBtn) stopBtn.style.display = 'flex'; 
             
             audio.onended = function() {
                 toggleSpeakingGlow(false);
-                // 🚨 THE FIX: Hide the Stop button when done!
                 if (stopBtn) stopBtn.style.display = 'none';
             };
             window.currentAudio = audio; 
@@ -284,8 +296,14 @@ async function deleteEntireSession(sessionId) {
 
 function clearChat() {
     const chatBox = document.getElementById("chat-box");
-    if(chatBox) chatBox.innerHTML = '<div class="msg bot">New session started. I am here to listen.</div>';
+    if(chatBox) chatBox.innerHTML = '';
     sessionMemory = []; currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    // Reset Lungs
+    const lungsContainer = document.getElementById('lungs-container');
+    if (lungsContainer) {
+        lungsContainer.style.display = 'flex';
+        setTimeout(() => lungsContainer.style.opacity = '0.3', 50);
+    }
 }
 
 document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
@@ -323,29 +341,30 @@ if (SpeechRecognition) {
 
 function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
-    const avatarStage = document.getElementById('avatar-stage');
-    
-    const fallbackLogo = document.getElementById('avatar-fallback'); 
-    
-    const desktopContainer = document.getElementById('desktop-avatar-container');
-    const mobilePlaceholder = document.getElementById('mobile-avatar-placeholder');
+    const fallbackLogo = document.getElementById('lungs-container'); 
 
     if (show) {
         voiceMode.classList.add('active');
         document.body.classList.add('voice-active');
-        
-        if (mobilePlaceholder && fallbackLogo) mobilePlaceholder.appendChild(fallbackLogo);
-        if (mobilePlaceholder && avatarStage) mobilePlaceholder.appendChild(avatarStage);
-        
+        if (fallbackLogo) {
+            fallbackLogo.style.opacity = '1';
+            fallbackLogo.style.zIndex = '10000';
+            fallbackLogo.style.pointerEvents = 'none';
+        }
         setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     } else {
         voiceMode.classList.remove('active');
         document.body.classList.remove('voice-active');
         if (isListening) recognition.stop();
-        
-        if (desktopContainer && fallbackLogo) desktopContainer.appendChild(fallbackLogo);
-        if (desktopContainer && avatarStage) desktopContainer.appendChild(avatarStage);
-        
+        if (fallbackLogo) {
+            fallbackLogo.style.zIndex = '0';
+            const chatBox = document.getElementById("chat-box");
+            if (chatBox && chatBox.children.length > 0) {
+                fallbackLogo.style.opacity = '0';
+            } else {
+                fallbackLogo.style.opacity = '0.3';
+            }
+        }
         setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     }
 }
@@ -404,102 +423,9 @@ function switchMobileTab(tabName) {
     }
 }
 
-// ==========================================
-// 🧍‍♂️ 3D AVATAR ENGINE
-// ==========================================
+// Keeping the 3D Engine just in case you ever want to revert
 let scene, camera, renderer, avatar;
 let faceMesh = null, mouthMorphIndex = -1, fallbackHeadBone = null;
 let leftArmBone = null, rightArmBone = null, leftForearmBone = null, rightForearmBone = null;
 
-function init3DAvatar() {
-    const stage = document.getElementById('avatar-stage');
-    if (!stage) return;
-
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(45, stage.clientWidth / stage.clientHeight, 0.1, 100); 
-    camera.position.set(0, 1.4, 0.9); 
-    camera.lookAt(new THREE.Vector3(0, 1.4, 0));
-
-    renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true }); 
-    renderer.setSize(stage.clientWidth, stage.clientHeight); 
-    renderer.setPixelRatio(window.devicePixelRatio);
-    stage.innerHTML = ""; 
-    stage.appendChild(renderer.domElement);
-
-    scene.add(new THREE.AmbientLight(0xffffff, 1));
-    const light1 = new THREE.DirectionalLight(0xffffff, 1);
-    light1.position.set(0, 2, 2);
-    scene.add(light1);
-    const light2 = new THREE.DirectionalLight(0x8b5cf6, 0.5);
-    light2.position.set(-2, 1, 1);
-    scene.add(light2);
-
-    const loader = new THREE.GLTFLoader();
-    const modelPath = window.AVATAR_URL || '/static/models/avatar.glb';
-
-    loader.load(modelPath, function (gltf) {
-        avatar = gltf.scene; 
-        avatar.scale.set(1.65, 1.65, 1.65); 
-        const baseY = -1.2; 
-        avatar.position.set(0, baseY, 0); 
-        avatar.userData.baseY = baseY;
-
-        avatar.traverse((child) => {
-            if (child.isMesh && child.morphTargetDictionary) {
-                for (let key in child.morphTargetDictionary) {
-                    if (key.toLowerCase().includes('mouthopen') || key.toLowerCase().includes('jawopen') || key.toLowerCase().includes('viseme_o') || key.toLowerCase().includes('mouth')) {
-                        faceMesh = child; mouthMorphIndex = child.morphTargetDictionary[key]; break;
-                    }
-                }
-            }
-            if (child.isBone) {
-                const b = child.name.toLowerCase();
-                if (b.includes('head')) fallbackHeadBone = child;
-                if (b.includes('leftarm') || b.includes('left_arm') || b.includes('mixamorigleftarm') || b.includes('mixamorig:leftarm')) leftArmBone = child;
-                if (b.includes('rightarm') || b.includes('right_arm') || b.includes('mixamorigrightarm') || b.includes('mixamorig:rightarm')) rightArmBone = child;
-                if (b.includes('leftforearm') || b.includes('left_forearm') || b.includes('mixamorigleftforearm') || b.includes('mixamorig:leftforearm')) leftForearmBone = child;
-                if (b.includes('rightforearm') || b.includes('right_forearm') || b.includes('mixamorigrightforearm') || b.includes('mixamorig:rightforearm')) rightForearmBone = child;
-            }
-        });
-        scene.add(avatar);
-    }, undefined, function (error) { 
-        console.error("Error loading 3D model!", error); 
-    });
-
-    function animate() {
-        requestAnimationFrame(animate); 
-        const time = Date.now() * 0.001;
-
-        if (avatar && avatar.userData.baseY !== undefined) {
-            const floatOffset = Math.sin(time * 2) * 0.02; 
-            avatar.position.y = avatar.userData.baseY + (isNaN(floatOffset) ? 0 : floatOffset);
-            
-            if (typeof isSpeaking !== 'undefined' && isSpeaking) {
-                const talkSpeed = 15; 
-                const mouthAmount = (Math.sin(time * talkSpeed) + 1) / 2;
-                if (faceMesh && mouthMorphIndex !== -1) faceMesh.morphTargetInfluences[mouthMorphIndex] = mouthAmount * 0.6;
-                else if (fallbackHeadBone) fallbackHeadBone.rotation.x = Math.sin(time * talkSpeed) * 0.05;
-            } else {
-                if (faceMesh && mouthMorphIndex !== -1) faceMesh.morphTargetInfluences[mouthMorphIndex] = 0;
-                else if (fallbackHeadBone) fallbackHeadBone.rotation.x = 0;
-            }
-
-            if (leftArmBone) { leftArmBone.rotation.set(0, 0, 1.35); }
-            if (rightArmBone) { rightArmBone.rotation.set(0, 0, -1.35); }
-            if (leftForearmBone) { leftForearmBone.rotation.set(0, 0, 0); }
-            if (rightForearmBone) { rightForearmBone.rotation.set(0, 0, 0); }
-        }
-        renderer.render(scene, camera);
-    }
-    
-    animate();
-    
-    window.addEventListener('resize', () => {
-        const stage = document.getElementById('avatar-stage');
-        if(stage) { 
-            camera.aspect = stage.clientWidth / stage.clientHeight; 
-            camera.updateProjectionMatrix(); 
-            renderer.setSize(stage.clientWidth, stage.clientHeight); 
-        }
-    });
-}
+function init3DAvatar() { }

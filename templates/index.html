@@ -3,90 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SafeMinds-AI | Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+    <title>SafeMinds-AI | Obsidian Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=14.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=16.0">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
 
     {% if show_auth %}
     <style>
-        body.auth-body { background: radial-gradient(circle at 50% 50%, #1753b5 0%, #031c47 100%); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Poppins', sans-serif; position: relative; }
-        .glass-wrapper { position: relative; width: 85vw; max-width: 1200px; height: 85vh; background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 24px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: center; align-items: center; z-index: 10; }
-        .login-glass-card { width: 100%; max-width: 380px; padding: 40px; background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); border-top: 1px solid rgba(255, 255, 255, 0.4); border-left: 1px solid rgba(255, 255, 255, 0.4); box-shadow: 0 30px 50px rgba(0, 0, 0, 0.3); color: white; z-index: 20; display: flex; flex-direction: column; }
-        .login-glass-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; text-align: center; margin-bottom: 5px; }
-        .login-glass-card h3 { font-weight: 600; font-size: 1.8rem; margin-bottom: 25px; }
-        .login-glass-card input { width: 100%; padding: 14px 15px; margin-bottom: 20px; background: #ffffff; border: none; border-radius: 8px; color: #333; font-size: 0.95rem; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); transition: 0.3s; }
-        .login-glass-card input:focus { outline: none; box-shadow: 0 0 0 4px rgba(255,255,255,0.3); }
-        .login-glass-card input::placeholder { color: #94a3b8; }
-        .input-label { font-size: 0.85rem; margin-bottom: 6px; color: #f1f5f9; display: block; font-weight: 500;}
-        .login-glass-card button { width: 100%; padding: 14px; margin-top: 10px; background: #0a295c; color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.25); }
-        .login-glass-card button:hover { background: #061c40; transform: translateY(-2px); box-shadow: 0 15px 25px rgba(0,0,0,0.35); }
-        .auth-link { margin-top: 25px; font-size: 0.85rem; text-align: center; color: #e2e8f0; }
-        .auth-link a { color: #ffffff; font-weight: 700; text-decoration: none; }
-        .css-3d-shape { position: absolute; box-shadow: 20px 20px 40px rgba(0,0,0,0.4), inset 10px 10px 20px rgba(255,255,255,0.4), inset -10px -10px 20px rgba(0,0,0,0.25); }
-        @keyframes float-ring { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-25px); } }
-        @keyframes float-pill-1 { 0%, 100% { transform: translateY(0px) rotate(-30deg); } 50% { transform: translateY(-20px) rotate(-25deg); } }
-        @keyframes float-pill-2 { 0%, 100% { transform: translateY(0px) rotate(30deg); } 50% { transform: translateY(-15px) rotate(35deg); } }
-        @keyframes float-tube { 0%, 100% { transform: translateY(0px) rotate(-15deg); } 50% { transform: translateY(-30px) rotate(-10deg); } }
-        @keyframes float-ring-2 { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(20px); } }
-        .shape-ring { width: 130px; height: 130px; border: 35px solid #3a82f7; border-radius: 50%; top: 8%; left: 32%; background: transparent; z-index: 15; animation: float-ring 6s ease-in-out infinite; }
-        .shape-pill-1 { width: 160px; height: 55px; background: linear-gradient(135deg, #5ba4ff, #2b7af0); border-radius: 30px; top: 38%; left: 18%; z-index: 15; animation: float-pill-1 7s ease-in-out infinite; }
-        .shape-full-ring { width: 160px; height: 160px; border: 40px solid #144ba3; border-radius: 50%; bottom: 15%; left: 22%; background: transparent; z-index: 15; animation: float-ring-2 8s ease-in-out infinite; }
-        .shape-pill-2 { width: 120px; height: 55px; background: linear-gradient(135deg, #81baff, #4A90E2); border-radius: 30px; top: 48%; left: 15%; z-index: 5; animation: float-pill-2 6s ease-in-out infinite; }
-        .shape-tube { width: 300px; height: 80px; background: linear-gradient(135deg, #1e60c8, #0e3b85); border-radius: 40px; bottom: 8%; right: 8%; z-index: 5; animation: float-tube 9s ease-in-out infinite; }
-        
-        @media screen and (max-width: 950px) {
-            .glass-wrapper { width: 95vw; height: auto; min-height: 90vh; padding: 15px; }
-            .login-glass-card { padding: 30px 20px; margin: 20px 0; }
-            .shape-ring { transform: scale(0.4); top: -10%; left: -10%; }
-            .shape-pill-1 { transform: scale(0.5) rotate(-30deg); top: 5%; left: -25%; }
-            .shape-full-ring { transform: scale(0.4); bottom: -10%; left: -15%; }
-            .shape-pill-2 { transform: scale(0.5) rotate(30deg); top: 15%; left: -15%; }
-            .shape-tube { transform: scale(0.4) rotate(-15deg); bottom: -5%; right: -40%; }
-        }
+        body.auth-body { background: #020804; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; position: relative; }
+        .glass-wrapper { position: relative; width: 85vw; max-width: 1200px; height: 85vh; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 24px; border: 1px solid rgba(16, 185, 129, 0.1); display: flex; justify-content: center; align-items: center; z-index: 10; }
+        .shape-ring { position: absolute; width: 130px; height: 130px; border: 35px solid #10b981; border-radius: 50%; top: 8%; left: 32%; background: transparent; z-index: 15; opacity: 0.5; filter: blur(4px); }
+        .shape-pill-1 { position: absolute; width: 160px; height: 55px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 30px; top: 38%; left: 18%; z-index: 15; opacity: 0.5; filter: blur(4px); }
     </style>
-
-    <div class="css-3d-shape shape-pill-2"></div>
-    <div class="css-3d-shape shape-tube"></div>
-    <div class="css-3d-shape shape-ring"></div>
-    <div class="css-3d-shape shape-pill-1"></div>
-    <div class="css-3d-shape shape-full-ring"></div>
+    
+    <div class="shape-ring"></div>
+    <div class="shape-pill-1"></div>
 
     <div class="glass-wrapper">
-        <div class="login-glass-card">
+        <div class="auth-container">
             <h2>SafeMinds-AI</h2>
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
-                  <div style="color: #ff8a8a; margin-bottom: 15px; font-size: 0.85rem; text-align: center;">{{ message }}</div>
+                  <div style="color: #ef4444; margin-bottom: 15px; font-size: 0.85rem; text-align: center;">{{ message }}</div>
                 {% endfor %}
               {% endif %}
             {% endwith %}
 
             {% if auth_type == 'login' %}
-            <h3>Login</h3>
+            <p style="font-weight: 600; font-size: 1.2rem; color: #f8fafc; margin-bottom: 25px;">Login to your Sanctuary</p>
             <form action="{{ url_for('login') }}" method="POST">
-                <span class="input-label">Username</span>
                 <input type="text" name="username" placeholder="Enter your username" required>
-                <span class="input-label">Password</span>
                 <input type="password" name="password" placeholder="••••••••" required>
-                <button type="submit">Sign in</button>
+                <button class="auth-btn" type="submit">Sign in</button>
             </form>
             <div class="auth-link">Don't have an account yet? <a href="{{ url_for('register') }}">Register for free</a></div>
             
             {% else %}
-            <h3>Register</h3>
+            <p style="font-weight: 600; font-size: 1.2rem; color: #f8fafc; margin-bottom: 25px;">Create your Sanctuary</p>
             <form action="{{ url_for('register') }}" method="POST">
-                <span class="input-label">Choose a Username</span>
                 <input type="text" name="username" placeholder="Create a username" required>
-                <span class="input-label">Create a Password</span>
                 <input type="password" name="password" placeholder="••••••••" required>
-                <button type="submit">Sign up</button>
+                <button class="auth-btn" type="submit">Sign up</button>
             </form>
             <div class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></div>
             {% endif %}
@@ -94,481 +55,98 @@
     </div>
 
     {% else %}
-    <style>
-        body.dashboard-body { background: radial-gradient(circle at 80% 20%, #0a1f42 0%, #050508 70%); margin: 0; overflow: hidden; font-family: 'Poppins', sans-serif;}
-        .spiral-bg { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 0; overflow: hidden; }
-        .spiral { position: absolute; opacity: 0.15; filter: blur(4px); animation: spin-float linear infinite; }
-        .spiral svg { width: 100%; height: 100%; }
-        .s1 { width: 600px; height: 600px; top: -150px; left: -150px; animation-duration: 45s; }
-        .s2 { width: 400px; height: 400px; bottom: 10%; right: -100px; animation-duration: 35s; animation-direction: reverse; opacity: 0.1; }
-        .s3 { width: 250px; height: 250px; top: 40%; left: 35%; animation-duration: 50s; opacity: 0.08; filter: blur(8px); }
-        @keyframes spin-float { 0% { transform: rotate(0deg) translate(0px, 0px) scale(1); } 33% { transform: rotate(120deg) translate(30px, -20px) scale(1.05); } 66% { transform: rotate(240deg) translate(-20px, 20px) scale(0.95); } 100% { transform: rotate(360deg) translate(0px, 0px) scale(1); } }
-        
-        .insight-box { background: rgba(74, 144, 226, 0.1); border-left: 3px solid #4A90E2; padding: 12px 15px; border-radius: 0 8px 8px 0; display: flex; gap: 12px; align-items: center; margin-top: 15px; }
-        .insight-icon { font-size: 1.2rem; }
-        .insight-box p { font-size: 0.85rem; color: #e2e8f0; margin: 0; line-height: 1.4; }
-        .insight-box strong { color: #ffffff; font-weight: 600; }
-
-        .lang-selector { appearance: none; -webkit-appearance: none; background: rgba(255, 255, 255, 0.05); color: #e2e8f0; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 8px 12px; padding-right: 32px; font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; outline: none; transition: 0.3s; margin-right: 8px; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20viewBox%3D%220%200%20292.4%20292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto; }
-        .lang-selector:hover, .lang-selector:focus { background-color: rgba(255, 255, 255, 0.1); border-color: #4A90E2; box-shadow: 0 0 10px rgba(74, 144, 226, 0.2); }
-        .lang-selector option { background: #0f172a; color: #f8fafc; padding: 12px; font-size: 0.9rem; }
-
-        /* 🎤 IMMERSIVE MOBILE VOICE MODE */
-        .mobile-voice-mode {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(180deg, #0a0f1c 0%, #050508 100%);
-            z-index: 9999; display: flex; flex-direction: column;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
-        }
-        .mobile-voice-mode.active { opacity: 1; pointer-events: all; }
-
-        .voice-top-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 25px; color: #94a3b8; font-size: 0.9rem; font-weight: 500;
-            padding-top: max(20px, env(safe-area-inset-top));
-        }
-
-        .voice-text-container {
-            padding: 0 30px; text-align: center; margin-bottom: 40px; min-height: 80px;
-            display: flex; align-items: flex-end; justify-content: center;
-        }
-        #live-transcript {
-            color: #ffffff; font-size: 1.5rem; font-weight: 600; line-height: 1.4;
-            text-shadow: 0 4px 20px rgba(74, 144, 226, 0.3); margin: 0;
-        }
-
-        .voice-bottom-dock {
-            display: flex; justify-content: center; align-items: center; gap: 30px;
-            padding-bottom: max(40px, env(safe-area-inset-bottom));
-        }
-
-        .dock-btn {
-            background: rgba(255,255,255,0.05); border: none; width: 50px; height: 50px;
-            border-radius: 50%; color: #94a3b8; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .mic-ring-container {
-            position: relative; width: 80px; height: 80px;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .big-mic-btn {
-            width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer;
-            background: linear-gradient(135deg, #4A90E2, #8b5cf6); color: white;
-            box-shadow: 0 10px 30px rgba(74, 144, 226, 0.4); z-index: 2;
-            display: flex; align-items: center; justify-content: center; transition: 0.3s;
-        }
-
-        .mic-ring-container::before {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background: rgba(74, 144, 226, 0.2); border-radius: 50%;
-            z-index: 1; transition: 0.3s;
-        }
-
-        body.voice-listening .mic-ring-container::before { animation: bigPulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-        body.voice-listening .big-mic-btn { transform: scale(1.05); background: #e17070; box-shadow: 0 10px 30px rgba(225, 112, 112, 0.4); }
-
-        @keyframes bigPulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.4); }
-            70% { transform: scale(1.5); box-shadow: 0 0 0 30px rgba(74, 144, 226, 0); }
-            100% { transform: scale(1.5); box-shadow: 0 0 0 0 rgba(74, 144, 226, 0); }
-        }
-
-        /* ------------------------------------------
-           📱 PREMIUM NATIVE MOBILE OVERRIDES 
-        ------------------------------------------ */
-        .mobile-bottom-nav, .mobile-native-banner, .mobile-action-grid, .mobile-account-view { display: none; } 
-
-        @media screen and (max-width: 950px) {
-            .spiral-bg { display: none; } 
-            .app-layout { padding: 0; padding-bottom: 80px; height: 100vh; overflow: hidden; background: #080c14; }
-            .top-header { display: none; } 
-            .workspace { flex-direction: column; height: 100%; gap: 0; }
-            
-            .left-col, .center-col, .right-col { display: none !important; width: 100%; flex: 1; margin: 0; border: none !important; box-shadow: none !important; border-radius: 0 !important;}
-
-            /* 🏠 NATIVE HOME TAB */
-            body.mobile-tab-history .left-col { 
-                display: flex !important; 
-                flex-direction: column;
-                background: #080c14 !important; 
-                padding: 20px; 
-            }
-            
-            .mobile-native-banner {
-                display: flex;
-                background: linear-gradient(135deg, #4de0ff 0%, #3b82f6 100%);
-                border-radius: 20px;
-                padding: 20px;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 15px;
-                color: #050508;
-                box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
-                order: 1;
-            }
-            .mobile-native-banner h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; }
-            .mobile-native-banner p { font-size: 0.8rem; opacity: 0.8; font-weight: 500; margin-bottom: 15px; }
-            .mobile-native-banner button { background: #050508; color: white; border: none; padding: 8px 16px; border-radius: 100px; font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 8px;}
-            
-            /* 🌟 REMOVED AVATAR FROM HOME TAB AS REQUESTED */
-            body.mobile-tab-history #desktop-avatar-container {
-                display: none !important;
-            }
-
-            .mobile-action-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
-                margin-bottom: 25px;
-                order: 3;
-            }
-            .action-card {
-                background: #1e293b;
-                border-radius: 16px;
-                padding: 15px;
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                cursor: pointer;
-            }
-            .action-icon { width: 35px; height: 35px; border-radius: 50%; background: rgba(77, 224, 255, 0.1); color: #4de0ff; display: flex; align-items: center; justify-content: center; }
-            .action-card span { font-size: 0.85rem; font-weight: 500; color: #e2e8f0; line-height: 1.3; }
-
-            body.mobile-tab-history .history-container { 
-                order: 4; 
-                background: transparent !important; 
-                height: auto !important; 
-                padding: 0 !important; 
-            }
-            body.mobile-tab-history .panel-title { color: #f8fafc; font-size: 1.1rem; text-transform: none; letter-spacing: 0; font-weight: 600; margin-bottom: 15px;}
-            body.mobile-tab-history .history-item { 
-                background: #1e293b !important; 
-                border-radius: 12px !important; 
-                padding: 16px 20px !important;
-                margin-bottom: 10px;
-                font-size: 0.9rem;
-                border: none !important;
-                color: #e2e8f0;
-            }
-
-            /* 💬 NATIVE CHAT TAB */
-            body.mobile-tab-chat .left-col { 
-                display: flex !important; 
-                flex: none; 
-                height: auto; 
-                padding: 20px 0 10px 0; 
-                background: transparent !important; 
-                align-items: center; /* Centers the glowing orb */
-            }
-            
-            /* 🌟 THE GLOWING ORB MASK */
-            body.mobile-tab-chat #desktop-avatar-container {
-                display: block !important;
-                width: 220px !important;
-                height: 220px !important;
-                min-height: 220px !important;
-                margin: 0 auto;
-                border-radius: 50%;
-                background: radial-gradient(circle at center, rgba(77, 224, 255, 0.1) 0%, transparent 70%);
-                box-shadow: 0 0 35px rgba(77, 224, 255, 0.25), inset 0 0 20px rgba(77, 224, 255, 0.15);
-                border: 2px solid rgba(77, 224, 255, 0.4);
-                overflow: hidden;
-                /* Crucial: Forces the 3D Canvas to cut into a circle */
-                -webkit-mask-image: -webkit-radial-gradient(white, black);
-                mask-image: radial-gradient(white, black);
-            }
-          
-            /* 🚨 NEW ZOOM FIX: Safely zooms out without breaking the 3D Canvas */
-            body.mobile-tab-chat #desktop-avatar-container {
-                position: relative;
-            }
-            
-            body.mobile-tab-chat #avatar-stage {
-                width: 340px !important;
-                height: 340px !important;
-                position: absolute !important;
-                top: 50% !important;
-                left: 50% !important;
-                /* Centers her perfectly and pulls her down slightly so her hair isn't cut off */
-                transform: translate(-50%, -40%) !important; 
-            }
-
-            body.mobile-tab-chat .mobile-native-banner, body.mobile-tab-chat .mobile-action-grid { display: none !important; }
-            body.mobile-tab-chat .history-container { display: none !important; }
-            body.mobile-tab-chat .center-col { display: flex !important; height: auto; margin-top: 5px; background: #080c14 !important;}
-            body.mobile-tab-chat .chat-box { padding: 15px; }
-            body.mobile-tab-chat .msg { padding: 14px 18px; font-size: 0.95rem; line-height: 1.4; border-radius: 20px;}
-            body.mobile-tab-chat .msg.user { 
-                background: #4de0ff !important;
-                color: #050508 !important; 
-                border-bottom-right-radius: 4px; 
-                font-weight: 500;
-                box-shadow: none !important;
-            }
-            body.mobile-tab-chat .msg.bot { 
-                background: #1e293b !important; 
-                color: #f8fafc !important; 
-                border-bottom-left-radius: 4px;
-                border: none !important;
-            }
-            
-            body.mobile-tab-chat .input-area { padding: 10px 15px 95px 15px; background: #080c14; }
-            body.mobile-tab-chat .input-wrapper { background: #1e293b; border: none; padding: 6px 6px 6px 15px; border-radius: 30px;}
-            body.mobile-tab-chat #user-input { background: transparent; border: none; padding: 8px; font-size: 16px;}
-            body.mobile-tab-chat .icon-btn { color: #94a3b8; }
-            body.mobile-tab-chat .send-btn { background: transparent; color: #94a3b8; box-shadow: none;}
-
-            /* ⚙️ TOOLS TAB */
-            body.mobile-tab-tools .right-col { display: flex !important; overflow-y: auto; padding: 20px; background: #080c14 !important; }
-
-            /* 👤 NATIVE ACCOUNT TAB */
-            body.mobile-tab-account .left-col, 
-            body.mobile-tab-account .center-col, 
-            body.mobile-tab-account .right-col { display: none !important; }
-            
-            body.mobile-tab-account .mobile-account-view { 
-                display: flex !important; 
-                flex-direction: column; 
-                padding: 20px; 
-                background: #080c14; 
-                height: 100%; 
-                width: 100%;
-                overflow-y: auto;
-            }
-
-            /* NATIVE BOTTOM NAVIGATION BAR */
-            .mobile-bottom-nav {
-                display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 80px;
-                background: #080c14; border-top: 1px solid rgba(255,255,255,0.05);
-                justify-content: space-around; align-items: center; z-index: 1000;
-                padding-bottom: env(safe-area-inset-bottom);
-            }
-            .mobile-nav-item {
-                display: flex; flex-direction: column; align-items: center; gap: 6px; color: #64748b;
-                background: transparent; border: none; font-family: 'Poppins', sans-serif; font-size: 0.7rem; font-weight: 500; cursor: pointer; transition: 0.3s;
-            }
-            .mobile-nav-item.active { color: #4de0ff; }
-            .mobile-nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; transition: 0.3s; }
-            .mobile-nav-item.active svg { fill: rgba(77, 224, 255, 0.15); stroke-width: 2.5px;}
-        }
-
-        /* 🌊 AUDIO WAVE ANIMATIONS */
-        .avatar-idle {
-            box-shadow: 0 0 20px rgba(77, 224, 255, 0.2), inset 0 0 10px rgba(77, 224, 255, 0.1);
-            transition: all 0.5s ease;
-        }
-        
-        .avatar-speaking {
-            animation: audioWave 0.8s infinite alternate ease-in-out;
-        }
-        
-        @keyframes audioWave {
-            0% { box-shadow: 0 0 20px rgba(77, 224, 255, 0.4), inset 0 0 15px rgba(77, 224, 255, 0.2); transform: scale(1); }
-            100% { box-shadow: 0 0 60px rgba(77, 224, 255, 0.9), 0 0 20px rgba(77, 224, 255, 0.6), inset 0 0 30px rgba(77, 224, 255, 0.5); transform: scale(1.05); }
-        }
-    </style>
-
-    <div class="spiral-bg">
-        <div class="spiral s1"><svg viewBox="0 0 100 100" fill="none" stroke="#4A90E2" stroke-width="2"><path d="M50,50 m0,-5 a5,5 0 1,1 0,10 a10,10 0 1,0 0,-20 a15,15 0 1,1 0,30 a20,20 0 1,0 0,-40 a25,25 0 1,1 0,50 a30,30 0 1,0 0,-60 a35,35 0 1,1 0,70" stroke-linecap="round"/></svg></div>
-        <div class="spiral s2"><svg viewBox="0 0 100 100" fill="none" stroke="#8b5cf6" stroke-width="3"><path d="M50,50 m0,-5 a5,5 0 1,1 0,10 a10,10 0 1,0 0,-20 a15,15 0 1,1 0,30 a20,20 0 1,0 0,-40 a25,25 0 1,1 0,50 a30,30 0 1,0 0,-60 a35,35 0 1,1 0,70" stroke-linecap="round"/></svg></div>
-        <div class="spiral s3"><svg viewBox="0 0 100 100" fill="none" stroke="#6FCF97" stroke-width="2"><path d="M50,50 m0,-5 a5,5 0 1,1 0,10 a10,10 0 1,0 0,-20 a15,15 0 1,1 0,30 a20,20 0 1,0 0,-40 a25,25 0 1,1 0,50 a30,30 0 1,0 0,-60 a35,35 0 1,1 0,70" stroke-linecap="round"/></svg></div>
-    </div>
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow-2"></div>
     
     <div class="app-layout">
         <header class="glass-panel top-header">
-            <div class="logo">SafeMinds<span>-AI</span></div>
-            <div class="header-right">
-                <span class="user-status">● Session: {{ session['username'] }}</span>
-                <button class="nav-btn" onclick="clearChat()">New Chat</button>
-                <a href="{{ url_for('logout') }}" class="nav-btn logout">Logout</a>
+            <div class="logo-container">
+                <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <div class="logo">SafeMinds<span>-AI</span></div>
+            </div>
+            
+            <div class="header-nav">
+                <button class="header-nav-btn">Dashboard</button>
+                <button class="header-nav-btn active">AI Chat</button>
+                <button class="header-nav-btn">Help</button>
+            </div>
+
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="breathe-sos-btn" onclick="startBreathing()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 
+                    Breathe Now
+                </button>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #020804; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        {{ session['username'][0]|upper if session['username'] else 'U' }}
+                    </div>
+                </div>
             </div>
         </header>
 
         <div class="workspace">
-            <aside class="glass-panel left-col" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-                
-                <div class="mobile-native-banner">
-                    <div>
-                        <h3>SafeMinds Premium</h3>
-                        <p>Harness the full power of AI.</p>
-                        <button><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> Upgrade Now</button>
-                    </div>
-                </div>
-
-             <div id="desktop-avatar-container" style="flex: 1; width: 100%; position: relative; min-height: 35vh;">
-                    
-                  <div id="avatar-fallback" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 10;">
-                        
-                        <div id="sm-logo-circle" class="avatar-idle" style="width: 140px; height: 140px; border-radius: 50%; background: rgba(8, 12, 20, 0.8); border: 2px solid #4de0ff; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <span style="font-family: 'Space Grotesk', sans-serif; font-size: 2.8rem; font-weight: 700; color: #4de0ff; text-shadow: 0 0 15px #4de0ff; line-height: 1;">SM</span>
-                            <span style="font-size: 0.65rem; color: #94a3b8; font-weight: 600; margin-top: 5px; letter-spacing: 1px;">AI ACTIVE</span>
-                        </div>
-                        
-                    </div>
-
-                    <div id="avatar-stage" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 2;"></div>
-                </div>
-
-                <div class="mobile-action-grid">
-                    <div class="action-card" onclick="startBreathing()">
-                        <div class="action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg></div>
-                        <span>Guided<br>Breathing</span>
-                    </div>
-                    <div class="action-card" onclick="switchMobileTab('tools')">
-                        <div class="action-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg></div>
-                        <span>Track<br>Emotions</span>
-                    </div>
-                </div>
-
-                <div class="history-container" style="height: 35%; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05); padding: 20px; display: flex; flex-direction: column;">
-                    <h3 class="panel-title">History</h3>
-                    <div class="history-list" id="history-list" style="overflow-y: auto; flex: 1;"></div>
-                </div>
+            <aside class="glass-panel side-nav-icons">
+                <div class="icon-pill active" title="Chat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>
+                <div class="icon-pill" title="Analytics"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+                <div class="icon-pill" title="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div>
+                <div style="flex-grow:1"></div>
+                <a href="{{ url_for('logout') }}" class="icon-pill" style="color: var(--danger);" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></a>
             </aside>
 
             <main class="glass-panel center-col">
-                <div class="chat-box" id="chat-box">
-                    <div class="msg bot">Welcome back. I'm here to support you. How are you feeling right now?</div>
+                <div class="lungs-container" id="lungs-container">
+                    <div id="sm-logo-circle" class="lungs-orb avatar-idle">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#020804" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </div>
+                    <h2 class="lungs-title">Good Morning, {{ session['username'] }}!<br>How can I assist you?</h2>
                 </div>
+
+                <div class="chat-box" id="chat-box"></div>
                 
                 <div class="input-area">
-                    <div id="voice-status" style="display: none; color: #4de0ff; font-size: 0.8rem; margin-bottom: 5px; font-weight: 600;">🎙️ Listening... Speak now.</div>
+                    <div id="voice-status" style="display: none; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: var(--primary); font-size: 0.8rem; font-weight: 600;">🎙️ Listening... Speak now.</div>
+                    
                     <div class="input-wrapper">
-                        <input type="text" id="user-input" placeholder="Message SafeMinds..." autocomplete="off">
-                        
-                        <button class="icon-btn stop-audio-btn" id="stop-audio-btn" onclick="stopSpeech()" title="Stop Speaking" style="display: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg></button>
+                        <input type="text" id="user-input" placeholder="Start your request, and let SafeMinds handle everything..." autocomplete="off">
                         
                         <select id="mic-lang" class="lang-selector">
                             <option value="en-US">EN</option>
                             <option value="ta-IN">தமிழ்</option>
                             <option value="hi-IN">हिंदी</option>
                         </select>
-
-                        <button class="icon-btn mic-btn" id="mic-btn" onclick="toggleListening()" title="Speak"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
-                        <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24" width="24" height="24"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button>
+                        
+                        <button class="icon-btn stop-audio-btn" id="stop-audio-btn" onclick="stopSpeech()" style="display: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg></button>
+                        <button class="icon-btn mic-btn" id="mic-btn" onclick="toggleListening()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
+                        <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button>
                     </div>
                 </div>
             </main>
 
             <aside class="glass-panel right-col">
-                <button class="breathe-trigger-btn" onclick="startBreathing()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg> Need to Breathe?</button>
-
-                <div class="tool-section">
-                    <p class="panel-title">Mood Tracker</p>
-                    <div class="mood-grid">
-                        <button class="mood-btn" onclick="saveMood('Happy')" title="Happy"><span>😊</span></button>
-                        <button class="mood-btn" onclick="saveMood('Calm')" title="Calm"><span>🧘</span></button>
-                        <button class="mood-btn" onclick="saveMood('Sad')" title="Sad"><span>😢</span></button>
-                        <button class="mood-btn" onclick="saveMood('Stressed')" title="Stressed"><span>😫</span></button>
-                    </div>
+                <div>
+                    <div class="panel-title">History Chat <button class="new-chat-btn" onclick="clearChat()">+ New Chat</button></div>
+                    <div id="history-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
 
-                <div class="tool-section">
-                    <p class="panel-title">Mood Trends</p>
-                    <div class="chart-container"><canvas id="moodChart"></canvas></div>
+                <div style="margin-top: 10px;">
+                    <div class="panel-title">Mood & Emotion</div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Happy')">😊</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Calm')">🧘</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Sad')">😢</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Stressed')">😫</button>
+                    </div>
+                    <div class="chart-container" style="height: 110px;"><canvas id="moodChart"></canvas></div>
                     <div class="insight-box" id="mood-insight-box"><span class="insight-icon">💡</span><p id="mood-insight-text">Log your mood to see your insights.</p></div>
                 </div>
-
-                <div class="tool-section" style="flex:1;">
-                    <p class="panel-title">Live Emotion Radar</p>
+                
+                <div style="margin-top: 10px; flex: 1;">
+                    <div class="panel-title">Emotion Radar</div>
                     <div class="chart-container radar-container"><canvas id="emotionRadarChart"></canvas></div>
                     <div class="insight-box" id="radar-insight-box" style="display: none;"><span class="insight-icon">🧠</span><p id="radar-insight-text">Chat to analyze emotions.</p></div>
                 </div>
             </aside>
-            
-            <div class="mobile-account-view">
-                <h2 style="color: white; font-family: 'Space Grotesk', sans-serif; margin-bottom: 20px; font-size: 1.8rem;">My Account</h2>
-                
-                <div style="background: #1e293b; padding: 20px; border-radius: 20px; display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
-                    <div style="width: 65px; height: 65px; background: linear-gradient(135deg, #4de0ff, #3b82f6); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 700; color: #050508;">
-                        {{ session['username'][0]|upper if session['username'] else 'U' }}
-                    </div>
-                    <div>
-                        <h3 style="color: white; margin: 0; font-size: 1.3rem;">{{ session['username'] }}</h3>
-                        <p style="color: #4de0ff; margin: 0; font-size: 0.85rem; font-weight: 600;">SafeMinds Premium</p>
-                    </div>
-                </div>
-
-                <div style="background: #1e293b; border-radius: 20px; overflow: hidden; margin-bottom: 20px;">
-                    <div style="padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; color: white; font-weight: 500;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <svg width="20" height="20" stroke="#94a3b8" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                            App Preferences
-                        </div>
-                        <span style="color: #94a3b8;">></span>
-                    </div>
-                    <div style="padding: 18px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; color: white; font-weight: 500;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <svg width="20" height="20" stroke="#94a3b8" fill="none" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
-                            Privacy & Security
-                        </div>
-                        <span style="color: #94a3b8;">></span>
-                    </div>
-                </div>
-
-                <a href="{{ url_for('logout') }}" style="background: #1e293b; padding: 18px 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; color: #e17070; text-decoration: none; font-weight: 600;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <svg width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                        Log Out
-                    </div>
-                </a>
-            </div>
-            </div>
-
-        <div id="mobile-voice-mode" class="mobile-voice-mode">
-            <div class="voice-top-bar">
-                <button class="icon-btn" onclick="toggleVoiceMode(false)">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </button>
-                <span>Speaking to SafeMinds</span>
-                <button class="icon-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                </button>
-            </div>
-
-            <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"></div>
-
-            <div class="voice-text-container">
-                <h2 id="live-transcript">I'm listening...</h2>
-            </div>
-
-            <div class="voice-bottom-dock">
-                <button class="dock-btn" onclick="toggleVoiceMode(false)">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H3c-1.1 0-2-.9-2-2V7c0-1.1.9-2 2-2z"></path><path d="M7 9h.01"></path><path d="M12 9h.01"></path><path d="M17 9h.01"></path><path d="M7 13h.01"></path><path d="M12 13h.01"></path><path d="M17 13h.01"></path><path d="M9 17h6"></path></svg>
-                </button>
-                
-                <div class="mic-ring-container">
-                    <button class="big-mic-btn" id="big-mic-btn" onclick="toggleListening()">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
-                    </button>
-                </div>
-                
-                <button class="dock-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-                </button>
-            </div>
         </div>
-
-        <nav class="mobile-bottom-nav">
-            <button class="mobile-nav-item" id="nav-history" onclick="switchMobileTab('history')">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                <span>Home</span>
-            </button>
-            <button class="mobile-nav-item active" id="nav-chat" onclick="switchMobileTab('chat')">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                <span>Chats</span>
-            </button>
-            <button class="mobile-nav-item" id="nav-tools" onclick="switchMobileTab('tools')">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                <span>Folders</span>
-            </button>
-            <button class="mobile-nav-item" id="nav-account" onclick="switchMobileTab('account')">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                <span>Account</span>
-            </button>
-        </nav>
     </div>
 
     <div id="breathe-modal" class="breathe-modal">
@@ -578,22 +156,39 @@
             <p id="breathe-text" class="breathe-text">Ready?</p>
         </div>
     </div>
- <!-- <script src="{{ url_for('static', filename='js/script.js') }}"></script> -->
-  <script src="{{ url_for('static', filename='js/script.js') }}?v=3.0"></script>
     
+    <div id="mobile-voice-mode" class="mobile-voice-mode">
+        <div class="voice-top-bar">
+            <button class="icon-btn" onclick="toggleVoiceMode(false)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <span>Speaking to SafeMinds</span>
+            <div style="width: 24px;"></div>
+        </div>
+        <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center;"></div>
+        <div class="voice-text-container"><h2 id="live-transcript">I'm listening...</h2></div>
+        <div class="voice-bottom-dock">
+            <div class="mic-ring-container">
+                <button class="big-mic-btn" id="big-mic-btn" onclick="toggleListening()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=4.0"></script>
     <script>
-        window.AVATAR_URL = "{{ url_for('static', filename='models/avatar.glb') }}";
+        // Smoothly fade out the Lungs orb when chatting begins
+        const chatBox = document.getElementById('chat-box');
+        const lungsContainer = document.getElementById('lungs-container');
         
-        window.switchMobileTab = function(tabName) {
-            document.body.classList.remove('mobile-tab-history', 'mobile-tab-chat', 'mobile-tab-tools', 'mobile-tab-account');
-            document.body.classList.add('mobile-tab-' + tabName);
-            
-            document.querySelectorAll('.mobile-nav-item').forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.getElementById('nav-' + tabName);
-            if(activeBtn) activeBtn.classList.add('active');
-        };
+        const observer = new MutationObserver(() => {
+            if (chatBox.children.length > 0) {
+                lungsContainer.style.opacity = '0';
+                setTimeout(() => lungsContainer.style.display = 'none', 500);
+            } else {
+                lungsContainer.style.display = 'flex';
+                setTimeout(() => lungsContainer.style.opacity = '0.3', 50);
+            }
+        });
+        observer.observe(chatBox, { childList: true });
     </script>
-   
     {% endif %}
 </body>
 </html>
