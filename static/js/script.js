@@ -4,27 +4,24 @@ let isSpeaking = false;
 
 // 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
 function getThemeColors() {
-    const mood = document.documentElement.getAttribute('data-mood') || 'calm';
+    const mood = document.body.getAttribute('data-mood') || 'calm';
     const palettes = {
         'calm':      { text: '#2d4a48', grid: 'rgba(92, 184, 178, 0.2)', line: '#5cb8b2', bg: 'rgba(92, 184, 178, 0.2)', point: '#a3d9d2' },
         'anxious':   { text: '#2c3338', grid: 'rgba(108, 122, 137, 0.15)', line: '#6c7a89', bg: 'rgba(108, 122, 137, 0.15)', point: '#b4bcc4' },
         'motivated': { text: '#4a2c2a', grid: 'rgba(242, 139, 130, 0.2)', line: '#f28b82', bg: 'rgba(242, 139, 130, 0.25)', point: '#fce8b2' },
         'sleep':     { text: '#e8eaf6', grid: 'rgba(121, 134, 203, 0.15)', line: '#7986cb', bg: 'rgba(121, 134, 203, 0.15)', point: '#3f51b5' }
     };
-    return palettes[mood];
+    return palettes[mood] || palettes['calm'];
 }
 
 const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // Load saved mood
-    const savedMood = localStorage.getItem('safeminds_mood');
-    if (savedMood) {
-        document.documentElement.setAttribute('data-mood', savedMood);
-        const selector = document.getElementById('mood-selector');
-        if(selector) selector.value = savedMood;
-        syncThemePickerUI(savedMood);
-    }
+    // ✨ FIX: Load saved mood onto the body directly to ensure CSS cascades properly
+    const savedMood = localStorage.getItem('safeminds_mood') || 'calm';
+    document.body.setAttribute('data-mood', savedMood);
+    const selector = document.getElementById('mood-selector');
+    if(selector) selector.value = savedMood;
 
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
@@ -34,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // 🧠 MOOD CHANGE TRIGGER
 function changeMood(mood) {
-    document.documentElement.setAttribute('data-mood', mood);
+    document.body.setAttribute('data-mood', mood);
     localStorage.setItem('safeminds_mood', mood);
     
     // Force Chart.js graphs to redraw with the new psychological colors
@@ -43,77 +40,6 @@ function changeMood(mood) {
         if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
     }, 300);
 }
-
-// ✨ GLASSMORPHISM THEME PICKER
-const themeConfig = {
-    calm:      { label: 'Calm',    swatchClass: 'swatch-calm' },
-    anxious:   { label: 'Anxious', swatchClass: 'swatch-anxious' },
-    motivated: { label: 'Hopeful', swatchClass: 'swatch-motivated' },
-    sleep:     { label: 'Sleep',   swatchClass: 'swatch-sleep' }
-};
-
-function toggleThemePicker(e) {
-    e && e.stopPropagation();
-    const orbital  = document.getElementById('theme-orbital');
-    const btn      = document.getElementById('theme-trigger-btn');
-    const backdrop = document.getElementById('theme-backdrop');
-    const isOpen   = orbital.classList.contains('visible');
-    if (isOpen) {
-        closeThemePicker();
-    } else {
-        orbital.classList.add('visible');
-        btn.classList.add('open');
-        backdrop.classList.add('active');
-    }
-}
-
-function closeThemePicker() {
-    const orbital  = document.getElementById('theme-orbital');
-    const btn      = document.getElementById('theme-trigger-btn');
-    const backdrop = document.getElementById('theme-backdrop');
-    orbital.classList.remove('visible');
-    btn.classList.remove('open');
-    backdrop.classList.remove('active');
-}
-
-function selectTheme(mood) {
-    // Update hidden select so existing changeMood() keeps working
-    const selector = document.getElementById('mood-selector');
-    if (selector) selector.value = mood;
-
-    // Fire the real changeMood logic
-    changeMood(mood);
-
-    // Update trigger button appearance
-    const dot   = document.getElementById('theme-trigger-dot');
-    const label = document.getElementById('theme-trigger-label');
-    if (dot && themeConfig[mood]) {
-        dot.className = 'theme-trigger-dot ' + themeConfig[mood].swatchClass;
-        label.textContent = themeConfig[mood].label;
-    }
-
-    // Mark active card
-    document.querySelectorAll('.theme-orb-card').forEach(card => {
-        card.classList.toggle('active', card.dataset.value === mood);
-    });
-
-    closeThemePicker();
-}
-
-// Sync picker on initial load (called from DOMContentLoaded after savedMood is restored)
-function syncThemePickerUI(mood) {
-    if (!mood || !themeConfig[mood]) return;
-    const dot   = document.getElementById('theme-trigger-dot');
-    const label = document.getElementById('theme-trigger-label');
-    if (dot)   dot.className   = 'theme-trigger-dot ' + themeConfig[mood].swatchClass;
-    if (label) label.textContent = themeConfig[mood].label;
-    document.querySelectorAll('.theme-orb-card').forEach(card => {
-        card.classList.toggle('active', card.dataset.value === mood);
-    });
-}
-
-// Close on Escape key
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeThemePicker(); });
 
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
@@ -273,7 +199,7 @@ async function loadChatThread(sessionId) {
         if (!chats || chats.length === 0) { chatBox.innerHTML = '<div class="msg bot">This conversation is empty.</div>'; return; }
         chats.forEach(chat => {
             if (chat.user) { addMessage(chat.user, "user"); sessionMemory.push({ role: "User", text: chat.user }); }
-            if (chat.bot) { addMessage(chat.bot, "bot"); sessionMemory.push({ role: "SafeMinds", text: chat.bot }); }
+            if (chat.bot) { addMessage(chat.bot, "bot"); sessionMemory.push({ role: "SafeMind AI", text: chat.bot }); }
         });
         setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
     } catch (error) { chatBox.innerHTML = '<div class="msg bot" style="color: #ef4444;">Error loading chat.</div>'; }
@@ -302,7 +228,7 @@ async function sendMessage() {
         const data = await response.json();
         loadingBubble.remove();
         addMessage(data.response, "bot");
-        sessionMemory.push({ role: "SafeMinds", text: data.response });
+        sessionMemory.push({ role: "SafeMind AI", text: data.response });
         if (data.emotions) updateEmotionRadar(data.emotions);
         
        if (data.audio) {

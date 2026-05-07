@@ -2,7 +2,6 @@
 
 /* ==========================================
    🧠 EMOTIONALLY ADAPTIVE THEME ENGINE
-   (Replaces standard Light/Dark modes)
 ========================================== */
 
 /* 🧘 CALM & RELAXED (Default) - Grounding teals and soft whites */
@@ -16,7 +15,6 @@
     --text-main: #2d4a48;
     --text-muted: rgba(45, 74, 72, 0.6);
     
-    /* Soft Depth instead of harsh glass */
     --surface-panel: rgba(255, 255, 255, 0.85);
     --surface-input: rgba(255, 255, 255, 0.95);
     --border-soft: rgba(92, 184, 178, 0.2);
@@ -29,7 +27,7 @@
     --border-radius-ui: 24px;
 }
 
-/* 🌧️ ANXIOUS & OVERTHINKING - Desaturated, highly solid, extremely slow motion to reduce cognitive load */
+/* 🌧️ ANXIOUS & OVERTHINKING - Desaturated, highly solid, extremely slow motion */
 [data-mood="anxious"] {
     --bg-base: #f0f1f5;
     --primary: #6c7a89;
@@ -40,16 +38,16 @@
     --text-main: #2c3338;
     --text-muted: rgba(44, 51, 56, 0.6);
     
-    --surface-panel: rgba(255, 255, 255, 0.95); /* Very solid to feel safe */
+    --surface-panel: rgba(255, 255, 255, 0.95); 
     --surface-input: #ffffff;
     --border-soft: rgba(108, 122, 137, 0.15);
-    --panel-shadow: 0 10px 30px rgba(108, 122, 137, 0.05); /* Minimal shadow */
+    --panel-shadow: 0 10px 30px rgba(108, 122, 137, 0.05); 
     
     --glow-1: rgba(108, 122, 137, 0.15);
     --glow-2: rgba(180, 188, 196, 0.15);
     
-    --anim-speed: 35s; /* Slowest animation */
-    --border-radius-ui: 32px; /* Extra rounded safe edges */
+    --anim-speed: 35s; 
+    --border-radius-ui: 32px; 
 }
 
 /* 🌅 MOTIVATED & HOPEFUL - Bright, warm, energetic sunrise colors */
@@ -71,8 +69,8 @@
     --glow-1: rgba(242, 139, 130, 0.25);
     --glow-2: rgba(246, 178, 107, 0.25);
     
-    --anim-speed: 10s; /* Faster, uplifting motion */
-    --border-radius-ui: 20px; /* Slightly sharper */
+    --anim-speed: 10s; 
+    --border-radius-ui: 20px; 
 }
 
 /* 🌙 SLEEP & RELAXATION - Deep midnight immersive colors */
@@ -94,7 +92,7 @@
     --glow-1: rgba(121, 134, 203, 0.15);
     --glow-2: rgba(63, 81, 181, 0.15);
     
-    --anim-speed: 40s; /* Barely moving */
+    --anim-speed: 40s; 
     --border-radius-ui: 28px;
 }
 
@@ -107,10 +105,10 @@ body {
     height: 100vh; 
     overflow: hidden;
     position: relative;
-    transition: background-color 1s ease, color 1s ease; /* Long therapeutic transition */
+    transition: background-color 1s ease, color 1s ease;
 }
 
-/* 🌟 DYNAMIC ATMOSPHERIC MESH (Reacts to mood speed) */
+/* 🌟 DYNAMIC ATMOSPHERIC MESH */
 .bg-aurora-container {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     z-index: 0; overflow: hidden; pointer-events: none;
@@ -137,7 +135,7 @@ body {
 @keyframes slow-drift { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(3%, 5%) scale(1.05); } }
 @keyframes slow-drift-reverse { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-3%, -5%) scale(1.05); } }
 
-/* 🌟 ORGANIC SOFT PANELS (Replaces rigid glassmorphism) */
+/* 🌟 ORGANIC SOFT PANELS */
 .glass-panel {
     background: var(--surface-panel);
     backdrop-filter: blur(15px);
@@ -147,20 +145,20 @@ body {
     box-shadow: var(--panel-shadow);
     position: relative;
     z-index: 1;
-    transition: all 1s ease; /* Smooth morphing between mood shapes and colors */
+    transition: all 1s ease; 
 }
 
 /* ==========================================
    💻 LAYOUT
 ========================================== */
-.app-layout { display: flex; flex-direction: column; height: 100vh; padding: 15px 25px; gap: 15px; position: relative; z-index: 1; overflow: visible; }
+.app-layout { display: flex; flex-direction: column; height: 100vh; padding: 15px 25px; gap: 15px; position: relative; z-index: 1; }
 
-.top-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px; border-radius: 100px; flex-shrink: 0; overflow: visible; z-index: 200; }
+.top-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px; border-radius: 100px; flex-shrink: 0; }
 .logo-container { display: flex; align-items: center; gap: 12px; }
 .logo-icon { width: 36px; height: 36px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 1s; }
 .logo { font-size: 1.2rem; font-weight: 700; color: var(--text-main); transition: 1s;}
+.logo span { color: var(--primary); }
 
-/* Premium Magnetic Hover Buttons */
 .header-nav { display: flex; gap: 10px; background: var(--surface-input); padding: 5px; border-radius: 100px; border: 1px solid var(--border-soft); transition: 1s ease; }
 .header-nav-btn { padding: 8px 20px; border-radius: 100px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; background: transparent; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.4s ease, color 0.4s ease; }
 .header-nav-btn:hover { transform: scale(1.05); color: var(--text-main); }
@@ -244,290 +242,9 @@ input::placeholder { color: var(--text-muted); }
 .insight-box p { font-size: 0.85rem; color: var(--text-main); margin: 0; line-height: 1.4; transition: 1s ease; }
 .insight-box strong { color: var(--primary); font-weight: 600; transition: 1s ease; }
 
-.lang-selector { appearance: none; -webkit-appearance: none; background: var(--surface-input); color: var(--text-main); border: 1px solid var(--border-soft); border-radius: 12px; padding: 8px 12px; padding-right: 32px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; outline: none; transition: 0.5s ease; margin-right: 8px; }
+.lang-selector { appearance: auto; background: var(--surface-input); color: var(--text-main); border: 1px solid var(--border-soft); border-radius: 12px; padding: 8px 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; outline: none; transition: 0.5s ease; margin-right: 8px; }
 .lang-selector:hover, .lang-selector:focus { border-color: var(--primary); transform: translateY(-1px); }
 .lang-selector option { background: var(--bg-base); color: var(--text-main); }
-
-/* Mood Dropdown Styling */
-.mood-dropdown { background-image: url('data:image/svg+xml;utf8,<svg fill="%23a3d9d2" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); background-repeat: no-repeat; background-position-x: 95%; background-position-y: 5px;}
-
-/* ==========================================
-   🎨 CIRCULAR THEME PICKER (Glassmorphism)
-========================================== */
-
-/* Hide the original select — keep it in DOM for changeMood() compatibility */
-#mood-selector { display: none !important; }
-
-.theme-picker-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    z-index: 300;
-}
-
-/* Trigger button */
-.theme-trigger-btn {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    background: var(--surface-panel);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-soft);
-    border-radius: 100px;
-    padding: 8px 16px 8px 10px;
-    cursor: pointer;
-    color: var(--text-main);
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.82rem;
-    font-weight: 600;
-    box-shadow: 0 8px 24px var(--glow-1), inset 0 1px 0 rgba(255,255,255,0.3);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
-    white-space: nowrap;
-    position: relative;
-    overflow: hidden;
-}
-.theme-trigger-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, transparent 60%);
-    border-radius: inherit;
-    pointer-events: none;
-}
-.theme-trigger-btn:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 14px 32px var(--glow-2), inset 0 1px 0 rgba(255,255,255,0.4);
-    border-color: var(--primary);
-}
-
-.theme-trigger-btn.open {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--glow-1), 0 14px 32px var(--glow-2);
-}
-
-.theme-trigger-dot {
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-.theme-trigger-btn.open .theme-trigger-dot {
-    transform: rotate(360deg) scale(1.15);
-}
-
-.theme-trigger-label { transition: color 0.5s ease; }
-
-.theme-trigger-chevron {
-    width: 14px;
-    height: 14px;
-    color: var(--text-muted);
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), color 0.3s ease;
-    flex-shrink: 0;
-}
-.theme-trigger-btn.open .theme-trigger-chevron {
-    transform: rotate(180deg);
-    color: var(--primary);
-}
-
-/* Radial orbital menu */
-.theme-orbital {
-    position: absolute;
-    top: calc(100% + 14px);
-    right: 0;
-    width: 300px;
-    pointer-events: none;
-    opacity: 0;
-    transform: translateY(-10px) scale(0.94);
-    transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 9999;
-}
-.theme-orbital.visible {
-    pointer-events: all;
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-/* Glass card that holds the orbs */
-.theme-orbital-card {
-    background: rgba(255,255,255,0.72);
-    backdrop-filter: blur(28px) saturate(1.6);
-    -webkit-backdrop-filter: blur(28px) saturate(1.6);
-    border: 1px solid rgba(255,255,255,0.55);
-    border-radius: 28px;
-    padding: 20px 18px 16px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.12), 0 2px 0 rgba(255,255,255,0.6) inset;
-    position: relative;
-    overflow: hidden;
-}
-.theme-orbital-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 50%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-/* Sleep mode overrides the glass card */
-[data-mood="sleep"] .theme-orbital-card {
-    background: rgba(18, 20, 34, 0.82);
-    border-color: rgba(121, 134, 203, 0.2);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.5), 0 2px 0 rgba(121,134,203,0.08) inset;
-}
-[data-mood="sleep"] .theme-orbital-card::before {
-    background: linear-gradient(180deg, rgba(121,134,203,0.06) 0%, transparent 100%);
-}
-
-.theme-picker-header {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 14px;
-    padding-left: 2px;
-    transition: color 0.5s ease;
-}
-
-/* Grid of theme orb cards */
-.theme-orbs-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.theme-orb-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 12px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    border: 1.5px solid transparent;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.35s ease, box-shadow 0.35s ease, background 0.35s ease;
-    overflow: hidden;
-    text-align: left;
-    background: rgba(255,255,255,0.45);
-}
-.theme-orb-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 70%);
-    border-radius: inherit;
-    pointer-events: none;
-}
-
-[data-mood="sleep"] .theme-orb-card {
-    background: rgba(255,255,255,0.04);
-}
-
-.theme-orb-card:hover {
-    transform: translateY(-3px) scale(1.02);
-}
-
-.theme-orb-card.active {
-    border-color: var(--primary) !important;
-    box-shadow: 0 8px 24px var(--glow-1);
-}
-
-/* Active pill indicator */
-.theme-orb-card .active-pip {
-    position: absolute;
-    top: 8px; right: 8px;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--primary);
-    opacity: 0;
-    transform: scale(0);
-    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.theme-orb-card.active .active-pip {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* The big swatch orb */
-.theme-swatch {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    position: relative;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.theme-swatch::after {
-    content: '';
-    position: absolute;
-    top: 4px; left: 4px;
-    width: 14px; height: 14px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.45);
-    filter: blur(3px);
-}
-
-.theme-orb-card:hover .theme-swatch,
-.theme-orb-card.active .theme-swatch {
-    transform: scale(1.15) rotate(-8deg);
-}
-
-/* Theme-specific swatch gradients */
-.swatch-calm    { background: radial-gradient(circle at 35% 35%, #82c4c3, #5cb8b2, #2d9e97); }
-.swatch-anxious { background: radial-gradient(circle at 35% 35%, #b4bcc4, #8c98a4, #6c7a89); }
-.swatch-motivated { background: radial-gradient(circle at 35% 35%, #fce8b2, #f6b26b, #f28b82); }
-.swatch-sleep   { background: radial-gradient(circle at 35% 35%, #9fa8da, #7986cb, #3f51b5); }
-
-.theme-orb-info { flex: 1; min-width: 0; }
-.theme-orb-name {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--text-main);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.5s ease;
-}
-.theme-orb-desc {
-    font-size: 0.68rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: color 0.5s ease;
-}
-
-/* Mood-specific card hover colours */
-.theme-orb-card[data-value="calm"]:hover      { background: rgba(92, 184, 178, 0.12); border-color: rgba(92,184,178,0.4); }
-.theme-orb-card[data-value="anxious"]:hover   { background: rgba(108, 122, 137, 0.1); border-color: rgba(108,122,137,0.35); }
-.theme-orb-card[data-value="motivated"]:hover { background: rgba(242, 139, 130, 0.1); border-color: rgba(242,139,130,0.4); }
-.theme-orb-card[data-value="sleep"]:hover     { background: rgba(121, 134, 203, 0.12); border-color: rgba(121,134,203,0.4); }
-
-/* Backdrop close layer */
-.theme-backdrop {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 9998;
-}
-.theme-backdrop.active { display: block; }
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .theme-orbital { right: -5px; width: 260px; }
-    .theme-orb-card { padding: 10px 11px; gap: 9px; }
-    .theme-swatch { width: 32px; height: 32px; }
-    .theme-orb-name { font-size: 0.78rem; }
-    .theme-orb-desc { font-size: 0.64rem; }
-    .theme-trigger-btn { padding: 7px 12px 7px 9px; font-size: 0.78rem; }
-    .theme-trigger-dot { width: 18px; height: 18px; }
-}
 
 /* ==========================================
    🔐 AUTH SCREENS 
@@ -549,7 +266,9 @@ input::placeholder { color: var(--text-muted); }
 .breathe-container { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 .breathe-circle { position: absolute; width: 140px; height: 140px; background: radial-gradient(circle, var(--primary) 0%, var(--secondary) 100%); border-radius: 50%; transition: box-shadow 4s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.8; }
 .breathe-circle.pulse { box-shadow: 0 0 0 30px var(--glow-1), 0 0 0 60px var(--glow-2), 0 0 0 100px rgba(255,255,255,0.05); }
-.breathe-text { position: relative; z-index: 10; color: var(--bg-base); font-weight: 700; font-size: 2.5rem; text-align: center; margin: 0; pointer-events: none; }
+
+/* ✨ THE BREATHE FIX (Now always clearly readable text!) */
+.breathe-text { position: relative; z-index: 10; color: var(--text-main); font-weight: 700; font-size: 2.5rem; text-align: center; margin: 0; pointer-events: none; }
 
 /* =========================================
    📱 MODERN MOBILE UI OVERRIDES
@@ -574,8 +293,7 @@ input::placeholder { color: var(--text-muted); }
     .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); background: transparent; border: none; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .mobile-nav-item.active { color: var(--text-main); transform: translateY(-2px); }
     
-    /* Make mood selector fit on mobile */
-    #mood-selector { font-size: 0.75rem; padding: 6px 10px; padding-right: 25px; min-width: 110px;}
+    #mood-selector { font-size: 0.75rem; padding: 6px 10px; min-width: 110px;}
 }
 
 /* 🎤 IMMERSIVE MOBILE VOICE MODE */
