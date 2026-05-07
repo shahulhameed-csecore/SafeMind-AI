@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SafeMinds-AI | Obsidian Edition</title>
+    <title>SafeMinds | Emotional Sanctuary</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=22.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=23.0">
 </head>
 
-<body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
+<body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}" data-mood="calm">
 
     {% if show_auth %}
     <style>
-        body.auth-body { background: #020804; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; position: relative; }
-        .glass-wrapper { position: relative; width: 85vw; max-width: 1200px; height: 85vh; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 24px; border: 1px solid rgba(16, 185, 129, 0.1); display: flex; justify-content: center; align-items: center; z-index: 10; }
-        .shape-ring { position: absolute; width: 130px; height: 130px; border: 35px solid #10b981; border-radius: 50%; top: 8%; left: 32%; background: transparent; z-index: 15; opacity: 0.5; filter: blur(4px); }
-        .shape-pill-1 { position: absolute; width: 160px; height: 55px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 30px; top: 38%; left: 18%; z-index: 15; opacity: 0.5; filter: blur(4px); }
+        body.auth-body { background: #e8f4f1; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; position: relative; }
+        .soft-wrapper { position: relative; width: 85vw; max-width: 1200px; height: 85vh; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border-radius: 32px; border: 1px solid rgba(92, 184, 178, 0.2); box-shadow: 0 20px 50px rgba(92, 184, 178, 0.1); display: flex; justify-content: center; align-items: center; z-index: 10; }
     </style>
 
-    <div class="shape-ring"></div>
-    <div class="shape-pill-1"></div>
-
-    <div class="glass-wrapper">
+    <div class="soft-wrapper">
         <div class="auth-container">
-            <h2>SafeMinds-AI</h2>
+            <h2 style="color: #2d4a48;">SafeMinds</h2>
             {% with messages = get_flashed_messages(with_categories=true) %}
               {% if messages %}
                 {% for category, message in messages %}
@@ -34,22 +29,22 @@
             {% endwith %}
 
             {% if auth_type == 'login' %}
-            <p style="font-weight: 600; font-size: 1.2rem; color: #f8fafc; margin-bottom: 25px;">Login to your Sanctuary</p>
+            <p style="font-weight: 500; font-size: 1.1rem; color: #5cb8b2; margin-bottom: 25px;">Welcome to your safe space</p>
             <form action="{{ url_for('login') }}" method="POST">
-                <input type="text" name="username" placeholder="Enter your username" required>
-                <input type="password" name="password" placeholder="••••••••" required>
-                <button class="auth-btn" type="submit">Sign in</button>
+                <input type="text" name="username" placeholder="Username" required style="background: #f8fbfb; color: #2d4a48; border: 1px solid #a3d9d2;">
+                <input type="password" name="password" placeholder="••••••••" required style="background: #f8fbfb; color: #2d4a48; border: 1px solid #a3d9d2;">
+                <button class="auth-btn" type="submit" style="background: #5cb8b2; color: #fff;">Enter Sanctuary</button>
             </form>
-            <div class="auth-link">Don't have an account yet? <a href="{{ url_for('register') }}">Register for free</a></div>
+            <div class="auth-link" style="color: #82c4c3;">New here? <a href="{{ url_for('register') }}" style="color: #2d4a48;">Begin healing</a></div>
 
             {% else %}
-            <p style="font-weight: 600; font-size: 1.2rem; color: #f8fafc; margin-bottom: 25px;">Create your Sanctuary</p>
+            <p style="font-weight: 500; font-size: 1.1rem; color: #5cb8b2; margin-bottom: 25px;">Create your Sanctuary</p>
             <form action="{{ url_for('register') }}" method="POST">
-                <input type="text" name="username" placeholder="Create a username" required>
-                <input type="password" name="password" placeholder="••••••••" required>
-                <button class="auth-btn" type="submit">Sign up</button>
+                <input type="text" name="username" placeholder="Choose a username" required style="background: #f8fbfb; color: #2d4a48; border: 1px solid #a3d9d2;">
+                <input type="password" name="password" placeholder="••••••••" required style="background: #f8fbfb; color: #2d4a48; border: 1px solid #a3d9d2;">
+                <button class="auth-btn" type="submit" style="background: #5cb8b2; color: #fff;">Begin Journey</button>
             </form>
-            <div class="auth-link">Already have an account? <a href="{{ url_for('login') }}">Log in</a></div>
+            <div class="auth-link" style="color: #82c4c3;">Already joined? <a href="{{ url_for('login') }}" style="color: #2d4a48;">Return inside</a></div>
             {% endif %}
         </div>
     </div>
@@ -65,27 +60,30 @@
         <header class="glass-panel top-header">
             <div class="logo-container">
                 <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
-                <div class="logo">SafeMinds<span>-AI</span></div>
+                <div class="logo">SafeMinds</div>
             </div>
 
             <div class="header-nav">
                 <button class="header-nav-btn">Dashboard</button>
-                <button class="header-nav-btn active">AI Chat</button>
-                <button class="header-nav-btn">Help</button>
+                <button class="header-nav-btn active">Therapy Chat</button>
+                <button class="header-nav-btn">Journal</button>
             </div>
 
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="icon-btn" onclick="toggleTheme()" style="background: rgba(16, 185, 129, 0.1); border: 1px solid var(--border-glass); width: 40px; height: 40px; border-radius: 50%;">
-                    <svg id="theme-icon-sun" style="display: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg id="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-main)" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
+                
+                <select id="mood-selector" class="lang-selector mood-dropdown" onchange="changeMood(this.value)">
+                    <option value="calm">🧘 Calm & Relaxed</option>
+                    <option value="anxious">🌧️ Anxious / Overthinking</option>
+                    <option value="motivated">🌅 Motivated & Hopeful</option>
+                    <option value="sleep">🌙 Sleep & Healing</option>
+                </select>
 
                 <button class="breathe-sos-btn" onclick="startBreathing()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    <span>Breathe Now</span>
+                    <span>Breathe</span>
                 </button>
                 <div class="desktop-avatar" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
-                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--bg-base); display: flex; align-items: center; justify-content: center; font-weight: bold; transition: background 0.8s ease;">
                         {{ session['username'][0]|upper if session['username'] else 'U' }}
                     </div>
                 </div>
@@ -111,10 +109,10 @@
                 <div style="margin-top: 10px;">
                     <div class="panel-title">Mood Tracker</div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Happy')">😊</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Calm')">🧘</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Sad')">😢</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Stressed')">😫</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Happy')">😊</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Calm')">🧘</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Sad')">😢</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Stressed')">😫</button>
                     </div>
                     <div class="chart-container" style="height: 110px;"><canvas id="moodChart"></canvas></div>
                     <div class="insight-box" id="mood-insight-box"><span class="insight-icon">💡</span><p id="mood-insight-text">Log your mood to see your insights.</p></div>
@@ -132,7 +130,7 @@
 
             <main class="glass-panel center-col">
                 <div class="lungs-container" id="lungs-container">
-                    <h2 class="lungs-title" style="margin-top: -50px;">Good Morning, {{ session['username'] }}!<br>How can I assist you?</h2>
+                    <h2 class="lungs-title" style="margin-top: -50px;">I'm here for you, {{ session['username'] }}.<br><span style="font-size: 1.1rem; font-weight: 400; color: var(--text-muted);">Whenever you're ready to talk.</span></h2>
                 </div>
 
                 <div class="chat-box" id="chat-box" onclick="closeAllPanels(null)"></div>
@@ -141,7 +139,7 @@
                     <div id="voice-status" style="display: none; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: var(--primary); font-size: 0.8rem; font-weight: 600;">🎙️ Listening... Speak now.</div>
 
                     <div class="input-wrapper">
-                        <input type="text" id="user-input" placeholder="Start your request, and let SafeMinds handle everything..." autocomplete="off">
+                        <input type="text" id="user-input" placeholder="Share what's on your mind..." autocomplete="off">
 
                         <select id="mic-lang" class="lang-selector">
                             <option value="en-US">EN</option>
@@ -196,7 +194,7 @@
     <div id="mobile-voice-mode" class="mobile-voice-mode">
         <div class="voice-top-bar">
             <button class="icon-btn" onclick="toggleVoiceMode(false)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
-            <span>Speaking to SafeMinds</span>
+            <span>SafeMinds Audio Therapy</span>
             <div style="width: 24px;"></div>
         </div>
 
@@ -221,14 +219,14 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=22.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=23.0"></script>
     <script>
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
         const observer = new MutationObserver(() => {
             if (chatBox.children.length > 0) {
                 lungsContainer.style.opacity = '0';
-                setTimeout(() => lungsContainer.style.display = 'none', 500);
+                setTimeout(() => lungsContainer.style.display = 'none', 800);
             } else {
                 lungsContainer.style.display = 'flex';
                 setTimeout(() => lungsContainer.style.opacity = '1', 50);
