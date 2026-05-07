@@ -246,10 +246,16 @@ input::placeholder { color: var(--text-muted); }
 .lang-selector:hover, .lang-selector:focus { border-color: var(--primary); transform: translateY(-1px); }
 .lang-selector option { background: var(--bg-base); color: var(--text-main); }
 
+
 /* ==========================================
    🔐 AUTH SCREENS 
 ========================================== */
-.auth-container { width: 100%; text-align: center; }
+.auth-container { 
+    width: 100%; 
+    max-width: 400px; /* 🚨 THE FIX: Prevents it from stretching */
+    padding: 20px; 
+    text-align: center; 
+}
 .auth-container h2 { font-size: 2.5rem; margin-bottom: 5px; font-weight: 700; }
 .auth-container input { width: 100%; padding: 16px 20px; margin-bottom: 15px; border-radius: 16px; font-family: inherit; transition: 0.3s; }
 .auth-container input:focus { outline: none; box-shadow: 0 0 0 3px rgba(92, 184, 178, 0.3); transform: translateY(-2px); }
