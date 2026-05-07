@@ -34,7 +34,6 @@ function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     }, 300);
 }
 
-// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
 function getThemeColors() {
     const mood = document.body.getAttribute('data-mood') || 'woods';
     const palettes = {
@@ -326,19 +325,16 @@ let finalTranscript = '';
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition(); 
-    recognition.continuous = true; // Keeps listening even if user pauses
-    recognition.interimResults = true; // Shows live words 
+    recognition.continuous = true; 
+    recognition.interimResults = true; 
     
     recognition.onstart = () => {
         isListening = true;
         finalTranscript = '';
         document.getElementById("user-input").value = '';
-        
         const liveTranscript = document.getElementById("live-transcript");
         if(liveTranscript) liveTranscript.innerText = "I'm listening...";
-        
         toggleVoiceMode(true);
-        document.body.classList.add('voice-listening');
         const voiceStatus = document.getElementById("voice-status");
         if (voiceStatus) voiceStatus.style.display = "block";
     };
@@ -352,32 +348,43 @@ if (SpeechRecognition) {
                 interimTranscript += event.results[i][0].transcript;
             }
         }
-        
         const displayText = finalTranscript + interimTranscript;
-        
-        // Show live text in both places
         document.getElementById("user-input").value = displayText;
         const liveDisplay = document.getElementById("live-transcript");
         if(liveDisplay) liveDisplay.innerText = displayText || "I'm listening...";
     };
     
     recognition.onend = () => { 
-        isListening = false; 
-        document.body.classList.remove('voice-listening');
-        const voiceStatus = document.getElementById("voice-status");
-        if(voiceStatus) voiceStatus.style.display = "none"; 
-        
-        toggleVoiceMode(false); 
-        
-        // Only trigger message send if text exists 
-        const inputText = document.getElementById("user-input").value.trim();
-        if (inputText.length > 0) { 
-            sendMessage(); 
+        // 🚨 AUTO-RESTART HACK: If the browser paused due to silence, but the user didn't explicitly hit stop, restart the mic!
+        if (isListening) {
+            try {
+                recognition.start();
+            } catch (e) {
+                // If it fails to restart, shut it down cleanly.
+                console.error("Mic restart failed", e);
+                isListening = false;
+                toggleVoiceMode(false);
+            }
+        } else {
+            // User explicitly stopped it. Clean up and send the message.
+            document.body.classList.remove('voice-listening');
+            const voiceStatus = document.getElementById("voice-status");
+            if(voiceStatus) voiceStatus.style.display = "none"; 
+            toggleVoiceMode(false); 
+            
+            const inputText = document.getElementById("user-input").value.trim();
+            if (inputText.length > 0) { 
+                sendMessage(); 
+            }
         }
     };
     
     recognition.onerror = (event) => { 
         console.error("Microphone Error:", event.error);
+        if (event.error !== 'no-speech') {
+            isListening = false;
+            toggleVoiceMode(false);
+        }
     };
 }
 
@@ -401,12 +408,13 @@ function toggleListening() {
     }
     
     if (isListening) { 
-        // Manually stopping it will trigger onend() which sends the message
+        // Setting flag to false prevents the auto-restart loop in onend
+        isListening = false;
         recognition.stop(); 
     } else { 
-        // Start listening
         const langSelector = document.getElementById("mic-lang");
         recognition.lang = langSelector ? langSelector.value : 'en-US'; 
+        // The onstart handler sets isListening = true
         recognition.start(); 
     }
 }
