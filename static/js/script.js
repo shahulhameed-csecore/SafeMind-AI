@@ -476,3 +476,20 @@ function togglePanel(panelId, iconElement) {
         document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
     }
 }
+// ==========================================
+// ✨ INTERACTIVE BACKGROUND PARALLAX
+// ==========================================
+document.addEventListener("mousemove", (e) => {
+    const glow1 = document.getElementById('glow1');
+    const glow2 = document.getElementById('glow2');
+    
+    if (glow1 && glow2) {
+        // Calculate mouse position relative to center of screen (-1 to 1)
+        const x = (e.clientX / window.innerWidth - 0.5) * 2;
+        const y = (e.clientY / window.innerHeight - 0.5) * 2;
+        
+        // Move the glows slightly in opposite directions of the mouse
+        glow1.style.transform = `translate(${x * -40}px, ${y * -40}px)`;
+        glow2.style.transform = `translate(${x * 60}px, ${y * 60}px)`;
+    }
+});
