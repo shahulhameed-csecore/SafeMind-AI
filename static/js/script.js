@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.documentElement.setAttribute('data-mood', savedMood);
         const selector = document.getElementById('mood-selector');
         if(selector) selector.value = savedMood;
+        syncThemePickerUI(savedMood);
     }
 
     if (document.getElementById("history-list")) {
@@ -42,6 +43,77 @@ function changeMood(mood) {
         if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
     }, 300);
 }
+
+// ✨ GLASSMORPHISM THEME PICKER
+const themeConfig = {
+    calm:      { label: 'Calm',    swatchClass: 'swatch-calm' },
+    anxious:   { label: 'Anxious', swatchClass: 'swatch-anxious' },
+    motivated: { label: 'Hopeful', swatchClass: 'swatch-motivated' },
+    sleep:     { label: 'Sleep',   swatchClass: 'swatch-sleep' }
+};
+
+function toggleThemePicker(e) {
+    e && e.stopPropagation();
+    const orbital  = document.getElementById('theme-orbital');
+    const btn      = document.getElementById('theme-trigger-btn');
+    const backdrop = document.getElementById('theme-backdrop');
+    const isOpen   = orbital.classList.contains('visible');
+    if (isOpen) {
+        closeThemePicker();
+    } else {
+        orbital.classList.add('visible');
+        btn.classList.add('open');
+        backdrop.classList.add('active');
+    }
+}
+
+function closeThemePicker() {
+    const orbital  = document.getElementById('theme-orbital');
+    const btn      = document.getElementById('theme-trigger-btn');
+    const backdrop = document.getElementById('theme-backdrop');
+    orbital.classList.remove('visible');
+    btn.classList.remove('open');
+    backdrop.classList.remove('active');
+}
+
+function selectTheme(mood) {
+    // Update hidden select so existing changeMood() keeps working
+    const selector = document.getElementById('mood-selector');
+    if (selector) selector.value = mood;
+
+    // Fire the real changeMood logic
+    changeMood(mood);
+
+    // Update trigger button appearance
+    const dot   = document.getElementById('theme-trigger-dot');
+    const label = document.getElementById('theme-trigger-label');
+    if (dot && themeConfig[mood]) {
+        dot.className = 'theme-trigger-dot ' + themeConfig[mood].swatchClass;
+        label.textContent = themeConfig[mood].label;
+    }
+
+    // Mark active card
+    document.querySelectorAll('.theme-orb-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.value === mood);
+    });
+
+    closeThemePicker();
+}
+
+// Sync picker on initial load (called from DOMContentLoaded after savedMood is restored)
+function syncThemePickerUI(mood) {
+    if (!mood || !themeConfig[mood]) return;
+    const dot   = document.getElementById('theme-trigger-dot');
+    const label = document.getElementById('theme-trigger-label');
+    if (dot)   dot.className   = 'theme-trigger-dot ' + themeConfig[mood].swatchClass;
+    if (label) label.textContent = themeConfig[mood].label;
+    document.querySelectorAll('.theme-orb-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.value === mood);
+    });
+}
+
+// Close on Escape key
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeThemePicker(); });
 
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();

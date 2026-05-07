@@ -78,6 +78,58 @@
                     <option value="sleep">🌙 Sleep & Healing</option>
                 </select>
 
+                <!-- ✨ Glassmorphism Circular Theme Picker -->
+                <div class="theme-picker-wrapper" id="theme-picker-wrapper">
+                    <button class="theme-trigger-btn" id="theme-trigger-btn" onclick="toggleThemePicker(event)" aria-label="Choose theme">
+                        <span class="theme-trigger-dot swatch-calm" id="theme-trigger-dot"></span>
+                        <span class="theme-trigger-label" id="theme-trigger-label">Calm</span>
+                        <svg class="theme-trigger-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                        </svg>
+                    </button>
+
+                    <div class="theme-orbital" id="theme-orbital" role="listbox" aria-label="Select mood theme">
+                        <div class="theme-orbital-card">
+                            <div class="theme-picker-header">Choose Your Mood</div>
+                            <div class="theme-orbs-grid">
+                                <button class="theme-orb-card active" data-value="calm" onclick="selectTheme('calm')" role="option">
+                                    <span class="active-pip"></span>
+                                    <span class="theme-swatch swatch-calm"></span>
+                                    <span class="theme-orb-info">
+                                        <span class="theme-orb-name">🧘 Calm</span>
+                                        <span class="theme-orb-desc">Grounded & relaxed</span>
+                                    </span>
+                                </button>
+                                <button class="theme-orb-card" data-value="anxious" onclick="selectTheme('anxious')" role="option">
+                                    <span class="active-pip"></span>
+                                    <span class="theme-swatch swatch-anxious"></span>
+                                    <span class="theme-orb-info">
+                                        <span class="theme-orb-name">🌧️ Anxious</span>
+                                        <span class="theme-orb-desc">Soft & safe tones</span>
+                                    </span>
+                                </button>
+                                <button class="theme-orb-card" data-value="motivated" onclick="selectTheme('motivated')" role="option">
+                                    <span class="active-pip"></span>
+                                    <span class="theme-swatch swatch-motivated"></span>
+                                    <span class="theme-orb-info">
+                                        <span class="theme-orb-name">🌅 Hopeful</span>
+                                        <span class="theme-orb-desc">Warm & energising</span>
+                                    </span>
+                                </button>
+                                <button class="theme-orb-card" data-value="sleep" onclick="selectTheme('sleep')" role="option">
+                                    <span class="active-pip"></span>
+                                    <span class="theme-swatch swatch-sleep"></span>
+                                    <span class="theme-orb-info">
+                                        <span class="theme-orb-name">🌙 Sleep</span>
+                                        <span class="theme-orb-desc">Deep night healing</span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="theme-backdrop" id="theme-backdrop" onclick="closeThemePicker()"></div>
+
                 <button class="breathe-sos-btn" onclick="startBreathing()">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     <span>Breathe</span>
