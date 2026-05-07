@@ -13,8 +13,8 @@
     --text-muted: rgba(248, 250, 252, 0.6);
     
     /* TRUE DARK GLASS */
-    --surface-glass: rgba(10, 25, 15, 0.35); /* High transparency for main panels */
-    --glass-input: rgba(0, 0, 0, 0.4); /* For search bars, history items, nav pills */
+    --surface-glass: rgba(10, 25, 15, 0.35);
+    --glass-input: rgba(0, 0, 0, 0.4);
     --border-glass: rgba(255, 255, 255, 0.08);
     --border-glass-highlight: rgba(255, 255, 255, 0.15);
     
@@ -41,8 +41,8 @@
     --text-muted: rgba(46, 16, 101, 0.6);
     
     /* TRUE LIGHT GLASS */
-    --surface-glass: rgba(255, 255, 255, 0.45); /* Frosty white, highly transparent */
-    --glass-input: rgba(255, 255, 255, 0.6); /* Brighter for search bars, nav pills */
+    --surface-glass: rgba(255, 255, 255, 0.45); 
+    --glass-input: rgba(255, 255, 255, 0.6); 
     --border-glass: rgba(255, 255, 255, 0.6);
     --border-glass-highlight: rgba(255, 255, 255, 1);
     
@@ -118,7 +118,6 @@ body {
 .logo { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
 .logo span { color: var(--primary); }
 
-/* Dynamic Glass Input for Header Nav */
 .header-nav { display: flex; gap: 10px; background: var(--glass-input); padding: 5px; border-radius: 100px; border: 1px solid var(--border-glass); backdrop-filter: blur(15px); transition: 0.5s ease; }
 .header-nav-btn { padding: 8px 20px; border-radius: 100px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.3s; border: none; background: transparent; }
 .header-nav-btn.active { background: rgba(139, 92, 246, 0.15); color: var(--primary); border: 1px solid var(--primary); opacity: 0.8; }
@@ -147,7 +146,6 @@ body {
 .new-chat-btn { background: var(--glass-input); border: 1px solid var(--border-glass); color: var(--text-main); padding: 6px 12px; border-radius: 100px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
 .new-chat-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-/* Dynamic Glass Input for History Items */
 .history-item { display: flex; justify-content: space-between; align-items: center; padding: 14px; background: var(--glass-input); border: 1px solid var(--border-glass); border-radius: 16px; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
 .history-item:hover { border-color: var(--primary); color: var(--text-main); transform: translateX(5px); }
 .history-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
@@ -168,14 +166,8 @@ body {
 .lungs-orb.avatar-idle { animation: breathe-lungs 8s infinite ease-in-out; }
 .lungs-orb.avatar-speaking { animation: ai-speaking-pulse 0.8s infinite alternate ease-in-out; }
 
-@keyframes breathe-lungs {
-    0%, 100% { transform: scale(0.9); opacity: 0.8; }
-    50% { transform: scale(1.15); opacity: 1; }
-}
-@keyframes ai-speaking-pulse {
-    0% { transform: scale(1); opacity: 0.8; }
-    100% { transform: scale(1.1); opacity: 1; }
-}
+@keyframes breathe-lungs { 0%, 100% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
+@keyframes ai-speaking-pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
 
 .lungs-title { font-size: 1.8rem; font-weight: 600; color: var(--text-main); text-align: center; }
 
@@ -183,7 +175,6 @@ body {
 .msg { max-width: 75%; padding: 16px 24px; border-radius: 24px; font-size: 0.95rem; line-height: 1.6; animation: pop 0.3s;}
 @keyframes pop { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* Dynamic Glass Input for Bot Messages */
 .msg.bot { align-self: flex-start; background: var(--glass-input); color: var(--text-main); border: 1px solid var(--border-glass); border-bottom-left-radius: 6px; backdrop-filter: blur(10px); transition: 0.5s ease; }
 .msg.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 6px; font-weight: 500; box-shadow: 0 10px 25px var(--voice-ring); transition: 0.5s ease; }
 
@@ -219,13 +210,11 @@ input::placeholder { color: var(--text-muted); }
 .chart-container { position: relative; height: 120px; width: 100%; }
 .radar-container { height: 180px; }
 
-/* Dynamic Insight Boxes */
 .insight-box { background: var(--glass-input); border-left: 3px solid var(--primary); border-top: 1px solid var(--border-glass); border-right: 1px solid var(--border-glass); border-bottom: 1px solid var(--border-glass); padding: 12px 15px; border-radius: 0 12px 12px 0; display: flex; gap: 12px; align-items: center; margin-top: 15px; transition: 0.5s ease; }
 .insight-icon { font-size: 1.2rem; }
 .insight-box p { font-size: 0.85rem; color: var(--text-main); margin: 0; line-height: 1.4; transition: 0.5s ease; }
 .insight-box strong { color: var(--primary); font-weight: 600; transition: 0.5s ease; }
 
-/* Dynamic Language Selector */
 .lang-selector { appearance: none; -webkit-appearance: none; background: var(--glass-input); color: var(--text-main); border: 1px solid var(--border-glass); border-radius: 12px; padding: 8px 12px; padding-right: 32px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; outline: none; transition: 0.3s; margin-right: 8px; backdrop-filter: blur(10px); }
 .lang-selector:hover, .lang-selector:focus { border-color: var(--primary); }
 .lang-selector option { background: var(--bg-base); color: var(--text-main); }
@@ -244,9 +233,6 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
 .auth-link { margin-top: 25px; font-size: 0.9rem; color: var(--text-muted); }
 .auth-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
 
-/* ==========================================
-   🧘‍♀️ BREATHE MODAL
-========================================== */
 .breathe-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-base); backdrop-filter: blur(25px); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s; }
 .breathe-modal.active { opacity: 1; pointer-events: all; }
 .close-breathe-btn { position: absolute; top: 40px; right: 50px; background: transparent; border: none; font-size: 2.5rem; color: var(--danger); cursor: pointer; transition: 0.2s; z-index: 20; }
@@ -260,7 +246,7 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
    📱 MODERN MOBILE UI OVERRIDES
 ========================================= */
 @media (max-width: 768px) {
-    .right-col, .side-nav-icons { display: none !important; }
+    .right-col, .side-nav-icons, .desktop-avatar { display: none !important; }
     .app-layout { padding: 10px; padding-bottom: 75px; } 
     .workspace { padding: 0; gap: 0; flex-direction: column; }
     
@@ -281,11 +267,11 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     .chat-box { flex-grow: 1; padding: 15px; z-index: 1; margin: 0; overflow-y: auto; padding-bottom: 90px; }
     .msg { max-width: 90%; border-radius: 20px; font-size: 0.9rem; }
 
-    /* Fix Input Area Glass on Mobile */
-    .input-area { position: fixed; bottom: 75px; left: 0; width: 100vw; background: transparent; padding: 10px 15px; z-index: 999; }
+    /* 🚨 ULTIMATE FIX: Float the input dead-center above the nav bar */
+    .input-area { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); width: 95vw; background: transparent; padding: 0; z-index: 9999; }
     .input-wrapper { width: 100%; border-radius: 30px; }
     
-    /* Mobile Bottom Navigation */
+    /* Mobile Bottom Navigation (With Exit Button) */
     .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--surface-glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--border-glass); justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); transition: 0.5s ease; }
     .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); background: transparent; border: none; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .mobile-nav-item.active { color: var(--primary); }
@@ -301,7 +287,15 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
 .dock-btn { background: var(--glass-input); border: 1px solid var(--border-glass); width: 50px; height: 50px; border-radius: 50%; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.5s ease;}
 .mic-ring-container { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
 .big-mic-btn { width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 10px 30px var(--voice-shadow); z-index: 2; display: flex; align-items: center; justify-content: center; transition: 0.5s ease;}
-.mic-ring-container::before { content: ''; position: absolute; width: 100%; height: 100%; background: var(--voice-ring); border-radius: 50%; z-index: 1; transition: 0.3s; }
-body.voice-listening .mic-ring-container::before { animation: bigPulse 2s infinite cubic-bezier(0.4, 0, 0.2, 1); }
-body.voice-listening .big-mic-btn { background: var(--danger); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4); }
-@keyframes bigPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 var(--voice-shadow); } 70% { transform: scale(1.5); box-shadow: 0 0 0 30px rgba(16, 185, 129, 0); } 100% { transform: scale(1.5); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+/* 🌟 NEW: 3D HOLOGRAPHIC WAVEFORM */
+.wave-container { position: relative; width: 250px; height: 250px; display: flex; align-items: center; justify-content: center; transform: perspective(800px) rotateX(50deg); transform-style: preserve-3d; }
+.wave { position: absolute; border-radius: 50%; border: 2px solid var(--primary); box-shadow: 0 0 20px var(--voice-ring), inset 0 0 20px var(--voice-ring); opacity: 0; width: 80px; height: 80px; }
+.wave-core { width: 80px; height: 80px; background: radial-gradient(circle, var(--primary) 0%, transparent 70%); border-radius: 50%; box-shadow: 0 0 50px var(--voice-shadow), 0 0 20px var(--primary); animation: pulse-core 1.5s infinite alternate ease-in-out; }
+body.voice-listening .wave { animation: wave-ripple 2s infinite linear; }
+body.voice-listening .wave.ring-1 { animation-delay: 0s; }
+body.voice-listening .wave.ring-2 { animation-delay: 0.6s; }
+body.voice-listening .wave.ring-3 { animation-delay: 1.2s; }
+
+@keyframes wave-ripple { 0% { width: 80px; height: 80px; opacity: 1; border-width: 4px; } 100% { width: 350px; height: 350px; opacity: 0; border-width: 1px; } }
+@keyframes pulse-core { 0% { transform: scale(1) translateZ(0); box-shadow: 0 0 20px var(--voice-shadow); } 100% { transform: scale(1.2) translateZ(20px); box-shadow: 0 0 60px var(--primary); } }

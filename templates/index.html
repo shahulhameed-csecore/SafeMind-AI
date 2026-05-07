@@ -6,7 +6,7 @@
     <title>SafeMinds-AI | Obsidian Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=19.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20.0">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
@@ -83,7 +83,7 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> 
                     <span>Breathe Now</span>
                 </button>
-                <div style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                <div class="desktop-avatar" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold;">
                         {{ session['username'][0]|upper if session['username'] else 'U' }}
                     </div>
@@ -176,12 +176,18 @@
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
                 <span>Radar</span>
             </button>
+            <a href="{{ url_for('logout') }}" class="mobile-nav-item" style="color: var(--danger); text-decoration: none;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                <span>Exit</span>
+            </a>
         </nav>
         <script>
             if (window.innerWidth <= 768) { document.getElementById('mobile-nav').style.display = 'flex'; }
             window.addEventListener('resize', () => { document.getElementById('mobile-nav').style.display = window.innerWidth <= 768 ? 'flex' : 'none'; });
         </script>
-    </div> <div id="breathe-modal" class="breathe-modal">
+    </div> 
+    
+    <div id="breathe-modal" class="breathe-modal">
         <button class="close-breathe-btn" onclick="stopBreathing()">✕</button>
         <div class="breathe-container">
             <div class="breathe-circle" id="breathe-circle"></div>
@@ -195,7 +201,16 @@
             <span>Speaking to SafeMinds</span>
             <div style="width: 24px;"></div>
         </div>
-        <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center;"></div>
+        
+        <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center;">
+            <div class="wave-container">
+                <div class="wave ring-1"></div>
+                <div class="wave ring-2"></div>
+                <div class="wave ring-3"></div>
+                <div class="wave-core"></div>
+            </div>
+        </div>
+        
         <div class="voice-text-container"><h2 id="live-transcript">I'm listening...</h2></div>
         <div class="voice-bottom-dock">
             <div class="mic-ring-container">
@@ -204,7 +219,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=19.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=20.0"></script>
     <script>
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
