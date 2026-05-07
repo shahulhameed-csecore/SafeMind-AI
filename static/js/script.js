@@ -39,7 +39,7 @@ function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     }, 300);
 }
 
-// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE (All 11 Themes)
+// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
 function getThemeColors() {
     const mood = document.body.getAttribute('data-mood') || 'woods';
     const palettes = {
