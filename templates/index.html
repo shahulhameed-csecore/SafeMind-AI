@@ -6,7 +6,7 @@
     <title>SafeMinds-AI | Obsidian Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=21.0">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
@@ -55,23 +55,6 @@
     </div>
 
     {% else %}
-    <div class="bg-aurora-container">
-        <div class="ambient-glow" id="glow1"></div>
-        <div class="ambient-glow-2" id="glow2"></div>
-    </div>
-    <div class="bg-aurora-container">
-        <div class="ambient-glow" id="glow1"></div>
-        <div class="ambient-glow-2" id="glow2"></div>
-    </div>
-    
-    <div class="floating-bg">
-        <div class="float-shape shape-1"></div>
-        <div class="float-shape shape-2"></div>
-        <div class="float-shape shape-3"></div>
-        <div class="float-shape shape-4"></div>
-        <div class="float-shape shape-5"></div>
-        <div class="float-shape shape-6"></div>
-    </div>
     
     <div class="app-layout">
         <header class="glass-panel top-header">
@@ -144,10 +127,7 @@
 
             <main class="glass-panel center-col">
                 <div class="lungs-container" id="lungs-container">
-                    <div id="sm-logo-circle" class="lungs-orb avatar-idle">
-                       
-                    </div>
-                    <h2 class="lungs-title">Good Morning, {{ session['username'] }}!<br>How can I assist you?</h2>
+                    <h2 class="lungs-title" style="margin-top: -50px;">Good Morning, {{ session['username'] }}!<br>How can I assist you?</h2>
                 </div>
 
                 <div class="chat-box" id="chat-box" onclick="closeAllPanels(null)"></div>
@@ -236,7 +216,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=20.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=21.0"></script>
     <script>
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
@@ -246,17 +226,11 @@
                 setTimeout(() => lungsContainer.style.display = 'none', 500);
             } else {
                 lungsContainer.style.display = 'flex';
-                setTimeout(() => lungsContainer.style.opacity = '0.3', 50);
+                setTimeout(() => lungsContainer.style.opacity = '1', 50);
             }
         });
         observer.observe(chatBox, { childList: true });
     </script>
     {% endif %}
-    <div class="foreground-floating-objects">
-        <div class="fg-particle fg-1"></div>
-        <div class="fg-particle fg-2"></div>
-        <div class="fg-particle fg-3"></div>
-        <div class="fg-particle fg-4"></div>
-    </div>
 </body>
 </html>

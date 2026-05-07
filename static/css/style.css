@@ -12,21 +12,20 @@
     --text-main: #f8fafc;
     --text-muted: rgba(248, 250, 252, 0.6);
     
-    /* TRUE DARK GLASS */
-    --surface-glass: rgba(10, 25, 15, 0.35);
-    --glass-input: rgba(0, 0, 0, 0.4);
+    /* TRUE DARK GLASS (Higher opacity for readability) */
+    --surface-glass: rgba(10, 25, 15, 0.45);
+    --glass-input: rgba(0, 0, 0, 0.55);
     --border-glass: rgba(255, 255, 255, 0.08);
     --border-glass-highlight: rgba(255, 255, 255, 0.15);
     
-    --glow-hero: rgba(139, 255, 170, 0.35); 
-    --glow-secondary: rgba(252, 211, 77, 0.1); 
     --panel-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.6);
-    
 
     /* Voice Mode Glows */
     --voice-ring: rgba(16, 185, 129, 0.2);
     --voice-shadow: rgba(16, 185, 129, 0.3);
-    --bg-shape: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23bef264" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>');
+    
+    /* Subtle Premium Mesh Background (Replaces Aurora) */
+    --bg-mesh: radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.05), transparent 50%), radial-gradient(circle at 85% 30%, rgba(5, 150, 105, 0.05), transparent 50%);
 }
 
 /* ☀️ LIGHT MODE (Lavender Crystal) */
@@ -42,57 +41,35 @@
     --text-main: #2e1065; 
     --text-muted: rgba(46, 16, 101, 0.6);
     
-    /* TRUE LIGHT GLASS */
-    --surface-glass: rgba(255, 255, 255, 0.45); 
-    --glass-input: rgba(255, 255, 255, 0.6); 
+    /* TRUE LIGHT GLASS (Higher opacity for readability) */
+    --surface-glass: rgba(255, 255, 255, 0.65); 
+    --glass-input: rgba(255, 255, 255, 0.85); 
     --border-glass: rgba(255, 255, 255, 0.6);
     --border-glass-highlight: rgba(255, 255, 255, 1);
     
-    --glow-hero: rgba(139, 92, 246, 0.3); 
-    --glow-secondary: rgba(244, 114, 182, 0.2); 
     --panel-shadow: 0 15px 35px 0 rgba(139, 92, 246, 0.15); 
 
     /* Voice Mode Glows */
     --voice-ring: rgba(139, 92, 246, 0.2);
     --voice-shadow: rgba(139, 92, 246, 0.3);
+    
+    /* Subtle Premium Mesh Background (Replaces Aurora) */
+    --bg-mesh: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.05), transparent 50%), radial-gradient(circle at 85% 30%, rgba(244, 114, 182, 0.05), transparent 50%);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
-    background: var(--bg-base); 
+    background-color: var(--bg-base); 
+    background-image: var(--bg-mesh);
+    background-attachment: fixed;
     color: var(--text-main);
     height: 100vh; 
     overflow: hidden;
     position: relative;
-    transition: background 0.5s ease, color 0.5s ease;
+    transition: background-color 0.5s ease, background-image 0.5s ease, color 0.5s ease;
 }
-
-/* 🌟 INTENSE HERO BLOOM */
-.bg-aurora-container {
-    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-    overflow: hidden; z-index: 0; pointer-events: none;
-}
-
-.ambient-glow {
-    position: absolute; top: -20%; left: -10%; 
-    width: 70vw; height: 70vw;
-    background: radial-gradient(circle, var(--glow-hero) 0%, transparent 60%);
-    filter: blur(130px);
-    animation: breathe-glow 10s ease-in-out infinite alternate;
-    transition: background 0.5s ease;
-}
-
-.ambient-glow-2 {
-    position: absolute; bottom: -20%; right: -10%;
-    width: 60vw; height: 60vw;
-    background: radial-gradient(circle, var(--glow-secondary) 0%, transparent 60%);
-    filter: blur(120px);
-    transition: background 0.5s ease;
-}
-
-@keyframes breathe-glow { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
 
 /* 🌟 PREMIUM TRUE GLASS PANELS */
 .glass-panel {
@@ -155,22 +132,8 @@ body {
 
 .center-col { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 
-.lungs-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; position: absolute; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.3; transition: opacity 0.5s; }
-.chat-empty .lungs-container { opacity: 1; z-index: 2; pointer-events: all; }
-
-.lungs-orb {
-    width: 140px; height: 140px; border-radius: 50%;
-    background: radial-gradient(circle at center, var(--primary) 0%, transparent 70%);
-    box-shadow: 0 0 40px var(--voice-shadow), inset 0 0 20px var(--voice-ring);
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.5s ease, box-shadow 0.5s ease;
-}
-.lungs-orb.avatar-idle { animation: breathe-lungs 8s infinite ease-in-out; }
-.lungs-orb.avatar-speaking { animation: ai-speaking-pulse 0.8s infinite alternate ease-in-out; }
-
-@keyframes breathe-lungs { 0%, 100% { transform: scale(0.9); opacity: 0.8; } 50% { transform: scale(1.15); opacity: 1; } }
-@keyframes ai-speaking-pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
-
+/* The Clean, Calming Empty State */
+.lungs-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; width: 100%; height: 100%; z-index: 0; pointer-events: none; transition: opacity 0.5s; opacity: 1;}
 .lungs-title { font-size: 1.8rem; font-weight: 600; color: var(--text-main); text-align: center; }
 
 .chat-box { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; z-index: 1; }
@@ -269,11 +232,9 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     .chat-box { flex-grow: 1; padding: 15px; z-index: 1; margin: 0; overflow-y: auto; padding-bottom: 90px; }
     .msg { max-width: 90%; border-radius: 20px; font-size: 0.9rem; }
 
-    /* 🚨 ULTIMATE FIX: Float the input dead-center above the nav bar */
     .input-area { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); width: 95vw; background: transparent; padding: 0; z-index: 9999; }
     .input-wrapper { width: 100%; border-radius: 30px; }
     
-    /* Mobile Bottom Navigation (With Exit Button) */
     .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--surface-glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--border-glass); justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); transition: 0.5s ease; }
     .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); background: transparent; border: none; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .mobile-nav-item.active { color: var(--primary); }
@@ -323,100 +284,22 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     transition: 0.3s ease; 
 }
 
-/* Base Idle Animation (Perfectly round sphere, tilted sideways) */
+/* Base Idle Animation */
 @keyframes slow-spin { 
     0% { transform: rotateZ(20deg) rotateY(0deg); } 
     100% { transform: rotateZ(20deg) rotateY(360deg); } 
 }
 
-/* ==========================================
-   🎤 WHEN USER IS SPEAKING / AI IS LISTENING
-========================================== */
-body.voice-listening .wave-container { 
-    animation: fast-spin 4s infinite linear; 
-}
-body.voice-listening .wave-ring { 
-    border: 2px solid var(--primary); 
-    box-shadow: 0 0 25px var(--voice-shadow), inset 0 0 25px var(--voice-shadow); 
-    opacity: 0.8; 
-}
-body.voice-listening .wave-core { 
-    animation: pulse-core-sphere 1s infinite alternate ease-in-out; 
-}
+body.voice-listening .wave-container { animation: fast-spin 4s infinite linear; }
+body.voice-listening .wave-ring { border: 2px solid var(--primary); box-shadow: 0 0 25px var(--voice-shadow), inset 0 0 25px var(--voice-shadow); opacity: 0.8; }
+body.voice-listening .wave-core { animation: pulse-core-sphere 1s infinite alternate ease-in-out; }
 
-/* Active Animations */
 @keyframes fast-spin { 
     0% { transform: rotateZ(20deg) rotateY(0deg) scale(1); } 
     50% { transform: rotateZ(20deg) rotateY(180deg) scale(1.08); } 
     100% { transform: rotateZ(20deg) rotateY(360deg) scale(1); } 
 }
-
 @keyframes pulse-core-sphere { 
     0% { transform: scale(1); box-shadow: 0 0 20px var(--voice-shadow); } 
     100% { transform: scale(1.6); box-shadow: 0 0 60px var(--primary); } 
-}
-/* ==========================================
-   🌿 FLOATING ORGANIC BACKGROUND ELEMENTS
-========================================== */
-.floating-bg {
-    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-    overflow: hidden; z-index: 0; pointer-events: none;
-}
-
-.float-shape {
-    position: absolute;
-    background-image: var(--bg-shape);
-    background-size: contain;
-    background-repeat: no-repeat;
-    opacity: 0;
-    animation: float-up linear infinite;
-    transition: background-image 0.5s ease;
-}
-
-/* Different sizes, speeds, and starting positions for natural randomness */
-.shape-1 { width: 60px; height: 60px; bottom: -10%; left: 10%; animation-duration: 25s; animation-delay: 0s; }
-.shape-2 { width: 85px; height: 85px; bottom: -10%; left: 25%; animation-duration: 32s; animation-delay: 5s; filter: blur(2px); }
-.shape-3 { width: 45px; height: 45px; bottom: -10%; left: 55%; animation-duration: 20s; animation-delay: 2s; }
-.shape-4 { width: 100px; height: 100px; bottom: -10%; left: 75%; animation-duration: 38s; animation-delay: 8s; filter: blur(3px); }
-.shape-5 { width: 55px; height: 55px; bottom: -10%; left: 90%; animation-duration: 28s; animation-delay: 14s; }
-.shape-6 { width: 70px; height: 70px; bottom: -10%; left: 40%; animation-duration: 26s; animation-delay: 10s; filter: blur(1px); }
-
-@keyframes float-up {
-    0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 0.12; } /* Keep opacity very low so it doesn't distract from the chat */
-    90% { opacity: 0.12; }
-    100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
-}
-/* ==========================================
-   ✨ FOREGROUND FLOATING OBJECTS (OVER UI)
-========================================== */
-.foreground-floating-objects {
-    position: fixed; /* Locks it to the user's screen */
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    z-index: 9999; /* Forces it to render on top of EVERYTHING */
-    pointer-events: none; /* CRITICAL: Lets you click completely through them */
-    overflow: hidden;
-}
-
-.fg-particle {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(3px); /* Gives it a glowing, out-of-focus camera depth effect */
-    opacity: 0;
-    animation: drift-across linear infinite;
-}
-
-/* Mix of Primary (Green/Purple) and Accent (Yellow/Pink) colors */
-.fg-1 { width: 12px; height: 12px; background: var(--primary); top: 80%; left: -10%; animation-duration: 25s; animation-delay: 0s; }
-.fg-2 { width: 20px; height: 20px; background: var(--accent); top: 30%; left: -10%; animation-duration: 35s; animation-delay: 8s; filter: blur(6px); }
-.fg-3 { width: 8px; height: 8px; background: var(--primary); top: 60%; left: -10%; animation-duration: 20s; animation-delay: 4s; }
-.fg-4 { width: 30px; height: 30px; background: var(--secondary); top: 90%; left: -10%; animation-duration: 40s; animation-delay: 15s; filter: blur(8px); }
-
-/* Drifts slowly from the bottom-left of the screen to the top-right */
-@keyframes drift-across {
-    0% { transform: translateX(0vw) translateY(0) scale(0.5); opacity: 0; }
-    10% { opacity: 0.6; } /* Fades in */
-    50% { transform: translateX(50vw) translateY(-20vh) scale(1.5); } /* Gets closer to camera */
-    90% { opacity: 0.6; }
-    100% { transform: translateX(120vw) translateY(-50vh) scale(0.5); opacity: 0; } /* Fades out off-screen */
 }
