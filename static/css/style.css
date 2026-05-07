@@ -1,32 +1,63 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-/* 🌑 DEFAULT DARK MODE (Obsidian Reference Theme) */
+/* 🌑 DEFAULT DARK MODE (Midnight Crocus) */
 :root {
-    --bg-base: #030705; /* Deeper dark background to make the glow pop */
-    --primary: #10b981; 
-    --secondary: #059669; 
-    --accent: #fcd34d; 
+    --bg-base: #2f2d3b; /* Deep purple/charcoal background */
+    --primary: #6768ab; /* Vibrant periwinkle */
+    --secondary: #5e4d9b; /* Deep purple */
+    --accent: #9389bd; /* Soft lavender */
     --danger: #ef4444;
     --success: #10b981;
     
-    --text-main: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.5);
+    --text-main: #ffffff; /* Crisp white text for dark mode */
+    --text-muted: #cfcad1; /* Light grey/purple for muted text */
     
-    /* TRUE DARK GLASS - Clean, no stripes */
-    --surface-glass: rgba(12, 22, 16, 0.45); 
-    --glass-input: rgba(0, 0, 0, 0.4);
-    --border-glass: rgba(255, 255, 255, 0.06);
-    --border-glass-highlight: rgba(255, 255, 255, 0.12);
+    /* TRUE DARK GLASS */
+    --surface-glass: rgba(0, 0, 0, 0.35); 
+    --glass-input: rgba(0, 0, 0, 0.5);
+    --border-glass: rgba(207, 202, 209, 0.1); 
+    --border-glass-highlight: rgba(207, 202, 209, 0.25);
     
-    --panel-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.7);
+    --panel-shadow: 0 20px 40px 0 rgba(0, 0, 0, 0.6);
 
     /* Voice Mode Glows */
-    --voice-ring: rgba(16, 185, 129, 0.2);
-    --voice-shadow: rgba(16, 185, 129, 0.3);
+    --voice-ring: rgba(103, 104, 171, 0.3); 
+    --voice-shadow: rgba(103, 104, 171, 0.4);
     
-    /* Massive Reference Image Aurora Glows */
-    --glow-hero: rgba(20, 185, 100, 0.25); 
-    --glow-accent: rgba(200, 220, 80, 0.12); 
+    /* Massive Aurora Glows */
+    --glow-hero: rgba(103, 104, 171, 0.35); /* Based on #6768ab */
+    --glow-accent: rgba(147, 137, 189, 0.25); /* Based on #9389bd */
+}
+
+/* ☀️ LIGHT MODE (Blushing Peonies) */
+[data-theme="light"] {
+    --bg-base: #fceeed; /* Softest pink background */
+    
+    --primary: #f7a49e; /* Peach/Dark pink */
+    --secondary: #f7c6c2; /* Soft pink */
+    --accent: #948d71; /* Olive/Khaki green accent */
+    --danger: #ef4444;
+    --success: #10b981;
+    
+    /* We use a darkened olive for text to ensure perfect readability on light pink */
+    --text-main: #4a4536; 
+    --text-muted: rgba(74, 69, 54, 0.6);
+    
+    /* TRUE LIGHT GLASS */
+    --surface-glass: rgba(255, 255, 255, 0.5); 
+    --glass-input: rgba(255, 255, 255, 0.8); 
+    --border-glass: rgba(255, 255, 255, 0.6);
+    --border-glass-highlight: rgba(255, 255, 255, 0.9);
+    
+    --panel-shadow: 0 15px 35px 0 rgba(148, 141, 113, 0.15); /* Olive tinted shadow */
+
+    /* Voice Mode Glows */
+    --voice-ring: rgba(247, 164, 158, 0.3);
+    --voice-shadow: rgba(247, 164, 158, 0.4);
+    
+    /* Massive Aurora Glows */
+    --glow-hero: rgba(247, 164, 158, 0.4); /* Based on #f7a49e */
+    --glow-accent: rgba(217, 215, 194, 0.6); /* Based on #d9d7c2 */
 }
 
 /* ☀️ LIGHT MODE (Lavender Crystal) */
