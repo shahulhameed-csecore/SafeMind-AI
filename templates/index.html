@@ -6,7 +6,7 @@
     <title>SafeMind AI | Emotional Sanctuary</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=26.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=27.0">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
@@ -98,7 +98,7 @@
                 </button>
                 <div class="desktop-avatar" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--bg-base); display: flex; align-items: center; justify-content: center; font-weight: bold; transition: background 0.8s ease;">
-                        {{ session.get('username', 'U')[0] | upper }}
+                        {{ session['username'][0]|upper if session['username'] else 'U' }}
                     </div>
                 </div>
             </div>
@@ -144,7 +144,7 @@
 
             <main class="glass-panel center-col">
                 <div class="lungs-container" id="lungs-container">
-                    <h2 class="lungs-title" style="margin-top: -50px;">I'm here for you, {{ session.get('username', 'Guest') }}.<br><span style="font-size: 1.1rem; font-weight: 400; color: var(--text-muted);">Whenever you're ready to talk.</span></h2>
+                    <h2 class="lungs-title" style="margin-top: -50px;">I'm here for you, {{ session['username'] if session['username'] else 'Guest' }}.<br><span style="font-size: 1.1rem; font-weight: 400; color: var(--text-muted);">Whenever you're ready to talk.</span></h2>
                 </div>
 
                 <div class="chat-box" id="chat-box" onclick="closeAllPanels(null)"></div>
@@ -231,7 +231,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=26.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=27.0"></script>
     <script>
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
@@ -246,5 +246,6 @@
         });
         observer.observe(chatBox, { childList: true });
     </script>
-    {% endif %} </body>
+    {% endif %}
+</body>
 </html>
