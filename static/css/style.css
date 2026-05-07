@@ -153,9 +153,9 @@ body {
 /* ==========================================
    💻 LAYOUT
 ========================================== */
-.app-layout { display: flex; flex-direction: column; height: 100vh; padding: 15px 25px; gap: 15px; position: relative; z-index: 1; }
+.app-layout { display: flex; flex-direction: column; height: 100vh; padding: 15px 25px; gap: 15px; position: relative; z-index: 1; overflow: visible; }
 
-.top-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px; border-radius: 100px; flex-shrink: 0; }
+.top-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 25px; border-radius: 100px; flex-shrink: 0; overflow: visible; z-index: 200; }
 .logo-container { display: flex; align-items: center; gap: 12px; }
 .logo-icon { width: 36px; height: 36px; background: rgba(255, 255, 255, 0.1); border: 1px solid var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 1s; }
 .logo { font-size: 1.2rem; font-weight: 700; color: var(--text-main); transition: 1s;}
@@ -262,6 +262,7 @@ input::placeholder { color: var(--text-muted); }
     position: relative;
     display: flex;
     align-items: center;
+    z-index: 300;
 }
 
 /* Trigger button */
