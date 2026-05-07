@@ -8,7 +8,6 @@ function toggleThemeMenu() {
     menu.classList.toggle('active');
 }
 
-// Close the theme menu if user clicks outside of it
 document.addEventListener('click', function(event) {
     const wrapper = document.getElementById('theme-dropdown-wrapper');
     const menu = document.getElementById('theme-menu');
@@ -18,21 +17,17 @@ document.addEventListener('click', function(event) {
 });
 
 function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
-    // Update HTML/CSS State
     document.body.setAttribute('data-mood', moodId);
     localStorage.setItem('safeminds_theme', moodId);
     
-    // Update the UI Button text and indicator dot
     const nameEl = document.getElementById('current-theme-name');
     if(nameEl) nameEl.innerText = moodName;
     
     const dot = document.getElementById('current-theme-dot');
     if(dot) dot.style.background = `linear-gradient(135deg, ${primaryHex}, ${secondaryHex})`;
     
-    // Close the menu
     document.getElementById('theme-menu').classList.remove('active');
     
-    // Force Chart.js graphs to redraw with the new psychological colors
     setTimeout(() => {
         if(moodChartInstance) loadMoodChart(); 
         if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
@@ -61,11 +56,9 @@ function getThemeColors() {
 const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // Recover saved theme
     const savedTheme = localStorage.getItem('safeminds_theme') || 'woods';
     document.body.setAttribute('data-mood', savedTheme);
     
-    // Map theme IDs to their names and gradients for the UI recovery
     const themeMaps = {
         'woods':      { name: 'Into the Woods', p: '#848871', s: '#464b37' },
         'sunset':     { name: 'Purple Sunset',  p: '#c266a7', s: '#52489f' },
@@ -325,25 +318,60 @@ function clearChat() {
 
 document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
+/* 🎤 🚨 FIX: REAL-TIME VOICE TRANSCRIPTION 🚨 🎤 */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition; let isListening = false;
 if (SpeechRecognition) {
-    recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
+    recognition = new SpeechRecognition(); 
+    recognition.continuous = false; 
+    
+    // 🚨 THIS IS THE FIX: Shows words on screen instantly as you speak them!
+    recognition.interimResults = true; 
+    
+    recognition.lang = 'en-US';
+    
     recognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = 0; i < event.results.length; i++) transcript += event.results[i][0].transcript;
-        document.getElementById("user-input").value = transcript;
+        let finalTranscript = '';
+        let interimTranscript = '';
+        
+        for (let i = 0; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                finalTranscript += event.results[i][0].transcript;
+            } else {
+                interimTranscript += event.results[i][0].transcript;
+            }
+        }
+        
+        const displayTranscript = finalTranscript + interimTranscript;
+        
+        // Put text in the input box AND the big voice mode screen
+        document.getElementById("user-input").value = displayTranscript;
         const liveTranscript = document.getElementById("live-transcript");
-        if(liveTranscript) liveTranscript.innerText = transcript;
+        if(liveTranscript) liveTranscript.innerText = displayTranscript || "I'm listening...";
     };
+    
     recognition.onend = () => { 
         isListening = false; 
         document.body.classList.remove('voice-listening');
         if(document.getElementById("voice-status")) document.getElementById("voice-status").style.display = "none"; 
+        
+        // Only send if they actually spoke words
         const inputText = document.getElementById("user-input").value.trim();
-        if (inputText.length > 0) { toggleVoiceMode(false); sendMessage(); } else { toggleVoiceMode(false); }
+        if (inputText.length > 0) { 
+            toggleVoiceMode(false); 
+            sendMessage(); 
+        } else { 
+            toggleVoiceMode(false); 
+        }
     };
-    recognition.onerror = () => { recognition.onend(); };
+    
+    // 🚨 THIS IS THE FIX: Prevent silent crashes when there's a 1-second pause
+    recognition.onerror = (event) => { 
+        console.error("Microphone Error:", event.error);
+        if(event.error !== 'no-speech') {
+            recognition.stop();
+        }
+    };
 }
 
 function toggleVoiceMode(show) {
@@ -357,14 +385,21 @@ function toggleVoiceMode(show) {
 }
 
 function toggleListening() {
-    if (!SpeechRecognition) return alert("Browser doesn't support voice chat.");
+    if (!SpeechRecognition) return alert("Your browser doesn't support Voice Chat. Please use Google Chrome or Edge.");
+    
     if (isListening) { 
         recognition.stop(); document.body.classList.remove('voice-listening'); 
     } else { 
         document.getElementById("user-input").value = ""; 
         document.getElementById("live-transcript").innerText = "I'm listening..."; 
+        
+        // Sync language with selector
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
-        recognition.lang = selectedLang; recognition.start(); isListening = true; toggleVoiceMode(true);
+        recognition.lang = selectedLang; 
+        
+        recognition.start(); 
+        isListening = true; 
+        toggleVoiceMode(true);
         document.body.classList.add('voice-listening');
         if (document.getElementById("voice-status")) document.getElementById("voice-status").style.display = "block"; 
     }
