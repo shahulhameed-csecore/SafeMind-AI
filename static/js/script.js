@@ -2,39 +2,55 @@ let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
 
+// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
 function getThemeColors() {
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    return {
-        text: isLight ? 'rgba(46, 16, 101, 0.8)' : 'rgba(248, 250, 252, 0.6)',
-        grid: isLight ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-        line: isLight ? '#8b5cf6' : '#10b981', 
-        bg: isLight ? 'rgba(139, 92, 246, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-        point: isLight ? '#f472b6' : '#fcd34d' 
+    const mood = document.documentElement.getAttribute('data-mood') || 'calm';
+    const palettes = {
+        'calm':      { text: '#2d4a48', grid: 'rgba(92, 184, 178, 0.2)', line: '#5cb8b2', bg: 'rgba(92, 184, 178, 0.2)', point: '#a3d9d2' },
+        'anxious':   { text: '#2c3338', grid: 'rgba(108, 122, 137, 0.15)', line: '#6c7a89', bg: 'rgba(108, 122, 137, 0.15)', point: '#b4bcc4' },
+        'motivated': { text: '#4a2c2a', grid: 'rgba(242, 139, 130, 0.2)', line: '#f28b82', bg: 'rgba(242, 139, 130, 0.25)', point: '#fce8b2' },
+        'sleep':     { text: '#e8eaf6', grid: 'rgba(121, 134, 203, 0.15)', line: '#7986cb', bg: 'rgba(121, 134, 203, 0.15)', point: '#3f51b5' }
     };
+    return palettes[mood];
 }
+
 const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // Load saved mood
+    const savedMood = localStorage.getItem('safeminds_mood');
+    if (savedMood) {
+        document.documentElement.setAttribute('data-mood', savedMood);
+        const selector = document.getElementById('mood-selector');
+        if(selector) selector.value = savedMood;
+    }
+
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
         await loadMoodChart();
     }
 });
 
+// 🧠 MOOD CHANGE TRIGGER
+function changeMood(mood) {
+    document.documentElement.setAttribute('data-mood', mood);
+    localStorage.setItem('safeminds_mood', mood);
+    
+    // Force Chart.js graphs to redraw with the new psychological colors
+    setTimeout(() => {
+        if(moodChartInstance) loadMoodChart(); 
+        if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
+    }, 300);
+}
+
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
-    if (/[\u0B80-\u0BFF]/.test(text)) {
-        let tamilVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('ta')) || voices.find(v => v.lang.includes('ta-IN') || v.lang.includes('ta'));
-        return tamilVoice; 
-    }
-    if (/[\u0900-\u097F]/.test(text)) {
-        let hindiVoice = voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || voices.find(v => v.lang.includes('hi-IN') || v.lang.includes('hi'));
-        return hindiVoice;
-    }
+    if (/[\u0B80-\u0BFF]/.test(text)) return voices.find(v => v.name.includes('Google') && v.lang.includes('ta')) || voices.find(v => v.lang.includes('ta'));
+    if (/[\u0900-\u097F]/.test(text)) return voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || voices.find(v => v.lang.includes('hi'));
+    
     let best = voices.find(v => v.name.includes('Natural') && (v.name.includes('Female') || v.name.includes('Jenny')));
     if (!best) best = voices.find(v => v.name.includes('Google US English'));
     if (!best) best = voices.find(v => v.name.includes('Google UK English Female'));
-    if (!best) best = voices.find(v => v.name.includes('Samantha') || v.name.includes('Zira'));
     return best || voices[0];
 }
 
@@ -43,27 +59,22 @@ function speakText(text) {
     let smoothedText = text.replace(/ \. /g, '... ').replace(/,/g, ', ');
     const utterance = new SpeechSynthesisUtterance(smoothedText);
     utterance.voice = getBestTherapistVoice(text);
-    if (/[\u0B80-\u0BFF]/.test(text) || /[\u0900-\u097F]/.test(text)) { utterance.rate = 0.85; } else { utterance.rate = 1.05; }
-    utterance.pitch = 1.05; 
-    utterance.volume = 1.0;
+    utterance.rate = (/[\u0B80-\u0BFF]/.test(text) || /[\u0900-\u097F]/.test(text)) ? 0.85 : 1.05;
+    utterance.pitch = 1.05; utterance.volume = 1.0;
+    
     const stopBtn = document.getElementById('stop-audio-btn');
-
     utterance.onstart = () => { isSpeaking = true; if(stopBtn) stopBtn.style.display = 'flex'; };
     utterance.onend = () => { isSpeaking = false; if(stopBtn) stopBtn.style.display = 'none'; };
     
-    if (utterance.voice || !(/[\u0B80-\u0BFF]/.test(text) || /[\u0900-\u097F]/.test(text))) {
-        window.speechSynthesis.speak(utterance);
-    }
+    if (utterance.voice || !(/[\u0B80-\u0BFF]/.test(text) || /[\u0900-\u097F]/.test(text))) window.speechSynthesis.speak(utterance);
 }
 
 let currentCloudAudio = null;
-
 function playCloudAudio(base64Audio) {
     if (currentCloudAudio) { currentCloudAudio.pause(); currentCloudAudio.currentTime = 0; }
     window.speechSynthesis.cancel(); 
     currentCloudAudio = new Audio("data:audio/mp3;base64," + base64Audio);
     const stopBtn = document.getElementById('stop-audio-btn');
-
     currentCloudAudio.onplay = () => { isSpeaking = true; if(stopBtn) stopBtn.style.display = 'flex'; };
     currentCloudAudio.onended = () => { isSpeaking = false; if(stopBtn) stopBtn.style.display = 'none'; };
     currentCloudAudio.play();
@@ -102,7 +113,7 @@ async function loadMoodChart() {
             type: 'line',
             data: { labels: labels, datasets: [{ 
                 data: plotData, borderColor: theme.line, backgroundColor: theme.bg, 
-                borderWidth: 2, tension: 0.4, fill: true, pointBackgroundColor: '#020604', pointBorderColor: theme.point, pointBorderWidth: 2, pointRadius: 4 
+                borderWidth: 2, tension: 0.4, fill: true, pointBackgroundColor: 'transparent', pointBorderColor: theme.point, pointBorderWidth: 2, pointRadius: 4 
             }] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0.5, max: 4.5, ticks: { stepSize: 1, color: theme.text, font: {size: 10} }, grid: { color: theme.grid } } } }
         });
@@ -113,7 +124,7 @@ async function loadMoodChart() {
             if (latestMood === 'Happy') insightText.innerHTML = "You've been feeling <strong>positive</strong>. Keep up the great energy!";
             else if (latestMood === 'Calm') insightText.innerHTML = "Your mood is <strong>steady and calm</strong>. This is a great baseline.";
             else if (latestMood === 'Sad') insightText.innerHTML = "You've been feeling <strong>down</strong> lately. Be kind to yourself.";
-            else if (latestMood === 'Stressed') insightText.innerHTML = "Your <strong>stress levels are high</strong>. Consider using the breathing tool.";
+            else if (latestMood === 'Stressed') insightText.innerHTML = "Your <strong>stress levels are high</strong>. Try the breathing tool.";
         }
     } catch (error) { console.error("Chart error:", error); }
 }
@@ -148,7 +159,6 @@ function updateEmotionRadar(emotionData) {
     const theme = getThemeColors(); 
 
     if (radarChartInstance) radarChartInstance.destroy(); 
-    
     radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: { labels: labels, datasets: [{ data: dataPoints, backgroundColor: theme.bg, borderColor: theme.line, pointBackgroundColor: theme.point, borderWidth: 2 }] },
@@ -167,7 +177,7 @@ async function loadSidebarSessions() {
         const response = await fetch("/get_sessions");
         const sessions = await response.json();
         historyList.innerHTML = "";
-        if (sessions.length === 0) { historyList.innerHTML = '<div class="empty" style="color:rgba(255,255,255,0.3);font-size:0.85rem;">No recent chats</div>'; return; }
+        if (sessions.length === 0) { historyList.innerHTML = '<div class="empty" style="font-size:0.85rem; opacity:0.5;">No recent chats</div>'; return; }
         sessions.forEach(sess => {
             const div = document.createElement("div"); div.className = "history-item";
             div.onclick = () => loadChatThread(sess.session_id);
@@ -177,7 +187,7 @@ async function loadSidebarSessions() {
             delBtn.onclick = (e) => { e.stopPropagation(); deleteEntireSession(sess.session_id); };
             div.appendChild(titleSpan); div.appendChild(delBtn); historyList.appendChild(div);
         });
-    } catch (error) { historyList.innerHTML = '<div class="empty">Error loading</div>'; }
+    } catch (error) {}
 }
 
 async function loadChatThread(sessionId) {
@@ -209,7 +219,7 @@ async function sendMessage() {
     const liveTranscript = document.getElementById("live-transcript");
     if(liveTranscript) liveTranscript.innerText = "Analyzing...";
 
-    const loadingBubble = addMessage("Typing...", "bot");
+    const loadingBubble = addMessage("Thinking...", "bot");
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
 
@@ -233,7 +243,6 @@ async function sendMessage() {
         } else {
             speakResponse(data.response);
         }
-        
         if (isFirstMessage) loadSidebarSessions();
     } catch (error) { loadingBubble.innerText = "Connection lost."; }
 }
@@ -258,7 +267,6 @@ function clearChat() {
     const chatBox = document.getElementById("chat-box");
     if(chatBox) chatBox.innerHTML = '';
     sessionMemory = []; currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-    // Reset idle state
     const lungsContainer = document.getElementById('lungs-container');
     if (lungsContainer) {
         lungsContainer.style.display = 'flex';
@@ -272,7 +280,6 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 let recognition; let isListening = false;
 if (SpeechRecognition) {
     recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
-    
     recognition.onresult = (event) => {
         let transcript = '';
         for (let i = 0; i < event.results.length; i++) transcript += event.results[i][0].transcript;
@@ -280,13 +287,10 @@ if (SpeechRecognition) {
         const liveTranscript = document.getElementById("live-transcript");
         if(liveTranscript) liveTranscript.innerText = transcript;
     };
-    
     recognition.onend = () => { 
         isListening = false; 
-        document.getElementById("mic-btn")?.classList.remove("recording"); 
         document.body.classList.remove('voice-listening');
         if(document.getElementById("voice-status")) document.getElementById("voice-status").style.display = "none"; 
-        
         const inputText = document.getElementById("user-input").value.trim();
         if (inputText.length > 0) { toggleVoiceMode(false); sendMessage(); } else { toggleVoiceMode(false); }
     };
@@ -296,32 +300,23 @@ if (SpeechRecognition) {
 function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
     if (show) {
-        voiceMode.classList.add('active');
-        document.body.classList.add('voice-active');
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+        voiceMode.classList.add('active'); document.body.classList.add('voice-active');
     } else {
-        voiceMode.classList.remove('active');
-        document.body.classList.remove('voice-active');
+        voiceMode.classList.remove('active'); document.body.classList.remove('voice-active');
         if (isListening) recognition.stop();
-        setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
     }
 }
 
 function toggleListening() {
     if (!SpeechRecognition) return alert("Browser doesn't support voice chat.");
     if (isListening) { 
-        recognition.stop(); 
-        document.body.classList.remove('voice-listening'); 
+        recognition.stop(); document.body.classList.remove('voice-listening'); 
     } else { 
         document.getElementById("user-input").value = ""; 
         document.getElementById("live-transcript").innerText = "I'm listening..."; 
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
-        recognition.lang = selectedLang;
-        recognition.start(); 
-        isListening = true; 
-        toggleVoiceMode(true);
+        recognition.lang = selectedLang; recognition.start(); isListening = true; toggleVoiceMode(true);
         document.body.classList.add('voice-listening');
-        document.getElementById("mic-btn").classList.add("recording"); 
         if (document.getElementById("voice-status")) document.getElementById("voice-status").style.display = "block"; 
     }
 }
@@ -355,17 +350,13 @@ function switchMobileTab(tabName) {
     document.querySelectorAll('.mobile-nav-item').forEach(el => { el.classList.remove('active'); });
     const selectedBtn = document.getElementById('nav-' + tabName);
     if (selectedBtn) selectedBtn.classList.add('active');
-    if (tabName === 'chat') {
-        const chatBox = document.getElementById("chat-box");
-        if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50);
-    }
+    if (tabName === 'chat') { const chatBox = document.getElementById("chat-box"); if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50); }
 }
 
 function closeAllPanels(clickedIcon) {
     document.querySelectorAll('.side-panel').forEach(panel => { panel.classList.remove('active'); });
     document.querySelectorAll('.side-nav-icons .icon-pill').forEach(icon => { icon.classList.remove('active'); });
-    if (clickedIcon) { clickedIcon.classList.add('active'); } 
-    else { document.querySelector('.side-nav-icons .icon-pill').classList.add('active'); }
+    if (clickedIcon) { clickedIcon.classList.add('active'); } else { document.querySelector('.side-nav-icons .icon-pill').classList.add('active'); }
 }
 
 function togglePanel(panelId, iconElement) {
@@ -380,26 +371,3 @@ function togglePanel(panelId, iconElement) {
         document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
     }
 }
-
-function toggleTheme() {
-    const body = document.documentElement;
-    const currentTheme = body.getAttribute('data-theme');
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    body.setAttribute('data-theme', newTheme);
-    localStorage.setItem('safeminds_theme', newTheme);
-    document.getElementById('theme-icon-sun').style.display = newTheme === 'light' ? 'none' : 'block';
-    document.getElementById('theme-icon-moon').style.display = newTheme === 'light' ? 'block' : 'none';
-    setTimeout(() => {
-        if(moodChartInstance) loadMoodChart(); 
-        if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
-    }, 100);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const savedTheme = localStorage.getItem('safeminds_theme');
-    if (savedTheme === 'light') {
-        document.documentElement.setAttribute('data-theme', 'light');
-        document.getElementById('theme-icon-sun').style.display = 'none';
-        document.getElementById('theme-icon-moon').style.display = 'block';
-    }
-});
