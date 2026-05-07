@@ -12,25 +12,26 @@
     --text-main: #f8fafc;
     --text-muted: rgba(248, 250, 252, 0.6);
     
-    /* TRUE DARK GLASS (Higher opacity for readability) */
-    --surface-glass: rgba(10, 25, 15, 0.45);
-    --glass-input: rgba(0, 0, 0, 0.55);
+    /* TRUE DARK GLASS */
+    --surface-glass: rgba(10, 30, 15, 0.25); /* More transparent so the glow shows through */
+    --glass-input: rgba(0, 0, 0, 0.45);
     --border-glass: rgba(255, 255, 255, 0.08);
-    --border-glass-highlight: rgba(255, 255, 255, 0.15);
+    --border-glass-highlight: rgba(255, 255, 255, 0.2);
     
-    --panel-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.6);
+    --panel-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.5);
 
     /* Voice Mode Glows */
     --voice-ring: rgba(16, 185, 129, 0.2);
     --voice-shadow: rgba(16, 185, 129, 0.3);
     
-    /* Subtle Premium Mesh Background (Replaces Aurora) */
-    --bg-mesh: radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.05), transparent 50%), radial-gradient(circle at 85% 30%, rgba(5, 150, 105, 0.05), transparent 50%);
+    /* BACKGROUND BLUR LIGHTS */
+    --glow-1: rgba(16, 185, 129, 0.25); /* Deep Emerald */
+    --glow-2: rgba(5, 150, 105, 0.15); /* Soft Mint */
 }
 
 /* ☀️ LIGHT MODE (Lavender Crystal) */
 [data-theme="light"] {
-    --bg-base: #f8f5fa; 
+    --bg-base: #f5f3f9; 
     
     --primary: #8b5cf6; 
     --secondary: #a78bfa; 
@@ -41,20 +42,21 @@
     --text-main: #2e1065; 
     --text-muted: rgba(46, 16, 101, 0.6);
     
-    /* TRUE LIGHT GLASS (Higher opacity for readability) */
-    --surface-glass: rgba(255, 255, 255, 0.65); 
-    --glass-input: rgba(255, 255, 255, 0.85); 
+    /* TRUE LIGHT GLASS */
+    --surface-glass: rgba(255, 255, 255, 0.35); /* Frosty white, highly transparent */
+    --glass-input: rgba(255, 255, 255, 0.7); 
     --border-glass: rgba(255, 255, 255, 0.6);
     --border-glass-highlight: rgba(255, 255, 255, 1);
     
-    --panel-shadow: 0 15px 35px 0 rgba(139, 92, 246, 0.15); 
+    --panel-shadow: 0 15px 35px 0 rgba(139, 92, 246, 0.1); 
 
     /* Voice Mode Glows */
     --voice-ring: rgba(139, 92, 246, 0.2);
     --voice-shadow: rgba(139, 92, 246, 0.3);
     
-    /* Subtle Premium Mesh Background (Replaces Aurora) */
-    --bg-mesh: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.05), transparent 50%), radial-gradient(circle at 85% 30%, rgba(244, 114, 182, 0.05), transparent 50%);
+    /* BACKGROUND BLUR LIGHTS */
+    --glow-1: rgba(139, 92, 246, 0.3); /* Lavender */
+    --glow-2: rgba(244, 114, 182, 0.2); /* Soft Rose/Pink */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -62,20 +64,54 @@
 body { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
     background-color: var(--bg-base); 
-    background-image: var(--bg-mesh);
-    background-attachment: fixed;
     color: var(--text-main);
     height: 100vh; 
     overflow: hidden;
     position: relative;
-    transition: background-color 0.5s ease, background-image 0.5s ease, color 0.5s ease;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* ==========================================
+   🌟 THE GLASSMORPHISM ENGINE (SOFT GLOWS)
+========================================== */
+.bg-aurora-container {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 0; overflow: hidden; pointer-events: none;
+}
+
+/* These are the soft blobs of color that sit BEHIND the glass */
+.ambient-glow {
+    position: absolute; top: -10%; left: 0%; 
+    width: 60vw; height: 60vw;
+    background: radial-gradient(circle, var(--glow-1) 0%, transparent 65%);
+    filter: blur(90px); /* Massive blur so it looks like soft light, not a shape */
+    animation: slow-drift 15s ease-in-out infinite alternate;
+    transition: background 0.5s ease;
+}
+
+.ambient-glow-2 {
+    position: absolute; bottom: -10%; right: 0%;
+    width: 70vw; height: 70vw;
+    background: radial-gradient(circle, var(--glow-2) 0%, transparent 65%);
+    filter: blur(100px);
+    animation: slow-drift-reverse 20s ease-in-out infinite alternate;
+    transition: background 0.5s ease;
+}
+
+@keyframes slow-drift {
+    0% { transform: translate(0, 0) scale(1); } 
+    100% { transform: translate(5%, 10%) scale(1.1); } 
+}
+@keyframes slow-drift-reverse {
+    0% { transform: translate(0, 0) scale(1); } 
+    100% { transform: translate(-5%, -10%) scale(1.05); } 
 }
 
 /* 🌟 PREMIUM TRUE GLASS PANELS */
 .glass-panel {
     background: var(--surface-glass);
-    backdrop-filter: blur(30px);
-    -webkit-backdrop-filter: blur(30px);
+    backdrop-filter: blur(35px); /* This grabs the soft colors behind it and frosts them */
+    -webkit-backdrop-filter: blur(35px);
     border: 1px solid var(--border-glass);
     border-top: 1px solid var(--border-glass-highlight);
     border-left: 1px solid var(--border-glass-highlight);
@@ -284,7 +320,6 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     transition: 0.3s ease; 
 }
 
-/* Base Idle Animation */
 @keyframes slow-spin { 
     0% { transform: rotateZ(20deg) rotateY(0deg); } 
     100% { transform: rotateZ(20deg) rotateY(360deg); } 
