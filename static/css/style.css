@@ -290,7 +290,7 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     .right-col, .side-nav-icons { display: none !important; }
     
     /* Make room for the bottom navigation bar */
-    .app-layout { padding: 10px; padding-bottom: 85px; } 
+    .app-layout { padding: 10px; padding-bottom: 75px; } 
     .workspace { padding: 0; gap: 0; flex-direction: column; }
     
     /* Fix header spacing */
@@ -311,21 +311,25 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     /* Fix side panels to fill screen above nav */
     .side-panel {
         width: 100vw; left: 0; top: 65px;
-        height: calc(100vh - 150px);
+        height: calc(100vh - 140px);
         border-radius: 24px; padding: 20px; z-index: 500;
     }
     
-    /* Fix chat box so it doesn't push the input away */
-    .chat-box { flex-grow: 1; padding: 15px; z-index: 1; margin: 0; overflow-y: auto; }
+    /* 🚨 THE FIX 1: Add padding so chat doesn't hide behind the input box */
+    .chat-box { flex-grow: 1; padding: 15px; z-index: 1; margin: 0; overflow-y: auto; padding-bottom: 90px; }
     .msg { max-width: 90%; border-radius: 20px; font-size: 0.9rem; }
 
-    /* 🚨 THE FIX: Bring back the input area */
+    /* 🚨 THE FIX 2: Pin the input area exactly above the bottom nav */
     .input-area {
-        position: relative; 
-        bottom: auto; left: auto; width: 100%; 
-        background: transparent; padding: 10px; border: none; z-index: 10;
+        position: fixed;
+        bottom: 75px; /* Sits exactly on top of the bottom nav */
+        left: 0;
+        width: 100vw;
+        background: transparent;
+        padding: 10px 15px;
+        z-index: 999;
     }
-    .input-wrapper { width: 100%; border-radius: 30px; background: rgba(5, 15, 10, 0.95); box-shadow: 0 -10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); }
+    .input-wrapper { width: 100%; border-radius: 30px; }
     
     /* Mobile Bottom Navigation */
     .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--surface-glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border-top: 1px solid var(--border-glass); justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
