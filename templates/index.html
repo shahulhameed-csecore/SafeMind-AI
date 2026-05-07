@@ -6,7 +6,7 @@
     <title>SafeMinds-AI | Obsidian Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=16.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=17.0">
 </head>
 
 <body class="{% if show_auth %}auth-body{% else %}dashboard-body mobile-tab-chat{% endif %}">
@@ -55,10 +55,11 @@
     </div>
 
     {% else %}
-   <div class="bg-aurora-container">
+    <div class="bg-aurora-container">
         <div class="ambient-glow" id="glow1"></div>
         <div class="ambient-glow-2" id="glow2"></div>
     </div>
+    
     <div class="app-layout">
         <header class="glass-panel top-header">
             <div class="logo-container">
@@ -151,36 +152,7 @@
                 </div>
             </main>
         </div>
-            </main>
-
-            <aside class="glass-panel right-col">
-                <div>
-                    <div class="panel-title">History Chat <button class="new-chat-btn" onclick="clearChat()">+ New Chat</button></div>
-                    <div id="history-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
-                </div>
-
-                <div style="margin-top: 10px;">
-                    <div class="panel-title">Mood & Emotion</div>
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Happy')">😊</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Calm')">🧘</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Sad')">😢</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Stressed')">😫</button>
-                    </div>
-                    <div class="chart-container" style="height: 110px;"><canvas id="moodChart"></canvas></div>
-                    <div class="insight-box" id="mood-insight-box"><span class="insight-icon">💡</span><p id="mood-insight-text">Log your mood to see your insights.</p></div>
-                </div>
-                
-                <div style="margin-top: 10px; flex: 1;">
-                    <div class="panel-title">Emotion Radar</div>
-                    <div class="chart-container radar-container"><canvas id="emotionRadarChart"></canvas></div>
-                    <div class="insight-box" id="radar-insight-box" style="display: none;"><span class="insight-icon">🧠</span><p id="radar-insight-text">Chat to analyze emotions.</p></div>
-                </div>
-            </aside>
-        </div>
-    </div>
-
-    <div id="breathe-modal" class="breathe-modal">
+    </div> <div id="breathe-modal" class="breathe-modal">
         <button class="close-breathe-btn" onclick="stopBreathing()">✕</button>
         <div class="breathe-container">
             <div class="breathe-circle" id="breathe-circle"></div>
@@ -203,7 +175,7 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}?v=4.0"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=5.0"></script>
     <script>
         // Smoothly fade out the Lungs orb when chatting begins
         const chatBox = document.getElementById('chat-box');
