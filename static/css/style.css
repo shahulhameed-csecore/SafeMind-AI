@@ -387,3 +387,36 @@ body.voice-listening .wave-core {
     90% { opacity: 0.12; }
     100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
 }
+/* ==========================================
+   ✨ FOREGROUND FLOATING OBJECTS (OVER UI)
+========================================== */
+.foreground-floating-objects {
+    position: fixed; /* Locks it to the user's screen */
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 9999; /* Forces it to render on top of EVERYTHING */
+    pointer-events: none; /* CRITICAL: Lets you click completely through them */
+    overflow: hidden;
+}
+
+.fg-particle {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(3px); /* Gives it a glowing, out-of-focus camera depth effect */
+    opacity: 0;
+    animation: drift-across linear infinite;
+}
+
+/* Mix of Primary (Green/Purple) and Accent (Yellow/Pink) colors */
+.fg-1 { width: 12px; height: 12px; background: var(--primary); top: 80%; left: -10%; animation-duration: 25s; animation-delay: 0s; }
+.fg-2 { width: 20px; height: 20px; background: var(--accent); top: 30%; left: -10%; animation-duration: 35s; animation-delay: 8s; filter: blur(6px); }
+.fg-3 { width: 8px; height: 8px; background: var(--primary); top: 60%; left: -10%; animation-duration: 20s; animation-delay: 4s; }
+.fg-4 { width: 30px; height: 30px; background: var(--secondary); top: 90%; left: -10%; animation-duration: 40s; animation-delay: 15s; filter: blur(8px); }
+
+/* Drifts slowly from the bottom-left of the screen to the top-right */
+@keyframes drift-across {
+    0% { transform: translateX(0vw) translateY(0) scale(0.5); opacity: 0; }
+    10% { opacity: 0.6; } /* Fades in */
+    50% { transform: translateX(50vw) translateY(-20vh) scale(1.5); } /* Gets closer to camera */
+    90% { opacity: 0.6; }
+    100% { transform: translateX(120vw) translateY(-50vh) scale(0.5); opacity: 0; } /* Fades out off-screen */
+}
