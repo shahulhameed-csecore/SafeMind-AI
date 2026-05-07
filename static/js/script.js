@@ -1,6 +1,17 @@
 let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
+// Helper to get the right colors for Chart.js based on Light/Dark Mode
+function getThemeColors() {
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    return {
+        text: isLight ? 'rgba(46, 16, 101, 0.8)' : 'rgba(248, 250, 252, 0.6)', // Deep Purple vs Soft White
+        grid: isLight ? 'rgba(139, 92, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+        line: isLight ? '#8b5cf6' : '#10b981', // Lavender vs Mint Green
+        bg: isLight ? 'rgba(139, 92, 246, 0.2)' : 'rgba(16, 185, 129, 0.2)',
+        point: isLight ? '#f472b6' : '#fcd34d' // Pink vs Amber
+    };
+}
 const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -118,19 +129,22 @@ async function loadMoodChart() {
         });
         const plotData = data.map(log => moodValues[log.mood] || 2);
         const ctx = canvas.getContext('2d');
+        
+        const theme = getThemeColors(); // Get dynamic colors!
+
         if (moodChartInstance) moodChartInstance.destroy();
         moodChartInstance = new Chart(ctx, {
             type: 'line',
             data: { labels: labels, datasets: [{ 
                 data: plotData, 
-                borderColor: '#10b981', 
-                backgroundColor: 'rgba(16, 185, 129, 0.15)', 
+                borderColor: theme.line, 
+                backgroundColor: theme.bg, 
                 borderWidth: 2, tension: 0.4, fill: true, 
-                pointBackgroundColor: '#020804', 
-                pointBorderColor: '#fcd34d', 
+                pointBackgroundColor: '#020604', 
+                pointBorderColor: theme.point, 
                 pointBorderWidth: 2, pointRadius: 4 
             }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0.5, max: 4.5, ticks: { stepSize: 1, color: 'rgba(255,255,255,0.3)', font: {size: 10} }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0.5, max: 4.5, ticks: { stepSize: 1, color: theme.text, font: {size: 10} }, grid: { color: theme.grid } } } }
         });
         
         if (data.length > 0) {
@@ -143,16 +157,20 @@ async function loadMoodChart() {
         }
     } catch (error) { console.error("Chart error:", error); }
 }
-
 function saveMood(mood) {
     fetch("/save_mood", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mood: mood }) }).then(() => loadMoodChart());
     addMessage(`Mood logged: ${mood}.`, "bot");
 }
 
 let radarChartInstance = null;
+let lastEmotionData = null; // Store this so we can redraw it on theme switch
+
 function updateEmotionRadar(emotionData) {
+    if (!emotionData || emotionData.length === 0) return;
+    lastEmotionData = emotionData; // Save for theme toggling
+    
     const canvas = document.getElementById('emotionRadarChart');
-    if (!canvas || !emotionData || emotionData.length === 0) return;
+    if (!canvas) return;
     
     let dominantEmotion = emotionData.reduce((max, obj) => (obj.score > max.score) ? obj : max);
     document.getElementById('radar-insight-box').style.display = "flex";
@@ -166,22 +184,33 @@ function updateEmotionRadar(emotionData) {
     });
 
     const ctx = canvas.getContext('2d');
-    if (radarChartInstance) {
-        radarChartInstance.data.datasets[0].data = dataPoints;
-        radarChartInstance.update();
-    } else {
-        radarChartInstance = new Chart(ctx, {
-            type: 'radar',
-            data: { labels: labels, datasets: [{ 
-                data: dataPoints, 
-                backgroundColor: 'rgba(16, 185, 129, 0.2)', 
-                borderColor: '#10b981', 
-                pointBackgroundColor: '#fcd34d', 
-                borderWidth: 2 
-            }] },
-            options: { responsive: true, maintainAspectRatio: false, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.05)' }, grid: { color: 'rgba(255,255,255,0.05)' }, pointLabels: { color: 'rgba(255,255,255,0.5)', font: { size: 9, family: 'Plus Jakarta Sans' } }, ticks: { display: false, min: 0, max: 100 } } }, plugins: { legend: { display: false } } }
-        });
-    }
+    const theme = getThemeColors(); // Get dynamic colors!
+
+    // Destroy the old chart completely to force new colors
+    if (radarChartInstance) radarChartInstance.destroy(); 
+    
+    radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: { labels: labels, datasets: [{ 
+            data: dataPoints, 
+            backgroundColor: theme.bg, 
+            borderColor: theme.line, 
+            pointBackgroundColor: theme.point, 
+            borderWidth: 2 
+        }] },
+        options: { 
+            responsive: true, maintainAspectRatio: false, 
+            scales: { 
+                r: { 
+                    angleLines: { color: theme.grid }, 
+                    grid: { color: theme.grid }, 
+                    pointLabels: { color: theme.text, font: { size: 10, family: 'Plus Jakarta Sans', weight: '600' } }, 
+                    ticks: { display: false, min: 0, max: 100 } 
+                } 
+            }, 
+            plugins: { legend: { display: false } } 
+        }
+    });
 }
 
 async function loadSidebarSessions() {
@@ -500,6 +529,9 @@ document.addEventListener("mousemove", (e) => {
 // ==========================================
 // 🌓 LIGHT / DARK MODE TOGGLE
 // ==========================================
+// ==========================================
+// 🌓 LIGHT / DARK MODE TOGGLE
+// ==========================================
 function toggleTheme() {
     const body = document.documentElement;
     const currentTheme = body.getAttribute('data-theme');
@@ -512,13 +544,12 @@ function toggleTheme() {
     document.getElementById('theme-icon-sun').style.display = newTheme === 'light' ? 'none' : 'block';
     document.getElementById('theme-icon-moon').style.display = newTheme === 'light' ? 'block' : 'none';
 
-    // Force Chart.js graphs to update their text colors to match the theme
+    // Force Chart.js graphs to redraw with the new theme colors instantly!
     setTimeout(() => {
         if(moodChartInstance) loadMoodChart(); 
-        if(radarChartInstance) document.getElementById("user-input").focus(); // Quick hack to trigger visual refresh
+        if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
     }, 100);
 }
-
 // Load saved theme on startup
 document.addEventListener("DOMContentLoaded", () => {
     const savedTheme = localStorage.getItem('safeminds_theme');
