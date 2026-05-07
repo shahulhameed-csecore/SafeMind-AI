@@ -288,16 +288,15 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
 .mic-ring-container { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
 .big-mic-btn { width: 70px; height: 70px; border-radius: 50%; border: none; cursor: pointer; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; box-shadow: 0 10px 30px var(--voice-shadow); z-index: 2; display: flex; align-items: center; justify-content: center; transition: 0.5s ease;}
 
-/* 🌟 UPGRADED: 3D HOLOGRAPHIC SPHERE WAVEFORM */
+/* 🌟 UPGRADED: TRUE 3D HOLOGRAPHIC SPHERE */
 .wave-container { 
     position: relative; 
-    width: 220px; 
-    height: 220px; 
+    width: 200px; 
+    height: 200px; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
     transform-style: preserve-3d; 
-    perspective: 1000px;
     animation: slow-spin 12s infinite linear; 
 }
 
@@ -307,36 +306,36 @@ body.auth-body { display: flex; justify-content: center; align-items: center; }
     height: 100%; 
     border-radius: 50%; 
     border: 1px solid var(--primary); 
-    box-shadow: 0 0 10px var(--voice-ring), inset 0 0 10px var(--voice-ring); 
-    opacity: 0.5; 
+    box-shadow: 0 0 15px var(--voice-ring), inset 0 0 15px var(--voice-ring); 
+    opacity: 0.4; 
     transition: 0.3s ease;
 }
 
 .wave-core { 
     position: absolute; 
-    width: 70px; 
-    height: 70px; 
+    width: 60px; 
+    height: 60px; 
     background: radial-gradient(circle, var(--primary) 0%, transparent 70%); 
     border-radius: 50%; 
     box-shadow: 0 0 40px var(--voice-shadow); 
     transition: 0.3s ease; 
 }
 
-/* Base Idle Animation (Slowly rotating perfectly round sphere) */
+/* Base Idle Animation (Perfectly round sphere, tilted sideways) */
 @keyframes slow-spin { 
-    0% { transform: rotateX(15deg) rotateY(0deg); } 
-    100% { transform: rotateX(15deg) rotateY(360deg); } 
+    0% { transform: rotateZ(20deg) rotateY(0deg); } 
+    100% { transform: rotateZ(20deg) rotateY(360deg); } 
 }
 
 /* ==========================================
    🎤 WHEN USER IS SPEAKING / AI IS LISTENING
 ========================================== */
 body.voice-listening .wave-container { 
-    animation: fast-spin 3s infinite linear; 
+    animation: fast-spin 4s infinite linear; 
 }
 body.voice-listening .wave-ring { 
     border: 2px solid var(--primary); 
-    box-shadow: 0 0 20px var(--voice-shadow), inset 0 0 20px var(--voice-shadow); 
+    box-shadow: 0 0 25px var(--voice-shadow), inset 0 0 25px var(--voice-shadow); 
     opacity: 0.8; 
 }
 body.voice-listening .wave-core { 
@@ -345,12 +344,12 @@ body.voice-listening .wave-core {
 
 /* Active Animations */
 @keyframes fast-spin { 
-    0% { transform: rotateX(15deg) rotateY(0deg) scale(1); } 
-    50% { transform: rotateX(15deg) rotateY(180deg) scale(1.1); } 
-    100% { transform: rotateX(15deg) rotateY(360deg) scale(1); } 
+    0% { transform: rotateZ(20deg) rotateY(0deg) scale(1); } 
+    50% { transform: rotateZ(20deg) rotateY(180deg) scale(1.08); } 
+    100% { transform: rotateZ(20deg) rotateY(360deg) scale(1); } 
 }
 
 @keyframes pulse-core-sphere { 
     0% { transform: scale(1); box-shadow: 0 0 20px var(--voice-shadow); } 
-    100% { transform: scale(1.5); box-shadow: 0 0 60px var(--primary); } 
+    100% { transform: scale(1.6); box-shadow: 0 0 60px var(--primary); } 
 }

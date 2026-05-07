@@ -202,7 +202,7 @@
             <div style="width: 24px;"></div>
         </div>
         
-       <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center;">
+    <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; perspective: 1000px;">
             <div class="wave-container">
                 <div class="wave-ring" style="transform: rotateY(0deg);"></div>
                 <div class="wave-ring" style="transform: rotateY(30deg);"></div>
@@ -210,7 +210,8 @@
                 <div class="wave-ring" style="transform: rotateY(90deg);"></div>
                 <div class="wave-ring" style="transform: rotateY(120deg);"></div>
                 <div class="wave-ring" style="transform: rotateY(150deg);"></div>
-                <div class="wave-core"></div>
+                
+                <div class="wave-ring" style="transform: rotateX(90deg);"></div> <div class="wave-ring" style="transform: rotateX(90deg) translateZ(50px) scale(0.866);"></div> <div class="wave-ring" style="transform: rotateX(90deg) translateZ(-50px) scale(0.866);"></div> <div class="wave-core"></div>
             </div>
         </div>
         
