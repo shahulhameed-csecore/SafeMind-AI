@@ -464,12 +464,16 @@ function togglePanel(panelId, iconElement) {
         targetPanel.classList.add('active');
         iconElement.classList.add('active');
         
-        // Fix for Chart.js: Force graphs to redraw when panel becomes visible
+        // Fix for Chart.js: Force graphs to redraw when their specific panel becomes visible
         if (panelId === 'panel-analytics') {
             setTimeout(() => {
                 if (moodChartInstance) moodChartInstance.resize();
-                if (radarChartInstance) radarChartInstance.resize();
             }, 300); // Wait for CSS slide animation to finish
+        }
+        if (panelId === 'panel-radar') {
+            setTimeout(() => {
+                if (radarChartInstance) radarChartInstance.resize();
+            }, 300); 
         }
     } else {
         // If it was already active, closing it drops us back to Chat mode

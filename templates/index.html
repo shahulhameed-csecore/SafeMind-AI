@@ -87,12 +87,14 @@
         </header>
 
         <div class="workspace">
-            <aside class="glass-panel side-nav-icons">
+        <aside class="glass-panel side-nav-icons">
                 <div class="icon-pill active" title="Chat" onclick="closeAllPanels(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>
                 
                 <div class="icon-pill" title="History" onclick="togglePanel('panel-history', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
                 
-                <div class="icon-pill" title="Analytics" onclick="togglePanel('panel-analytics', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+                <div class="icon-pill" title="Mood Tracker" onclick="togglePanel('panel-analytics', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
+                
+                <div class="icon-pill" title="Emotion Radar" onclick="togglePanel('panel-radar', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
                 
                 <div style="flex-grow:1"></div>
                 <a href="{{ url_for('logout') }}" class="icon-pill" style="color: var(--danger);" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></a>
@@ -103,9 +105,9 @@
                 <div id="history-list" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto;"></div>
             </div>
 
-            <div id="panel-analytics" class="glass-panel side-panel">
+           <div id="panel-analytics" class="glass-panel side-panel">
                 <div style="margin-top: 10px;">
-                    <div class="panel-title">Mood & Emotion</div>
+                    <div class="panel-title">Mood Tracker</div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
                         <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Happy')">😊</button>
                         <button class="icon-pill" style="border: 1px solid var(--border-glass);" onclick="saveMood('Calm')">🧘</button>
@@ -115,9 +117,12 @@
                     <div class="chart-container" style="height: 110px;"><canvas id="moodChart"></canvas></div>
                     <div class="insight-box" id="mood-insight-box"><span class="insight-icon">💡</span><p id="mood-insight-text">Log your mood to see your insights.</p></div>
                 </div>
-                
-                <div style="margin-top: 20px; flex: 1;">
-                    <div class="panel-title">Emotion Radar</div>
+            </div>
+
+            <div id="panel-radar" class="glass-panel side-panel">
+                <div style="margin-top: 10px; flex: 1;">
+                    <div class="panel-title">Live Emotion Radar</div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">Analyzes your conversation in real-time to map your current emotional state.</p>
                     <div class="chart-container radar-container"><canvas id="emotionRadarChart"></canvas></div>
                     <div class="insight-box" id="radar-insight-box" style="display: none;"><span class="insight-icon">🧠</span><p id="radar-insight-text">Chat to analyze emotions.</p></div>
                 </div>
@@ -165,6 +170,10 @@
             <button class="mobile-nav-item" id="nav-tools" onclick="togglePanel('panel-analytics', this); switchMobileTab('tools')">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                 <span>Mood</span>
+            </button>
+            <button class="mobile-nav-item" id="nav-radar" onclick="togglePanel('panel-radar', this); switchMobileTab('radar')">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                <span>Radar</span>
             </button>
         </nav>
         <script>
