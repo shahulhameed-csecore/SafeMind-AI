@@ -497,3 +497,34 @@ document.addEventListener("mousemove", (e) => {
         glow2.style.transform = `translate(${x * 60}px, ${y * 60}px)`;
     }
 });
+// ==========================================
+// 🌓 LIGHT / DARK MODE TOGGLE
+// ==========================================
+function toggleTheme() {
+    const body = document.documentElement;
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('safeminds_theme', newTheme);
+    
+    // Swap icons
+    document.getElementById('theme-icon-sun').style.display = newTheme === 'light' ? 'none' : 'block';
+    document.getElementById('theme-icon-moon').style.display = newTheme === 'light' ? 'block' : 'none';
+
+    // Force Chart.js graphs to update their text colors to match the theme
+    setTimeout(() => {
+        if(moodChartInstance) loadMoodChart(); 
+        if(radarChartInstance) document.getElementById("user-input").focus(); // Quick hack to trigger visual refresh
+    }, 100);
+}
+
+// Load saved theme on startup
+document.addEventListener("DOMContentLoaded", () => {
+    const savedTheme = localStorage.getItem('safeminds_theme');
+    if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        document.getElementById('theme-icon-sun').style.display = 'none';
+        document.getElementById('theme-icon-moon').style.display = 'block';
+    }
+});

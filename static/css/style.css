@@ -1,82 +1,94 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
+/* 🌑 DEFAULT DARK MODE (Obsidian Forest) */
 :root {
-    /* Obsidian Forest Palette */
-    --bg-dark: #020604;
+    --bg-base: #020604;
     --primary: #10b981; 
     --secondary: #059669; 
     --accent: #fcd34d; 
     --danger: #ef4444;
-    --success: #10b981;
     
-    /* NEW: Ultra Glassmorphism Variables */
-    --surface-glass: linear-gradient(135deg, rgba(20, 45, 30, 0.4) 0%, rgba(5, 15, 10, 0.6) 100%);
-    --border-glass: rgba(255, 255, 255, 0.08); /* White edge lighting */
-    --border-glass-highlight: rgba(255, 255, 255, 0.2); /* For top edges catching light */
-    
-    /* Typography */
     --text-main: #f8fafc;
     --text-muted: rgba(248, 250, 252, 0.6);
+    
+    --surface-glass: linear-gradient(135deg, rgba(20, 45, 30, 0.5) 0%, rgba(5, 15, 10, 0.7) 100%);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --border-glass-highlight: rgba(255, 255, 255, 0.2);
+    
+    --glow-hero: rgba(139, 255, 170, 0.35); /* Intense bright green */
+    --glow-secondary: rgba(252, 211, 77, 0.1); /* Soft amber */
+    --panel-shadow: rgba(0, 0, 0, 0.6);
+}
+
+/* ☀️ LIGHT MODE (Frosted Mint) */
+[data-theme="light"] {
+    --bg-base: #e8f3ec; /* Very soft pale green/grey background */
+    
+    --text-main: #022c22; /* Deep dark green text */
+    --text-muted: rgba(2, 44, 34, 0.6);
+    
+    --surface-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(240, 253, 244, 0.9) 100%);
+    --border-glass: rgba(0, 0, 0, 0.05);
+    --border-glass-highlight: rgba(255, 255, 255, 1);
+    
+    --glow-hero: rgba(16, 185, 129, 0.2); 
+    --glow-secondary: rgba(252, 211, 77, 0.2);
+    --panel-shadow: rgba(16, 185, 129, 0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { 
     font-family: 'Plus Jakarta Sans', sans-serif; 
-    background: var(--bg-dark); 
+    background: var(--bg-base); 
     color: var(--text-main);
     height: 100vh; 
     overflow: hidden;
     position: relative;
+    transition: background 0.5s ease, color 0.5s ease;
 }
 
-/* 🌟 NEW: Dynamic Interactive Aurora Background */
+/* 🌟 INTENSE HERO BLOOM (Matched to Reference Image) */
 .bg-aurora-container {
-    position: absolute;
-    top: 0; left: 0; width: 100vw; height: 100vh;
+    position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
     overflow: hidden; z-index: 0; pointer-events: none;
 }
 
 .ambient-glow {
     position: absolute;
-    top: 20%; left: 10%;
-    width: 50vw; height: 50vw;
-    background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 60%);
-    filter: blur(120px);
-    animation: float1 15s ease-in-out infinite alternate;
-    transition: transform 0.2s ease-out; /* For mouse tracking */
+    top: -20%; left: -10%; /* Anchored to top left */
+    width: 70vw; height: 70vw;
+    background: radial-gradient(circle, var(--glow-hero) 0%, transparent 60%);
+    filter: blur(130px);
+    animation: breathe-glow 10s ease-in-out infinite alternate;
+    transition: background 0.5s ease;
 }
 
 .ambient-glow-2 {
     position: absolute;
-    bottom: -10%; right: 10%;
+    bottom: -20%; right: -10%;
     width: 60vw; height: 60vw;
-    background: radial-gradient(circle, rgba(5, 150, 105, 0.25) 0%, rgba(252, 211, 77, 0.08) 40%, transparent 65%);
-    filter: blur(140px);
-    animation: float2 20s ease-in-out infinite alternate;
-    transition: transform 0.2s ease-out; /* For mouse tracking */
+    background: radial-gradient(circle, var(--glow-secondary) 0%, transparent 60%);
+    filter: blur(120px);
+    transition: background 0.5s ease;
 }
 
-@keyframes float1 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(15%, 15%) scale(1.2); } }
-@keyframes float2 { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-15%, -15%) scale(1.1); } }
+@keyframes breathe-glow { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
 
-/* 🌟 NEW: Premium Glass Panel Style */
+/* 🌟 Premium Glass Panel Style */
 .glass-panel {
     background: var(--surface-glass);
     backdrop-filter: blur(35px);
     -webkit-backdrop-filter: blur(35px);
     border: 1px solid var(--border-glass);
-    border-top: 1px solid var(--border-glass-highlight); /* Light catching the top edge */
-    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-glass-highlight);
+    border-left: 1px solid var(--border-glass-highlight);
     border-radius: 28px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 30px 60px var(--panel-shadow);
     position: relative;
     z-index: 1;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease;
 }
-
-
-
 /* ==========================================
    💻 LAYOUT
 ========================================== */
