@@ -87,14 +87,15 @@ body {
 }
 
 .ambient-glow-2 {
-    position: absolute; top: 10%; left: 15%; 
-    width: 50vw; height: 50vw;
+    position: absolute; 
+    bottom: -10%; /* Moved from top to bottom */
+    right: -5%;   /* Moved from left to right */
+    width: 60vw; height: 60vw;
     background: radial-gradient(circle, var(--glow-accent) 0%, transparent 60%);
     filter: blur(100px);
     animation: slow-drift-reverse 20s ease-in-out infinite alternate;
     transition: background 0.5s ease;
 }
-
 @keyframes slow-drift {
     0% { transform: translate(0, 0) scale(1); } 
     100% { transform: translate(3%, 5%) scale(1.05); } 
