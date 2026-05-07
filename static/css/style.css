@@ -1,100 +1,119 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 /* ==========================================
-   🧠 EMOTIONALLY ADAPTIVE THEME ENGINE
+   🎨 11-STATE EMOTIONAL THEME ENGINE
 ========================================== */
 
-/* 🧘 CALM & RELAXED (Default) - Grounding teals and soft whites */
-:root, [data-mood="calm"] {
-    --bg-base: #e8f4f1;
-    --primary: #5cb8b2;
-    --secondary: #82c4c3;
-    --accent: #a3d9d2;
-    --danger: #ef4444;
-    
-    --text-main: #2d4a48;
-    --text-muted: rgba(45, 74, 72, 0.6);
-    
-    --surface-panel: rgba(255, 255, 255, 0.85);
-    --surface-input: rgba(255, 255, 255, 0.95);
-    --border-soft: rgba(92, 184, 178, 0.2);
-    --panel-shadow: 0 16px 40px rgba(92, 184, 178, 0.08);
-    
-    --glow-1: rgba(92, 184, 178, 0.3);
-    --glow-2: rgba(163, 217, 210, 0.3);
-    
-    --anim-speed: 15s;
-    --border-radius-ui: 24px;
+/* 1. INTO THE WOODS (Default) */
+:root, [data-mood="woods"] {
+    --bg-base: #262b15; --primary: #848871; --secondary: #464b37; --accent: #afb4ad; --danger: #ef4444;
+    --text-main: #e2e8dd; --text-muted: #afb4ad;
+    --surface-panel: rgba(63, 63, 63, 0.85); --surface-input: rgba(38, 43, 21, 0.7); --border-soft: rgba(132, 136, 113, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    --glow-1: rgba(132, 136, 113, 0.25); --glow-2: rgba(70, 75, 55, 0.25);
+    --anim-speed: 25s; --border-radius-ui: 24px;
 }
 
-/* 🌧️ ANXIOUS & OVERTHINKING - Desaturated, highly solid, extremely slow motion */
-[data-mood="anxious"] {
-    --bg-base: #f0f1f5;
-    --primary: #6c7a89;
-    --secondary: #8c98a4;
-    --accent: #b4bcc4;
-    --danger: #d9534f;
-    
-    --text-main: #2c3338;
-    --text-muted: rgba(44, 51, 56, 0.6);
-    
-    --surface-panel: rgba(255, 255, 255, 0.95); 
-    --surface-input: #ffffff;
-    --border-soft: rgba(108, 122, 137, 0.15);
-    --panel-shadow: 0 10px 30px rgba(108, 122, 137, 0.05); 
-    
-    --glow-1: rgba(108, 122, 137, 0.15);
-    --glow-2: rgba(180, 188, 196, 0.15);
-    
-    --anim-speed: 35s; 
-    --border-radius-ui: 32px; 
+/* 2. PEACEFUL PURPLE SUNSET */
+[data-mood="sunset"] {
+    --bg-base: #0d0b33; --primary: #c266a7; --secondary: #52489f; --accent: #e7c8e7; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(231, 200, 231, 0.7);
+    --surface-panel: rgba(76, 47, 111, 0.85); --surface-input: rgba(13, 11, 51, 0.7); --border-soft: rgba(194, 102, 167, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(194, 102, 167, 0.25); --glow-2: rgba(82, 72, 159, 0.25);
+    --anim-speed: 30s; --border-radius-ui: 24px;
 }
 
-/* 🌅 MOTIVATED & HOPEFUL - Bright, warm, energetic sunrise colors */
-[data-mood="motivated"] {
-    --bg-base: #fff7f0;
-    --primary: #f28b82;
-    --secondary: #f6b26b;
-    --accent: #fce8b2;
-    --danger: #e53935;
-    
-    --text-main: #4a2c2a;
-    --text-muted: rgba(74, 44, 42, 0.6);
-    
-    --surface-panel: rgba(255, 255, 255, 0.8);
-    --surface-input: rgba(255, 255, 255, 0.95);
-    --border-soft: rgba(242, 139, 130, 0.2);
-    --panel-shadow: 0 20px 40px rgba(242, 139, 130, 0.15);
-    
-    --glow-1: rgba(242, 139, 130, 0.25);
-    --glow-2: rgba(246, 178, 107, 0.25);
-    
-    --anim-speed: 10s; 
-    --border-radius-ui: 20px; 
+/* 3. UNDER THE WAVE */
+[data-mood="wave"] {
+    --bg-base: #00022b; --primary: #4fa5d8; --secondary: #0855b1; --accent: #daeaf7; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(218, 234, 247, 0.7);
+    --surface-panel: rgba(1, 14, 84, 0.85); --surface-input: rgba(0, 2, 43, 0.7); --border-soft: rgba(79, 165, 216, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(79, 165, 216, 0.25); --glow-2: rgba(8, 85, 177, 0.25);
+    --anim-speed: 20s; --border-radius-ui: 24px;
 }
 
-/* 🌙 SLEEP & RELAXATION - Deep midnight immersive colors */
-[data-mood="sleep"] {
-    --bg-base: #0f111a;
-    --primary: #7986cb;
-    --secondary: #5c6bc0;
-    --accent: #3f51b5;
-    --danger: #ef5350;
-    
-    --text-main: #e8eaf6;
-    --text-muted: rgba(232, 234, 246, 0.5);
-    
-    --surface-panel: rgba(26, 29, 44, 0.85);
-    --surface-input: rgba(34, 38, 58, 0.95);
-    --border-soft: rgba(121, 134, 203, 0.15);
-    --panel-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-    
-    --glow-1: rgba(121, 134, 203, 0.15);
-    --glow-2: rgba(63, 81, 181, 0.15);
-    
-    --anim-speed: 40s; 
-    --border-radius-ui: 28px;
+/* 4. SHE'S A WILDFLOWER */
+[data-mood="wildflower"] {
+    --bg-base: #243127; --primary: #feb640; --secondary: #a46379; --accent: #ffdf7c; --danger: #ef4444;
+    --text-main: #fdefc0; --text-muted: rgba(253, 239, 192, 0.7);
+    --surface-panel: rgba(52, 72, 56, 0.85); --surface-input: rgba(36, 49, 39, 0.7); --border-soft: rgba(254, 182, 64, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(254, 182, 64, 0.25); --glow-2: rgba(164, 99, 121, 0.25);
+    --anim-speed: 15s; --border-radius-ui: 28px;
 }
+
+/* 5. BLUEBERRY BLISS */
+[data-mood="blueberry"] {
+    --bg-base: #1c2127; --primary: #bed4e9; --secondary: #3373b0; --accent: #e7f1fb; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(190, 212, 233, 0.7);
+    --surface-panel: rgba(11, 56, 95, 0.85); --surface-input: rgba(28, 33, 39, 0.7); --border-soft: rgba(190, 212, 233, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(190, 212, 233, 0.25); --glow-2: rgba(51, 115, 176, 0.25);
+    --anim-speed: 22s; --border-radius-ui: 24px;
+}
+
+/* 6. CEILING BLUES */
+[data-mood="ceiling"] {
+    --bg-base: #051827; --primary: #8eaebb; --secondary: #386994; --accent: #bdd9cd; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(189, 217, 205, 0.7);
+    --surface-panel: rgba(33, 68, 87, 0.85); --surface-input: rgba(5, 24, 39, 0.7); --border-soft: rgba(142, 174, 187, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(142, 174, 187, 0.25); --glow-2: rgba(56, 105, 148, 0.25);
+    --anim-speed: 28s; --border-radius-ui: 24px;
+}
+
+/* 7. BY THE SEASHORE (Light) */
+[data-mood="seashore"] {
+    --bg-base: #ebebeb; --primary: #97978f; --secondary: #c4b3a9; --accent: #787775; --danger: #ef4444;
+    --text-main: #333333; --text-muted: #787775;
+    --surface-panel: rgba(255, 255, 255, 0.8); --surface-input: rgba(245, 245, 245, 0.85); --border-soft: rgba(196, 179, 169, 0.3);
+    --panel-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    --glow-1: rgba(196, 179, 169, 0.4); --glow-2: rgba(151, 151, 143, 0.4);
+    --anim-speed: 25s; --border-radius-ui: 24px;
+}
+
+/* 8. PEACHY FOG */
+[data-mood="peachy"] {
+    --bg-base: #232220; --primary: #d9ae8e; --secondary: #9f8d8d; --accent: #ffddba; --danger: #ef4444;
+    --text-main: #ffddba; --text-muted: rgba(255, 221, 186, 0.7);
+    --surface-panel: rgba(78, 76, 79, 0.85); --surface-input: rgba(35, 34, 32, 0.7); --border-soft: rgba(217, 174, 142, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(217, 174, 142, 0.25); --glow-2: rgba(159, 141, 141, 0.25);
+    --anim-speed: 30s; --border-radius-ui: 28px;
+}
+
+/* 9. PEACE LOTUS */
+[data-mood="lotus"] {
+    --bg-base: #11302a; --primary: #e0829d; --secondary: #036264; --accent: #dac4d0; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(218, 196, 208, 0.7);
+    --surface-panel: rgba(26, 74, 66, 0.85); --surface-input: rgba(17, 48, 42, 0.7); --border-soft: rgba(224, 130, 157, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(224, 130, 157, 0.25); --glow-2: rgba(3, 98, 100, 0.25);
+    --anim-speed: 20s; --border-radius-ui: 24px;
+}
+
+/* 10. TEAL LIGHTNING */
+[data-mood="teal"] {
+    --bg-base: #041421; --primary: #86b9b0; --secondary: #4c7273; --accent: #d0d6d6; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(208, 214, 214, 0.7);
+    --surface-panel: rgba(4, 38, 48, 0.85); --surface-input: rgba(4, 20, 33, 0.7); --border-soft: rgba(134, 185, 176, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(134, 185, 176, 0.25); --glow-2: rgba(76, 114, 115, 0.25);
+    --anim-speed: 18s; --border-radius-ui: 20px;
+}
+
+/* 11. FOREST MIST */
+[data-mood="mist"] {
+    --bg-base: #1c2621; --primary: #7ea38e; --secondary: #476355; --accent: #c4d9ce; --danger: #ef4444;
+    --text-main: #ffffff; --text-muted: rgba(196, 217, 206, 0.7);
+    --surface-panel: rgba(43, 59, 51, 0.85); --surface-input: rgba(28, 38, 33, 0.7); --border-soft: rgba(126, 163, 142, 0.25);
+    --panel-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+    --glow-1: rgba(126, 163, 142, 0.25); --glow-2: rgba(71, 99, 85, 0.25);
+    --anim-speed: 35s; --border-radius-ui: 24px;
+}
+
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -105,8 +124,47 @@ body {
     height: 100vh; 
     overflow: hidden;
     position: relative;
-    transition: background-color 1s ease, color 1s ease;
+    transition: background-color 1s ease, color 1s ease; 
 }
+
+/* 🎨 PREMIUM FLOATING THEME SELECTOR */
+.theme-dropdown-container { position: relative; z-index: 100; }
+.theme-toggle-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface-input); color: var(--text-main);
+    border: 1px solid var(--border-soft); padding: 8px 18px;
+    border-radius: 100px; font-family: inherit; font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.theme-toggle-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 20px var(--glow-1); }
+.theme-indicator { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); box-shadow: 0 0 8px var(--glow-1); transition: 1s ease;}
+
+.theme-menu {
+    position: absolute; top: calc(100% + 15px); right: 0;
+    width: 250px; max-height: 60vh; overflow-y: auto;
+    background: var(--surface-panel); backdrop-filter: blur(25px);
+    border: 1px solid var(--border-soft); border-radius: 20px;
+    padding: 10px; box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    opacity: 0; pointer-events: none; transform: translateY(-10px) scale(0.98);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column; gap: 4px;
+}
+.theme-menu.active { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+
+.theme-option {
+    display: flex; align-items: center; gap: 12px;
+    background: transparent; border: none; color: var(--text-main);
+    padding: 12px 14px; border-radius: 12px; cursor: pointer;
+    font-family: inherit; font-size: 0.9rem; font-weight: 500; text-align: left;
+    transition: all 0.3s ease;
+}
+.theme-option:hover { background: var(--surface-input); transform: translateX(5px); color: var(--primary); }
+.theme-dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.2); }
+
+/* Scrollbar for theme menu */
+.theme-menu::-webkit-scrollbar { width: 4px; }
+.theme-menu::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 10px; }
+
 
 /* 🌟 DYNAMIC ATMOSPHERIC MESH */
 .bg-aurora-container {
@@ -195,7 +253,6 @@ body {
 
 .center-col { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
 
-/* The Clean Empty State */
 .lungs-container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: absolute; width: 100%; height: 100%; z-index: 0; pointer-events: none; transition: opacity 0.8s ease; opacity: 1;}
 .lungs-title { font-size: 2rem; font-weight: 600; color: var(--text-main); text-align: center; margin-top: -50px; transition: color 1s ease; }
 
@@ -220,7 +277,6 @@ body {
 input { flex: 1; border: none; background: transparent; outline: none; color: var(--text-main); font-family: inherit; font-size: 0.95rem; transition: 1s ease; }
 input::placeholder { color: var(--text-muted); }
 
-/* Premium Magnetic Button */
 .send-btn { background: var(--primary); color: var(--bg-base); border: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 1s ease; }
 .send-btn:hover { transform: scale(1.1) translateY(-2px); box-shadow: 0 10px 20px var(--glow-1); }
 
@@ -242,25 +298,15 @@ input::placeholder { color: var(--text-muted); }
 .insight-box p { font-size: 0.85rem; color: var(--text-main); margin: 0; line-height: 1.4; transition: 1s ease; }
 .insight-box strong { color: var(--primary); font-weight: 600; transition: 1s ease; }
 
-.lang-selector { appearance: auto; background: var(--surface-input); color: var(--text-main); border: 1px solid var(--border-soft); border-radius: 12px; padding: 8px 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.85rem; font-weight: 500; cursor: pointer; outline: none; transition: 0.5s ease; margin-right: 8px; }
-.lang-selector:hover, .lang-selector:focus { border-color: var(--primary); transform: translateY(-1px); }
-.lang-selector option { background: var(--bg-base); color: var(--text-main); }
-
-
 /* ==========================================
    🔐 AUTH SCREENS 
 ========================================== */
-.auth-container { 
-    width: 100%; 
-    max-width: 400px; /* 🚨 THE FIX: Prevents it from stretching */
-    padding: 20px; 
-    text-align: center; 
-}
+.auth-container { width: 100%; max-width: 400px; padding: 20px; text-align: center; }
 .auth-container h2 { font-size: 2.5rem; margin-bottom: 5px; font-weight: 700; }
 .auth-container input { width: 100%; padding: 16px 20px; margin-bottom: 15px; border-radius: 16px; font-family: inherit; transition: 0.3s; }
-.auth-container input:focus { outline: none; box-shadow: 0 0 0 3px rgba(92, 184, 178, 0.3); transform: translateY(-2px); }
+.auth-container input:focus { outline: none; box-shadow: 0 0 0 3px rgba(132, 136, 113, 0.3); transform: translateY(-2px); }
 .auth-btn { width: 100%; padding: 16px; border: none; border-radius: 16px; font-weight: 700; cursor: pointer; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease; font-size: 1rem; }
-.auth-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px rgba(92, 184, 178, 0.3); }
+.auth-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
 .auth-link { margin-top: 25px; font-size: 0.95rem; font-weight: 500; }
 .auth-link a { text-decoration: none; font-weight: 700; border-bottom: 2px solid transparent; transition: 0.3s; }
 .auth-link a:hover { border-bottom-color: #2d4a48; }
@@ -272,8 +318,6 @@ input::placeholder { color: var(--text-muted); }
 .breathe-container { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 .breathe-circle { position: absolute; width: 140px; height: 140px; background: radial-gradient(circle, var(--primary) 0%, var(--secondary) 100%); border-radius: 50%; transition: box-shadow 4s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.8; }
 .breathe-circle.pulse { box-shadow: 0 0 0 30px var(--glow-1), 0 0 0 60px var(--glow-2), 0 0 0 100px rgba(255,255,255,0.05); }
-
-/* ✨ THE BREATHE FIX (Now always clearly readable text!) */
 .breathe-text { position: relative; z-index: 10; color: var(--text-main); font-weight: 700; font-size: 2.5rem; text-align: center; margin: 0; pointer-events: none; }
 
 /* =========================================
@@ -299,7 +343,10 @@ input::placeholder { color: var(--text-muted); }
     .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); background: transparent; border: none; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .mobile-nav-item.active { color: var(--text-main); transform: translateY(-2px); }
     
-    #mood-selector { font-size: 0.75rem; padding: 6px 10px; min-width: 110px;}
+    /* Ensure the theme picker scales well on mobile */
+    .theme-dropdown-container { margin-right: 10px; }
+    .theme-toggle-btn { padding: 6px 12px; }
+    #current-theme-name { display: none; } /* Hide the text on mobile, just show the colored dot */
 }
 
 /* 🎤 IMMERSIVE MOBILE VOICE MODE */

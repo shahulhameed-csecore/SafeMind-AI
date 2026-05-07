@@ -2,37 +2,35 @@ let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
 
-// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
-function getThemeColors() {
-    const mood = document.body.getAttribute('data-mood') || 'calm';
-    const palettes = {
-        'calm':      { text: '#2d4a48', grid: 'rgba(92, 184, 178, 0.2)', line: '#5cb8b2', bg: 'rgba(92, 184, 178, 0.2)', point: '#a3d9d2' },
-        'anxious':   { text: '#2c3338', grid: 'rgba(108, 122, 137, 0.15)', line: '#6c7a89', bg: 'rgba(108, 122, 137, 0.15)', point: '#b4bcc4' },
-        'motivated': { text: '#4a2c2a', grid: 'rgba(242, 139, 130, 0.2)', line: '#f28b82', bg: 'rgba(242, 139, 130, 0.25)', point: '#fce8b2' },
-        'sleep':     { text: '#e8eaf6', grid: 'rgba(121, 134, 203, 0.15)', line: '#7986cb', bg: 'rgba(121, 134, 203, 0.15)', point: '#3f51b5' }
-    };
-    return palettes[mood] || palettes['calm'];
+// 🎨 PREMIUM FLOATING THEME LOGIC
+function toggleThemeMenu() {
+    const menu = document.getElementById('theme-menu');
+    menu.classList.toggle('active');
 }
 
-const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
-
-document.addEventListener("DOMContentLoaded", async () => {
-    // ✨ FIX: Load saved mood onto the body directly to ensure CSS cascades properly
-    const savedMood = localStorage.getItem('safeminds_mood') || 'calm';
-    document.body.setAttribute('data-mood', savedMood);
-    const selector = document.getElementById('mood-selector');
-    if(selector) selector.value = savedMood;
-
-    if (document.getElementById("history-list")) {
-        await loadSidebarSessions();
-        await loadMoodChart();
+// Close the theme menu if user clicks outside of it
+document.addEventListener('click', function(event) {
+    const wrapper = document.getElementById('theme-dropdown-wrapper');
+    const menu = document.getElementById('theme-menu');
+    if (wrapper && menu && !wrapper.contains(event.target)) {
+        menu.classList.remove('active');
     }
 });
 
-// 🧠 MOOD CHANGE TRIGGER
-function changeMood(mood) {
-    document.body.setAttribute('data-mood', mood);
-    localStorage.setItem('safeminds_mood', mood);
+function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
+    // Update HTML/CSS State
+    document.body.setAttribute('data-mood', moodId);
+    localStorage.setItem('safeminds_theme', moodId);
+    
+    // Update the UI Button text and indicator dot
+    const nameEl = document.getElementById('current-theme-name');
+    if(nameEl) nameEl.innerText = moodName;
+    
+    const dot = document.getElementById('current-theme-dot');
+    if(dot) dot.style.background = `linear-gradient(135deg, ${primaryHex}, ${secondaryHex})`;
+    
+    // Close the menu
+    document.getElementById('theme-menu').classList.remove('active');
     
     // Force Chart.js graphs to redraw with the new psychological colors
     setTimeout(() => {
@@ -40,6 +38,59 @@ function changeMood(mood) {
         if(radarChartInstance && lastEmotionData) updateEmotionRadar(lastEmotionData);
     }, 300);
 }
+
+// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE (All 11 Themes)
+function getThemeColors() {
+    const mood = document.body.getAttribute('data-mood') || 'woods';
+    const palettes = {
+        'woods':      { text: '#e2e8dd', grid: 'rgba(132, 136, 113, 0.25)', line: '#848871', bg: 'rgba(132, 136, 113, 0.25)', point: '#afb4ad' },
+        'sunset':     { text: '#ffffff', grid: 'rgba(194, 102, 167, 0.25)', line: '#c266a7', bg: 'rgba(194, 102, 167, 0.25)', point: '#e7c8e7' },
+        'wave':       { text: '#ffffff', grid: 'rgba(79, 165, 216, 0.25)',  line: '#4fa5d8', bg: 'rgba(79, 165, 216, 0.25)',  point: '#daeaf7' },
+        'wildflower': { text: '#fdefc0', grid: 'rgba(254, 182, 64, 0.25)',  line: '#feb640', bg: 'rgba(254, 182, 64, 0.25)',  point: '#ffdf7c' },
+        'blueberry':  { text: '#ffffff', grid: 'rgba(190, 212, 233, 0.25)', line: '#bed4e9', bg: 'rgba(190, 212, 233, 0.25)', point: '#e7f1fb' },
+        'ceiling':    { text: '#ffffff', grid: 'rgba(142, 174, 187, 0.25)', line: '#8eaebb', bg: 'rgba(142, 174, 187, 0.25)', point: '#bdd9cd' },
+        'seashore':   { text: '#333333', grid: 'rgba(196, 179, 169, 0.3)',  line: '#97978f', bg: 'rgba(196, 179, 169, 0.4)',  point: '#787775' },
+        'peachy':     { text: '#ffddba', grid: 'rgba(217, 174, 142, 0.25)', line: '#d9ae8e', bg: 'rgba(217, 174, 142, 0.25)', point: '#ffddba' },
+        'lotus':      { text: '#ffffff', grid: 'rgba(224, 130, 157, 0.25)', line: '#e0829d', bg: 'rgba(224, 130, 157, 0.25)', point: '#dac4d0' },
+        'teal':       { text: '#ffffff', grid: 'rgba(134, 185, 176, 0.25)', line: '#86b9b0', bg: 'rgba(134, 185, 176, 0.25)', point: '#d0d6d6' },
+        'mist':       { text: '#ffffff', grid: 'rgba(126, 163, 142, 0.25)', line: '#7ea38e', bg: 'rgba(126, 163, 142, 0.25)', point: '#c4d9ce' }
+    };
+    return palettes[mood] || palettes['woods'];
+}
+
+const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
+
+document.addEventListener("DOMContentLoaded", async () => {
+    // Recover saved theme
+    const savedTheme = localStorage.getItem('safeminds_theme') || 'woods';
+    document.body.setAttribute('data-mood', savedTheme);
+    
+    // Map theme IDs to their names and gradients for the UI recovery
+    const themeMaps = {
+        'woods':      { name: 'Into the Woods', p: '#848871', s: '#464b37' },
+        'sunset':     { name: 'Purple Sunset',  p: '#c266a7', s: '#52489f' },
+        'wave':       { name: 'Under the Wave', p: '#4fa5d8', s: '#0855b1' },
+        'wildflower': { name: 'Wildflower',     p: '#feb640', s: '#a46379' },
+        'blueberry':  { name: 'Blueberry Bliss',p: '#bed4e9', s: '#3373b0' },
+        'ceiling':    { name: 'Ceiling Blues',  p: '#8eaebb', s: '#386994' },
+        'seashore':   { name: 'By the Seashore',p: '#97978f', s: '#c4b3a9' },
+        'peachy':     { name: 'Peachy Fog',     p: '#d9ae8e', s: '#9f8d8d' },
+        'lotus':      { name: 'Peace Lotus',    p: '#e0829d', s: '#8f5774' },
+        'teal':       { name: 'Teal Lightning', p: '#86b9b0', s: '#4c7273' },
+        'mist':       { name: 'Forest Mist',    p: '#7ea38e', s: '#476355' }
+    };
+    
+    const currMap = themeMaps[savedTheme] || themeMaps['woods'];
+    const nameEl = document.getElementById('current-theme-name');
+    if(nameEl) nameEl.innerText = currMap.name;
+    const dot = document.getElementById('current-theme-dot');
+    if(dot) dot.style.background = `linear-gradient(135deg, ${currMap.p}, ${currMap.s})`;
+
+    if (document.getElementById("history-list")) {
+        await loadSidebarSessions();
+        await loadMoodChart();
+    }
+});
 
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
