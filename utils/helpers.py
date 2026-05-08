@@ -70,17 +70,28 @@ def analyze_sentiment(text):
         return "neutral"
 
 def generate_ai_response(user_input, chat_history, user_lang='en'):
-    # 1. Translate TO English
+    # 1. Translate CURRENT input to English
     if user_lang != 'en':
         try:
-            english_input = GoogleTranslator(source=user_lang, target='en').translate(user_input)
+            english_input = GoogleTranslator(source='auto', target='en').translate(user_input)
         except:
             english_input = user_input
     else:
         english_input = user_input
 
-    # 2. Format History
-    history_text = "\n".join([f"{msg['role']}: {msg['text']}" for msg in chat_history[-3:]])
+    # 2. 🚨 CRITICAL FIX: Translate the Chat History to English!
+    # This prevents the AI from seeing mixed languages and getting confused.
+    english_history = []
+    for msg in chat_history[-3:]:
+        try:
+            # We silently translate past context to English so the AI only sees English
+            en_text = GoogleTranslator(source='auto', target='en').translate(msg['text'])
+        except:
+            en_text = msg['text']
+        english_history.append(f"{msg['role']}: {en_text}")
+        
+    history_text = "\n".join(english_history)
+    
     system_prompt = "You are SafeMinds, a warm, highly empathetic mental health and well-being companion."
     
     enforced_input = f"""
@@ -95,11 +106,12 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
     1. You ONLY discuss mental health, emotional well-being, personal struggles, and coping strategies.
     2. IF the user asks about trivia, coding, politics, math, or general knowledge, YOU MUST REFUSE nicely and pivot back to their feelings.
     3. Keep your reply under 2 short sentences (Max 25 words).
+    4. 🚨 CRITICAL RULE: You MUST write your response ONLY in pure English. Do NOT output any Tamil, Hindi, or foreign scripts whatsoever.
     """
 
     english_reply = ""
 
-    #  pLAN A: Try Gemini First
+    #  PLAN A: Try Gemini First
     try:
         if not gemini_client: raise ValueError("Gemini offline.")
         
@@ -123,7 +135,7 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": enforced_input}
                 ],
-               model="llama-3.1-8b-instant", # Using Meta's newest Llama 3.1 model, # Using Meta's newest Llama 3.1 model, # Using Meta's fast Llama 3 model
+               model="llama-3.1-8b-instant",
                 temperature=0.7,
                 max_tokens=60
             )
@@ -141,6 +153,7 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
          
     if user_lang != 'en' and "connection issue" not in english_reply:
         try:
+            # 🚨 FIX: Safely translates the pure English AI output back into the exact language requested by the dropdown
             return GoogleTranslator(source='en', target=user_lang).translate(english_reply)
         except:
             pass
