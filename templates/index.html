@@ -235,7 +235,8 @@
                             <h4>CBT Thought Record</h4>
                             <p>Challenge cognitive distortions</p>
                         </div>
-                        <button class="launch-btn">Launch</button>
+                      <button class="launch-btn" onclick="openModal('cbt-modal')">Launch</button>
+<button class="launch-btn" onclick="openModal('phq-modal')">Start</button>
                     </div>
                     <div class="tool-item">
                         <div class="tool-icon">📋</div>
@@ -318,6 +319,58 @@
             <div class="mic-ring-container">
                 <button class="big-mic-btn" id="big-mic-btn" onclick="toggleListening()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
             </div>
+        </div>
+    </div>
+
+    <div id="cbt-modal" class="clinical-modal">
+        <div class="clinical-modal-content">
+            <button class="modal-close-btn" onclick="closeModal('cbt-modal')">✕</button>
+            <h2 style="margin-bottom: 10px; font-size: 1.8rem;">CBT Thought Record</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Challenge and reframe your cognitive distortions.</p>
+            
+            <label class="clinical-label">1. The Situation (Trigger)</label>
+            <textarea class="clinical-input" id="cbt-situation" rows="2" placeholder="What happened?"></textarea>
+
+            <label class="clinical-label">2. Automatic Negative Thought</label>
+            <textarea class="clinical-input" id="cbt-thought" rows="2" placeholder="What immediately crossed your mind?"></textarea>
+
+            <label class="clinical-label">3. Cognitive Distortion</label>
+            <select class="clinical-select" id="cbt-distortion">
+                <option value="all-or-nothing">All-or-Nothing Thinking</option>
+                <option value="catastrophizing">Catastrophizing</option>
+                <option value="mind-reading">Mind Reading</option>
+                <option value="emotional-reasoning">Emotional Reasoning</option>
+            </select>
+
+            <label class="clinical-label">4. Rational Challenge (Reframe)</label>
+            <textarea class="clinical-input" id="cbt-reframe" rows="2" placeholder="What is a more balanced way to look at this?"></textarea>
+
+            <button class="submit-clinical-btn" onclick="submitCBT()">Save to Journal</button>
+        </div>
+    </div>
+
+    <div id="phq-modal" class="clinical-modal">
+        <div class="clinical-modal-content">
+            <button class="modal-close-btn" onclick="closeModal('phq-modal')">✕</button>
+            <h2 style="margin-bottom: 10px; font-size: 1.8rem;">PHQ-9 Check-in</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Over the last 2 weeks, how often have you been bothered by the following?</p>
+            
+            <label class="clinical-label">1. Little interest or pleasure in doing things</label>
+            <select class="clinical-select phq-score">
+                <option value="0">Not at all</option><option value="1">Several days</option><option value="2">More than half the days</option><option value="3">Nearly every day</option>
+            </select>
+
+            <label class="clinical-label">2. Feeling down, depressed, or hopeless</label>
+            <select class="clinical-select phq-score">
+                <option value="0">Not at all</option><option value="1">Several days</option><option value="2">More than half the days</option><option value="3">Nearly every day</option>
+            </select>
+            
+            <label class="clinical-label">3. Feeling tired or having little energy</label>
+            <select class="clinical-select phq-score">
+                <option value="0">Not at all</option><option value="1">Several days</option><option value="2">More than half the days</option><option value="3">Nearly every day</option>
+            </select>
+
+            <button class="submit-clinical-btn" onclick="submitPHQ()">Calculate & Save Score</button>
         </div>
     </div>
 

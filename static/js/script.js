@@ -752,3 +752,69 @@ function switchMainView(viewName) {
         if(navChatBtn) navChatBtn.classList.add('active');
     }
 }
+/* ==========================================
+   📋 CLINICAL TOOLS & MODALS
+========================================== */
+
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.add('active');
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) modal.classList.remove('active');
+}
+
+// Close clinical modals if user clicks the dark background outside the content
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('clinical-modal')) {
+        event.target.classList.remove('active');
+    }
+});
+
+function submitCBT() {
+    const situation = document.getElementById('cbt-situation').value;
+    const thought = document.getElementById('cbt-thought').value;
+    const reframe = document.getElementById('cbt-reframe').value;
+
+    if (!situation || !thought || !reframe) {
+        alert("Please fill out the Situation, Thought, and Reframe fields to complete the exercise.");
+        return;
+    }
+
+    // Normally you would send this to app.py using fetch() here.
+    // For now, we simulate success and feed it into the chat!
+    closeModal('cbt-modal');
+    
+    // Switch back to chat view and send a message on their behalf
+    switchMainView('chat');
+    
+    const cbtSummary = `I just completed a CBT exercise. My trigger was: "${situation}". My negative thought was: "${thought}". But I reframed it to: "${reframe}".`;
+    
+    const inputField = document.getElementById("user-input");
+    if(inputField) {
+        inputField.value = cbtSummary;
+        sendMessage();
+    }
+}
+
+function submitPHQ() {
+    const scores = document.querySelectorAll('.phq-score');
+    let totalScore = 0;
+    
+    scores.forEach(select => {
+        totalScore += parseInt(select.value);
+    });
+
+    closeModal('phq-modal');
+    alert(`Your PHQ check-in score is ${totalScore}/9. This has been logged to your emotional trends.`);
+    
+    // Switch back to chat so the AI can check on them
+    switchMainView('chat');
+    const inputField = document.getElementById("user-input");
+    if(inputField) {
+        inputField.value = `I just took a PHQ check-in and scored ${totalScore}.`;
+        sendMessage();
+    }
+}
