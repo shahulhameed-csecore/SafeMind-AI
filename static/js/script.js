@@ -718,3 +718,37 @@ function stopVoiceVisualizer() {
         waveCore.style.boxShadow = '0 0 40px var(--glow-2)';
     }
 }
+/* ==========================================
+   🚀 SLIDING VIEW NAVIGATION
+========================================== */
+function switchMainView(viewName) {
+    const chatView = document.getElementById('view-chat');
+    const dashView = document.getElementById('view-dashboard');
+    const navChatBtn = document.getElementById('nav-btn-chat');
+    const navDashBtn = document.getElementById('nav-btn-dash');
+
+    if (viewName === 'dashboard') {
+        // Slide Chat out to the left, Slide Dashboard in from the right
+        chatView.classList.remove('active');
+        chatView.classList.add('slide-left');
+        
+        dashView.classList.remove('slide-right');
+        dashView.classList.add('active');
+
+        // Update Button colors
+        if(navChatBtn) navChatBtn.classList.remove('active');
+        if(navDashBtn) navDashBtn.classList.add('active');
+        
+    } else if (viewName === 'chat') {
+        // Slide Dashboard out to the right, Slide Chat in from the left
+        dashView.classList.remove('active');
+        dashView.classList.add('slide-right');
+        
+        chatView.classList.remove('slide-left');
+        chatView.classList.add('active');
+
+        // Update Button colors
+        if(navDashBtn) navDashBtn.classList.remove('active');
+        if(navChatBtn) navChatBtn.classList.add('active');
+    }
+}
