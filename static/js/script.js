@@ -375,22 +375,16 @@ function createRecognition() {
         : "en-US";
 
     recog.onstart = () => {
-
-        console.log("🎤 Mic started");
-
         isListening = true;
         manuallyStopped = false;
         finalTranscript = '';
 
         const input = document.getElementById("user-input");
-
         if (input) {
             input.value = '';
         }
 
-        const liveTranscript =
-            document.getElementById("live-transcript");
-
+        const liveTranscript = document.getElementById("live-transcript");
         if (liveTranscript) {
             liveTranscript.innerText = "Listening...";
         }
@@ -399,135 +393,85 @@ function createRecognition() {
     };
 
     recog.onresult = (event) => {
-
         let interimTranscript = '';
 
-        for (
-            let i = event.resultIndex;
-            i < event.results.length;
-            i++
-        ) {
-
-            const transcript =
-                event.results[i][0].transcript;
-
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
-
                 finalTranscript += transcript + ' ';
-
             } else {
-
                 interimTranscript += transcript;
             }
         }
 
-        const fullText =
-            finalTranscript + interimTranscript;
-
+        const fullText = finalTranscript + interimTranscript;
         const input = document.getElementById("user-input");
-
         if (input) {
             input.value = fullText;
         }
 
-        const liveTranscript =
-            document.getElementById("live-transcript");
-
+        const liveTranscript = document.getElementById("live-transcript");
         if (liveTranscript) {
-            liveTranscript.innerText =
-                fullText || "Listening...";
+            liveTranscript.innerText = fullText || "Listening...";
         }
     };
 
     recog.onerror = (event) => {
-
         console.error("🎤 Speech Error:", event.error);
-
-        const liveTranscript =
-            document.getElementById("live-transcript");
+        const liveTranscript = document.getElementById("live-transcript");
 
         switch (event.error) {
-
             case "not-allowed":
-
                 if (liveTranscript) {
-                    liveTranscript.innerText =
-                        "Microphone permission denied.";
+                    liveTranscript.innerText = "Microphone permission denied.";
                 }
-
                 stopListening(false);
                 break;
-
             case "audio-capture":
-
                 if (liveTranscript) {
-                    liveTranscript.innerText =
-                        "No microphone detected.";
+                    liveTranscript.innerText = "No microphone detected.";
                 }
-
                 stopListening(false);
                 break;
-
             case "network":
-
                 if (liveTranscript) {
-                    liveTranscript.innerText =
-                        "Network issue detected.";
+                    liveTranscript.innerText = "Network issue detected.";
                 }
-
                 break;
-
             case "no-speech":
-
                 if (liveTranscript) {
-                    liveTranscript.innerText =
-                        "No speech detected...";
+                    liveTranscript.innerText = "No speech detected...";
                 }
-
                 break;
-
             case "aborted":
-
                 console.log("🎤 Recognition aborted");
                 break;
-
             default:
-
                 if (liveTranscript) {
-                    liveTranscript.innerText =
-                        "Microphone error occurred.";
+                    liveTranscript.innerText = "Microphone error occurred.";
                 }
-
-                console.log(event.error);
         }
     };
 
     recog.onend = () => {
-
         console.log("🎤 Mic ended");
-
         isListening = false;
 
         if (!manuallyStopped) {
-
             setTimeout(() => {
-
                 if (!isListening && recognition) {
-
                     try {
-
                         recognition.start();
-
                     } catch (e) {
-
-                        console.log("Restart blocked");
+                        console.error("Restart blocked by browser. Closing UI to prevent freeze.");
+                        // 🚨 THE CRITICAL FIX: If the browser blocks the restart loop, close the UI!
+                        cleanupVoiceUI(false); 
                     }
+                } else if (!recognition) {
+                    cleanupVoiceUI(false);
                 }
-
             }, 500);
-
         } else {
-
             cleanupVoiceUI(true);
         }
     };
@@ -536,21 +480,20 @@ function createRecognition() {
 }
 
 function toggleListening() {
+    const voiceMode = document.getElementById('mobile-voice-mode');
+    const isUIOpen = voiceMode && voiceMode.classList.contains('active');
 
-    // STOP MIC
-    if (isListening && recognition) {
-
+    // 🚨 STOP MIC or CLOSE STUCK UI
+    if (isListening || isUIOpen) {
         stopListening(true);
         return;
     }
 
     // CLEAN OLD INSTANCE
     if (recognition) {
-
         try {
             recognition.stop();
         } catch (e) {}
-
         recognition = null;
     }
 
@@ -560,61 +503,42 @@ function toggleListening() {
     if (!recognition) return;
 
     try {
-
         recognition.start();
-
     } catch (err) {
-
         console.error("🎤 Mic start failed:", err);
-
         cleanupVoiceUI(false);
     }
 }
 
 function stopListening(sendAfter = true) {
-
     manuallyStopped = true;
 
     if (recognition) {
-
         try {
-
             recognition.onend = null;
             recognition.stop();
-
         } catch (e) {
-
             console.error(e);
         }
     }
 
     isListening = false;
-
     cleanupVoiceUI(sendAfter);
 }
 
 function cleanupVoiceUI(sendAfter = true) {
-
     toggleVoiceMode(false);
 
-    const liveTranscript =
-        document.getElementById("live-transcript");
-
+    const liveTranscript = document.getElementById("live-transcript");
     if (liveTranscript) {
         liveTranscript.innerText = "";
     }
 
     if (sendAfter) {
-
-        const input =
-            document.getElementById("user-input");
-
+        const input = document.getElementById("user-input");
         if (input) {
-
             const text = input.value.trim();
-
             if (text.length > 0) {
-
                 sendMessage();
             }
         }
@@ -624,30 +548,23 @@ function cleanupVoiceUI(sendAfter = true) {
 /* ==========================================
    EXTRA SAFETY FIXES
 ========================================== */
-
 window.addEventListener('beforeunload', () => {
-
     if (recognition) {
-
         try {
-
             recognition.stop();
-
         } catch (e) {}
     }
 });
 
 document.addEventListener('visibilitychange', () => {
-
     if (document.hidden && recognition && isListening) {
-
         stopListening(false);
     }
 });
+
 /* ==========================================
    🧘 BREATHE TOOL & NAVIGATION 
 ========================================== */
-
 let breathInterval; let breathTimeouts = [];
 function startBreathing() {
     const modal = document.getElementById('breathe-modal'); const circle = document.getElementById('breathe-circle'); const text = document.getElementById('breathe-text');
