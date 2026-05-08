@@ -320,135 +320,330 @@ document.getElementById("user-input")?.addEventListener("keypress", (e) => { if 
 
 
 /* ==========================================
-   🎤 🚨 BULLETPROOF VOICE ENGINE FIX 🚨 🎤 
+   🎤 FIXED STABLE VOICE ENGINE 🎤
 ========================================== */
-let recognition = null; 
+
+let recognition = null;
 let isListening = false;
 let finalTranscript = '';
-let autoRestart = false; 
+let manuallyStopped = false;
 
 function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
+
     if (!voiceMode) return;
-    
+
     if (show) {
-        voiceMode.classList.add('active'); 
+        voiceMode.classList.add('active');
         document.body.classList.add('voice-active');
+
         const voiceStatus = document.getElementById("voice-status");
-        if (voiceStatus) voiceStatus.style.display = "block";
+        if (voiceStatus) {
+            voiceStatus.style.display = "block";
+        }
     } else {
-        voiceMode.classList.remove('active'); 
+        voiceMode.classList.remove('active');
         document.body.classList.remove('voice-active');
+
         const voiceStatus = document.getElementById("voice-status");
-        if (voiceStatus) voiceStatus.style.display = "none";
+        if (voiceStatus) {
+            voiceStatus.style.display = "none";
+        }
     }
 }
 
-function toggleListening() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+function createRecognition() {
+
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        alert("Your browser doesn't support Voice Chat. Please use Google Chrome, Edge, or Safari.");
-        return;
+        alert("Speech Recognition is not supported in this browser. Use Chrome or Edge.");
+        return null;
     }
-    
-    // 1. If currently listening, user intentionally clicked the mic to STOP and send.
-    if (isListening) { 
-        isListening = false;
-        autoRestart = false; // Prevent it from turning back on
-        if (recognition) recognition.stop(); 
-        return;
-    }
-    
-    // 2. Start fresh
-    recognition = new SpeechRecognition(); 
-    recognition.continuous = true; 
-    recognition.interimResults = true; 
+
+    const recog = new SpeechRecognition();
+
+    recog.continuous = true;
+    recog.interimResults = true;
+    recog.maxAlternatives = 1;
 
     const langSelector = document.getElementById("mic-lang");
-    recognition.lang = langSelector ? langSelector.value : 'en-US'; 
-    
-    recognition.onstart = () => {
+
+    recog.lang = langSelector
+        ? langSelector.value
+        : "en-US";
+
+    recog.onstart = () => {
+
+        console.log("🎤 Mic started");
+
         isListening = true;
-        autoRestart = true;
+        manuallyStopped = false;
         finalTranscript = '';
-        document.getElementById("user-input").value = '';
-        
-        const liveTranscript = document.getElementById("live-transcript");
-        if(liveTranscript) liveTranscript.innerText = "I'm listening...";
-        
+
+        const input = document.getElementById("user-input");
+
+        if (input) {
+            input.value = '';
+        }
+
+        const liveTranscript =
+            document.getElementById("live-transcript");
+
+        if (liveTranscript) {
+            liveTranscript.innerText = "Listening...";
+        }
+
         toggleVoiceMode(true);
     };
 
-    recognition.onresult = (event) => {
+    recog.onresult = (event) => {
+
         let interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
+
+        for (
+            let i = event.resultIndex;
+            i < event.results.length;
+            i++
+        ) {
+
+            const transcript =
+                event.results[i][0].transcript;
+
             if (event.results[i].isFinal) {
-                finalTranscript += event.results[i][0].transcript;
+
+                finalTranscript += transcript + ' ';
+
             } else {
-                interimTranscript += event.results[i][0].transcript;
+
+                interimTranscript += transcript;
             }
         }
-        
-        const displayText = finalTranscript + interimTranscript;
-        document.getElementById("user-input").value = displayText;
-        const liveDisplay = document.getElementById("live-transcript");
-        if(liveDisplay) liveDisplay.innerText = displayText || "I'm listening...";
-    };
-    
-    recognition.onerror = (event) => { 
-        console.error("Microphone Error:", event.error);
-        const liveDisplay = document.getElementById("live-transcript");
-        
-        if (event.error === 'not-allowed' || event.error === 'audio-capture') {
-            if(liveDisplay) liveDisplay.innerHTML = "Microphone blocked.<br><span style='font-size:1rem; opacity:0.7'>Please check browser permissions.</span>";
-            autoRestart = false; // Stop the loop
-            setTimeout(() => cleanupVoiceUI(), 2500);
-        } else if (event.error === 'no-speech') {
-            // The browser heard nothing. Let's warn the user but keep the UI open.
-            if(liveDisplay) liveDisplay.innerHTML = "Didn't catch that.<br><span style='font-size:1rem; opacity:0.7'>Check if your computer mic is muted or volume is low.</span>";
-            // We leave autoRestart = true, so onend will reboot it smoothly.
+
+        const fullText =
+            finalTranscript + interimTranscript;
+
+        const input = document.getElementById("user-input");
+
+        if (input) {
+            input.value = fullText;
+        }
+
+        const liveTranscript =
+            document.getElementById("live-transcript");
+
+        if (liveTranscript) {
+            liveTranscript.innerText =
+                fullText || "Listening...";
         }
     };
 
-    recognition.onend = () => { 
-        if (autoRestart) {
-            // Browser killed the mic due to silence, but user didn't click stop.
-            // Gently restart it after 250ms to keep the session alive.
-            setTimeout(() => {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error("Auto-restart failed.", e);
-                    cleanupVoiceUI();
+    recog.onerror = (event) => {
+
+        console.error("🎤 Speech Error:", event.error);
+
+        const liveTranscript =
+            document.getElementById("live-transcript");
+
+        switch (event.error) {
+
+            case "not-allowed":
+
+                if (liveTranscript) {
+                    liveTranscript.innerText =
+                        "Microphone permission denied.";
                 }
-            }, 250);
-        } else {
-            // User explicitly stopped it. Clean up and send.
-            cleanupVoiceUI();
+
+                stopListening(false);
+                break;
+
+            case "audio-capture":
+
+                if (liveTranscript) {
+                    liveTranscript.innerText =
+                        "No microphone detected.";
+                }
+
+                stopListening(false);
+                break;
+
+            case "network":
+
+                if (liveTranscript) {
+                    liveTranscript.innerText =
+                        "Network issue detected.";
+                }
+
+                break;
+
+            case "no-speech":
+
+                if (liveTranscript) {
+                    liveTranscript.innerText =
+                        "No speech detected...";
+                }
+
+                break;
+
+            case "aborted":
+
+                console.log("🎤 Recognition aborted");
+                break;
+
+            default:
+
+                if (liveTranscript) {
+                    liveTranscript.innerText =
+                        "Microphone error occurred.";
+                }
+
+                console.log(event.error);
         }
     };
+
+    recog.onend = () => {
+
+        console.log("🎤 Mic ended");
+
+        isListening = false;
+
+        if (!manuallyStopped) {
+
+            setTimeout(() => {
+
+                if (!isListening && recognition) {
+
+                    try {
+
+                        recognition.start();
+
+                    } catch (e) {
+
+                        console.log("Restart blocked");
+                    }
+                }
+
+            }, 500);
+
+        } else {
+
+            cleanupVoiceUI(true);
+        }
+    };
+
+    return recog;
+}
+
+function toggleListening() {
+
+    // STOP MIC
+    if (isListening && recognition) {
+
+        stopListening(true);
+        return;
+    }
+
+    // CLEAN OLD INSTANCE
+    if (recognition) {
+
+        try {
+            recognition.stop();
+        } catch (e) {}
+
+        recognition = null;
+    }
+
+    // CREATE NEW INSTANCE
+    recognition = createRecognition();
+
+    if (!recognition) return;
 
     try {
-        recognition.start(); 
-    } catch (e) {
-        console.error("Failed to start mic:", e);
-        cleanupVoiceUI();
+
+        recognition.start();
+
+    } catch (err) {
+
+        console.error("🎤 Mic start failed:", err);
+
+        cleanupVoiceUI(false);
     }
 }
 
-function cleanupVoiceUI() {
+function stopListening(sendAfter = true) {
+
+    manuallyStopped = true;
+
+    if (recognition) {
+
+        try {
+
+            recognition.onend = null;
+            recognition.stop();
+
+        } catch (e) {
+
+            console.error(e);
+        }
+    }
+
     isListening = false;
-    autoRestart = false;
-    toggleVoiceMode(false); 
-    
-    // Send message if text exists
-    const inputText = document.getElementById("user-input").value.trim();
-    if (inputText.length > 0) { 
-        sendMessage(); 
+
+    cleanupVoiceUI(sendAfter);
+}
+
+function cleanupVoiceUI(sendAfter = true) {
+
+    toggleVoiceMode(false);
+
+    const liveTranscript =
+        document.getElementById("live-transcript");
+
+    if (liveTranscript) {
+        liveTranscript.innerText = "";
+    }
+
+    if (sendAfter) {
+
+        const input =
+            document.getElementById("user-input");
+
+        if (input) {
+
+            const text = input.value.trim();
+
+            if (text.length > 0) {
+
+                sendMessage();
+            }
+        }
     }
 }
 
+/* ==========================================
+   EXTRA SAFETY FIXES
+========================================== */
+
+window.addEventListener('beforeunload', () => {
+
+    if (recognition) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (e) {}
+    }
+});
+
+document.addEventListener('visibilitychange', () => {
+
+    if (document.hidden && recognition && isListening) {
+
+        stopListening(false);
+    }
+});
 /* ==========================================
    🧘 BREATHE TOOL & NAVIGATION 
 ========================================== */
