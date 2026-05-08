@@ -390,6 +390,7 @@ function createRecognition() {
         }
 
         toggleVoiceMode(true);
+        startVoiceVisualizer(); // 🚨 START VISUALIZER HERE
     };
 
     recog.onresult = (event) => {
@@ -464,7 +465,6 @@ function createRecognition() {
                         recognition.start();
                     } catch (e) {
                         console.error("Restart blocked by browser. Closing UI to prevent freeze.");
-                        // 🚨 THE CRITICAL FIX: If the browser blocks the restart loop, close the UI!
                         cleanupVoiceUI(false); 
                     }
                 } else if (!recognition) {
@@ -482,6 +482,13 @@ function createRecognition() {
 function toggleListening() {
     const voiceMode = document.getElementById('mobile-voice-mode');
     const isUIOpen = voiceMode && voiceMode.classList.contains('active');
+
+    // 🚨 SMART INTERRUPTION: Shut the AI up instantly if user taps mic!
+    window.speechSynthesis.cancel();
+    if (typeof currentCloudAudio !== 'undefined' && currentCloudAudio) {
+        currentCloudAudio.pause();
+        currentCloudAudio.currentTime = 0;
+    }
 
     // 🚨 STOP MIC or CLOSE STUCK UI
     if (isListening || isUIOpen) {
@@ -528,6 +535,7 @@ function stopListening(sendAfter = true) {
 
 function cleanupVoiceUI(sendAfter = true) {
     toggleVoiceMode(false);
+    stopVoiceVisualizer(); // 🚨 STOP VISUALIZER HERE
 
     const liveTranscript = document.getElementById("live-transcript");
     if (liveTranscript) {
@@ -613,5 +621,71 @@ function togglePanel(panelId, iconElement) {
         if (panelId === 'panel-radar') setTimeout(() => { if (radarChartInstance) radarChartInstance.resize(); }, 300); 
     } else {
         document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
+    }
+}
+/* ==========================================
+   🎙️ PREMIUM LIVE AUDIO VISUALIZER (ChatGPT Style)
+========================================== */
+let audioContext = null;
+let analyser = null;
+let microphoneStream = null;
+let visualizerFrame = null;
+
+async function startVoiceVisualizer() {
+    try {
+        // Request raw audio data from the mic
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        microphoneStream = audioContext.createMediaStreamSource(stream);
+        
+        microphoneStream.connect(analyser);
+        analyser.fftSize = 256;
+        
+        const bufferLength = analyser.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        const waveCore = document.querySelector('.wave-core');
+
+        function animateVisualizer() {
+            if (!isListening) return; // Stop animating if mic is off
+            
+            visualizerFrame = requestAnimationFrame(animateVisualizer);
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Calculate average volume
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            let averageVolume = sum / bufferLength;
+            
+            // Scale the central orb based on how loud the user speaks
+            // Base scale is 1.0, max scale is around 2.2 for loud noises
+            let scaleMultiplier = 1 + (averageVolume / 255) * 1.5; 
+            
+            if (waveCore) {
+                waveCore.style.transform = `scale(${scaleMultiplier})`;
+                // Intensify the glow when speaking louder
+                waveCore.style.boxShadow = `0 0 ${40 * scaleMultiplier}px var(--primary)`;
+            }
+        }
+        
+        animateVisualizer();
+        
+    } catch (err) {
+        console.warn("Visualizer could not access raw audio stream:", err);
+    }
+}
+
+function stopVoiceVisualizer() {
+    if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
+    if (audioContext) audioContext.close();
+    
+    // Reset the orb to normal size
+    const waveCore = document.querySelector('.wave-core');
+    if (waveCore) {
+        waveCore.style.transform = 'scale(1)';
+        waveCore.style.boxShadow = '0 0 40px var(--glow-2)';
     }
 }
