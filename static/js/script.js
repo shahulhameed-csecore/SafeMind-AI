@@ -320,10 +320,12 @@ document.getElementById("user-input")?.addEventListener("keypress", (e) => { if 
 
 
 /* ==========================================
-   🎤 🚨 ULTIMATE VOICE ENGINE FIX 🚨 🎤 
+   🎤 🚨 BULLETPROOF VOICE ENGINE FIX 🚨 🎤 
 ========================================== */
 let recognition = null; 
 let isListening = false;
+let finalTranscript = '';
+let autoRestart = false; 
 
 function toggleVoiceMode(show) {
     const voiceMode = document.getElementById('mobile-voice-mode');
@@ -333,12 +335,12 @@ function toggleVoiceMode(show) {
         voiceMode.classList.add('active'); 
         document.body.classList.add('voice-active');
         const voiceStatus = document.getElementById("voice-status");
-        if(voiceStatus) voiceStatus.style.display = "block";
+        if (voiceStatus) voiceStatus.style.display = "block";
     } else {
         voiceMode.classList.remove('active'); 
         document.body.classList.remove('voice-active');
         const voiceStatus = document.getElementById("voice-status");
-        if(voiceStatus) voiceStatus.style.display = "none";
+        if (voiceStatus) voiceStatus.style.display = "none";
     }
 }
 
@@ -350,13 +352,15 @@ function toggleListening() {
         return;
     }
     
-    // 1. If currently listening, stop it cleanly.
-    if (isListening && recognition) { 
-        recognition.stop(); 
+    // 1. If currently listening, user intentionally clicked the mic to STOP and send.
+    if (isListening) { 
+        isListening = false;
+        autoRestart = false; // Prevent it from turning back on
+        if (recognition) recognition.stop(); 
         return;
     }
     
-    // 2. CRITICAL FIX: Always build a fresh instance. Bypasses Chrome "Zombie" bugs.
+    // 2. Start fresh
     recognition = new SpeechRecognition(); 
     recognition.continuous = true; 
     recognition.interimResults = true; 
@@ -366,6 +370,8 @@ function toggleListening() {
     
     recognition.onstart = () => {
         isListening = true;
+        autoRestart = true;
+        finalTranscript = '';
         document.getElementById("user-input").value = '';
         
         const liveTranscript = document.getElementById("live-transcript");
@@ -375,9 +381,7 @@ function toggleListening() {
     };
 
     recognition.onresult = (event) => {
-        let finalTranscript = '';
         let interimTranscript = '';
-        
         for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
                 finalTranscript += event.results[i][0].transcript;
@@ -387,8 +391,6 @@ function toggleListening() {
         }
         
         const displayText = finalTranscript + interimTranscript;
-        
-        // Show live text instantly
         document.getElementById("user-input").value = displayText;
         const liveDisplay = document.getElementById("live-transcript");
         if(liveDisplay) liveDisplay.innerText = displayText || "I'm listening...";
@@ -396,20 +398,34 @@ function toggleListening() {
     
     recognition.onerror = (event) => { 
         console.error("Microphone Error:", event.error);
-        if (event.error === 'not-allowed') {
-            alert("Microphone access denied. Please check your browser settings.");
+        const liveDisplay = document.getElementById("live-transcript");
+        
+        if (event.error === 'not-allowed' || event.error === 'audio-capture') {
+            if(liveDisplay) liveDisplay.innerHTML = "Microphone blocked.<br><span style='font-size:1rem; opacity:0.7'>Please check browser permissions.</span>";
+            autoRestart = false; // Stop the loop
+            setTimeout(() => cleanupVoiceUI(), 2500);
+        } else if (event.error === 'no-speech') {
+            // The browser heard nothing. Let's warn the user but keep the UI open.
+            if(liveDisplay) liveDisplay.innerHTML = "Didn't catch that.<br><span style='font-size:1rem; opacity:0.7'>Check if your computer mic is muted or volume is low.</span>";
+            // We leave autoRestart = true, so onend will reboot it smoothly.
         }
-        // Let the onend handler do the UI cleanup safely
     };
 
     recognition.onend = () => { 
-        isListening = false;
-        toggleVoiceMode(false); 
-        
-        // Trigger sendMessage only if text was actually captured
-        const inputText = document.getElementById("user-input").value.trim();
-        if (inputText.length > 0) { 
-            sendMessage(); 
+        if (autoRestart) {
+            // Browser killed the mic due to silence, but user didn't click stop.
+            // Gently restart it after 250ms to keep the session alive.
+            setTimeout(() => {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Auto-restart failed.", e);
+                    cleanupVoiceUI();
+                }
+            }, 250);
+        } else {
+            // User explicitly stopped it. Clean up and send.
+            cleanupVoiceUI();
         }
     };
 
@@ -417,11 +433,21 @@ function toggleListening() {
         recognition.start(); 
     } catch (e) {
         console.error("Failed to start mic:", e);
-        isListening = false;
-        toggleVoiceMode(false);
+        cleanupVoiceUI();
     }
 }
 
+function cleanupVoiceUI() {
+    isListening = false;
+    autoRestart = false;
+    toggleVoiceMode(false); 
+    
+    // Send message if text exists
+    const inputText = document.getElementById("user-input").value.trim();
+    if (inputText.length > 0) { 
+        sendMessage(); 
+    }
+}
 
 /* ==========================================
    🧘 BREATHE TOOL & NAVIGATION 
