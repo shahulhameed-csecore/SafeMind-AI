@@ -164,12 +164,20 @@
                     <div class="input-wrapper">
                         <input type="text" id="user-input" placeholder="Share what's on your mind..." autocomplete="off">
 
-                        <select id="mic-lang" class="lang-selector">
-                            <option value="en-US">EN</option>
-                            <option value="ta-IN">தமிழ்</option>
-                            <option value="hi-IN">हिंदी</option>
-                        </select>
-
+                     <div class="custom-lang-dropdown" id="lang-dropdown-wrapper">
+    <button class="lang-toggle-btn" id="lang-toggle-btn" onclick="toggleLangMenu()" type="button">
+        <span id="current-lang-display">EN</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>
+    
+    <div class="lang-menu" id="lang-menu">
+        <button class="lang-option active" type="button" onclick="selectLang('en-US', 'EN', this)">English (EN)</button>
+        <button class="lang-option" type="button" onclick="selectLang('ta-IN', 'தமிழ்', this)">தமிழ் (TA)</button>
+        <button class="lang-option" type="button" onclick="selectLang('hi-IN', 'हिंदी', this)">हिंदी (HI)</button>
+    </div>
+    
+    <input type="hidden" id="mic-lang" value="en-US">
+</div>
                         <button class="icon-btn stop-audio-btn" id="stop-audio-btn" onclick="stopSpeech()" style="display: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg></button>
                         <button class="icon-btn mic-btn" id="mic-btn" onclick="toggleListening()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
                         <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button>

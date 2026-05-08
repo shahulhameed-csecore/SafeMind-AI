@@ -8,13 +8,42 @@ function toggleThemeMenu() {
     menu.classList.toggle('active');
 }
 
+// Close dropdowns if user clicks outside of them
 document.addEventListener('click', function(event) {
-    const wrapper = document.getElementById('theme-dropdown-wrapper');
-    const menu = document.getElementById('theme-menu');
-    if (wrapper && menu && !wrapper.contains(event.target)) {
-        menu.classList.remove('active');
+    // Theme Menu
+    const themeWrapper = document.getElementById('theme-dropdown-wrapper');
+    const themeMenu = document.getElementById('theme-menu');
+    if (themeWrapper && themeMenu && !themeWrapper.contains(event.target)) {
+        themeMenu.classList.remove('active');
+    }
+    
+    // Language Menu
+    const langWrapper = document.getElementById('lang-dropdown-wrapper');
+    const langMenu = document.getElementById('lang-menu');
+    if (langWrapper && langMenu && !langWrapper.contains(event.target)) {
+        langMenu.classList.remove('active');
     }
 });
+
+// Custom Language Menu Logic
+function toggleLangMenu() {
+    document.getElementById('lang-menu').classList.toggle('active');
+}
+
+function selectLang(val, label, element) {
+    // 1. Update the hidden input so the AI knows which language to use
+    document.getElementById('mic-lang').value = val;
+    
+    // 2. Update the button text (EN, தமிழ், etc)
+    document.getElementById('current-lang-display').innerText = label;
+    
+    // 3. Close the menu
+    document.getElementById('lang-menu').classList.remove('active');
+    
+    // 4. Highlight the selected option
+    document.querySelectorAll('.lang-option').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+}
 
 function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     document.body.setAttribute('data-mood', moodId);
