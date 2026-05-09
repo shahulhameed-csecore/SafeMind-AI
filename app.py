@@ -7,9 +7,10 @@ from functools import wraps
 from dotenv import load_dotenv
 from gtts import gTTS
 from langdetect import detect
-import chromadb
 import psycopg2
 import psycopg2.extras
+from pinecone import Pinecone
+from google import genai
 
 load_dotenv()
 from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, analyze_deep_emotion
@@ -17,12 +18,12 @@ from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "super_secret_safeminds_key")
 
-# 🌟 NEW: Connect to Neon.tech Cloud Database
+# 🌟 Connect to Neon.tech Cloud Database
 def get_db_connection():
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     return conn
 
-# 🌟 NEW: Initialize Postgres Tables
+# 🌟 Initialize Postgres Tables
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -30,7 +31,7 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_logs (id SERIAL PRIMARY KEY, session_id TEXT, user_id INTEGER, user_message TEXT, bot_response TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
-    # 🚀 NEW: Add Indexes for lightning-fast lookups
+    # Indexes for lightning-fast lookups
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_logs(session_id);''')
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_logs(user_id);''')
     
@@ -38,6 +39,45 @@ def init_db():
     conn.close()
 
 init_db()
+
+# 🌟 PRO MEMORY SYSTEM: Pinecone + Gemini API
+try:
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pinecone_index = pc.Index("safemind")
+    gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    print("✅ Pinecone & Gemini Vector Memory Initialized")
+except Exception as e:
+    print(f"⚠️ Pinecone/Gemini Memory Offline: {e}")
+    pinecone_index = None
+    gemini_client = None
+
+def get_embedding(text):
+    if not gemini_client: return None
+    try:
+        response = gemini_client.models.embed_content(
+            model="text-embedding-004", 
+            contents=text
+        )
+        return response.embeddings[0].values
+    except Exception as e:
+        print(f"Embedding error: {e}")
+        return None
+
+def retrieve_past_context(user_text):
+    if not pinecone_index: return ""
+    try:
+        vector = get_embedding(user_text)
+        if not vector: return ""
+        
+        # Search Pinecone for the 2 most emotionally relevant past messages
+        results = pinecone_index.query(vector=vector, top_k=2, include_metadata=True)
+        
+        if results and results.get('matches'):
+            past_messages = [match['metadata']['text'] for match in results['matches'] if 'text' in match['metadata']]
+            return "\n".join(past_messages)
+    except Exception as e:
+        print(f"Pinecone retrieval error: {e}")
+    return ""
 
 def login_required(f):
     @wraps(f)
@@ -104,19 +144,6 @@ def landing_page():
 def app_dashboard():
     return render_template('index.html', show_auth=False)
 
-# Initialize the local memory database
-chroma_client = chromadb.Client()
-memory_collection = chroma_client.get_or_create_collection(name="user_memories")
-
-def retrieve_past_context(user_text):
-    try:
-        results = memory_collection.query(query_texts=[user_text], n_results=2)
-        if results and results['documents'] and results['documents'][0]:
-            return "\n".join(results['documents'][0])
-    except:
-        pass
-    return ""
-
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
@@ -133,7 +160,7 @@ def analyze():
     sentiment = analyze_sentiment(user_input)
     deep_emotions = analyze_deep_emotion(user_input)
     
-    print("🚀 STEP 3: Querying ChromaDB (Long-term memory)...")
+    print("🚀 STEP 3: Querying Pinecone (Long-term memory)...")
     past_memory = retrieve_past_context(user_input)
     
     if past_memory:
@@ -144,14 +171,18 @@ def analyze():
     print("🚀 STEP 4: Calling Gemma 4 API...")
     ai_response = generate_ai_response(augmented_input, chat_history, user_lang)
 
-    print("🚀 STEP 5: Adding new memory to ChromaDB...")
-    try:
-        memory_collection.add(
-            documents=[user_input], 
-            ids=[f"{session_id}_{len(chat_history)}"]
-        )
-    except Exception as e:
-        print(f"Chroma error: {e}")
+    print("🚀 STEP 5: Adding new memory to Pinecone...")
+    if pinecone_index:
+        try:
+            vector = get_embedding(user_input)
+            if vector:
+                pinecone_index.upsert(vectors=[{
+                    "id": f"{session_id}_{len(chat_history)}", 
+                    "values": vector, 
+                    "metadata": {"text": user_input}
+                }])
+        except Exception as e:
+            print(f"⚠️ Pinecone Save Failed: {e}")
 
     print("🚀 STEP 6: Generating Voice Audio (gTTS)...")
     audio_base64 = None
@@ -188,6 +219,7 @@ def analyze():
         "emotions": deep_emotions,
         "audio": audio_base64
     })
+
 @app.route('/get_sessions', methods=['GET'])
 @login_required
 def get_sessions():
@@ -195,7 +227,6 @@ def get_sessions():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     
-    # 🌟 NEW: Postgres specific query to group chat sessions properly
     cursor.execute("""
         SELECT * FROM (
             SELECT DISTINCT ON (session_id) session_id, user_message, timestamp 
