@@ -361,10 +361,11 @@ def save_journal():
     ai_insight = "Thank you for sharing your thoughts today."
     
     # 🚀 Connecting to Google AI Studio directly instead of OpenRouter
+    # 🚀 Connecting to Google AI Studio directly
     if gemini_client:
         try:
             response = gemini_client.models.generate_content(
-                model="gemini-1.5-flash", 
+                model="gemma-4-26b-a4b-it", # 👈 CHANGED BACK TO GEMMA 4!
                 contents=insight_prompt,
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
