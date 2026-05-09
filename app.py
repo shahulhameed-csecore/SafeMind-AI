@@ -54,8 +54,9 @@ except Exception as e:
 def get_embedding(text):
     if not gemini_client: return None
     try:
+        # 🚀 FIX: Updated to Google's active embedding model
         response = gemini_client.models.embed_content(
-            model="text-embedding-004", 
+            model="gemini-embedding-001", 
             contents=text
         )
         return response.embeddings[0].values
@@ -168,7 +169,7 @@ def analyze():
     else:
         augmented_input = user_input
 
-    print("🚀 STEP 4: Calling Gemma 4 API...")
+    print("🚀 STEP 4: Calling Main AI API...")
     ai_response = generate_ai_response(augmented_input, chat_history, user_lang)
 
     print("🚀 STEP 5: Adding new memory to Pinecone...")
