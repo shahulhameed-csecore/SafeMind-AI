@@ -354,6 +354,69 @@ def get_dashboard_stats():
         "avg_sentiment": avg_sentiment,
         "crisis_alerts": crisis_alerts
     })
+    
+    # 🌟 CLINICAL REPORT EXPORT
+@app.route('/export_report', methods=['GET'])
+@login_required
+def export_report():
+    user_id = session.get('user_id')
+    username = session.get('username', 'User')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    # Calculate the date for 30 days ago
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+
+    # 1. Fetch recent Moods
+    cursor.execute("SELECT mood, timestamp FROM mood_logs WHERE user_id = %s AND timestamp >= %s ORDER BY timestamp DESC", (user_id, thirty_days_ago))
+    moods = cursor.fetchall()
+
+    # 2. Fetch recent Journals
+    cursor.execute("SELECT entry_text, emotion_tag, timestamp FROM journals WHERE user_id = %s AND timestamp >= %s ORDER BY timestamp DESC", (user_id, thirty_days_ago))
+    journals = cursor.fetchall()
+
+    # 3. Count Chat Messages
+    cursor.execute("SELECT COUNT(*) as msg_count FROM chat_logs WHERE user_id = %s AND timestamp >= %s", (user_id, thirty_days_ago))
+    chat_count = cursor.fetchone()['msg_count']
+
+    conn.close()
+
+    # 📝 Format the Text Report
+    report = f"====================================================\n"
+    report += f"   SAFEMIND AI - 30-DAY CLINICAL SUMMARY REPORT     \n"
+    report += f"====================================================\n\n"
+    report += f"Patient/User: {username}\n"
+    report += f"Generated On: {datetime.now().strftime('%B %d, %Y at %I:%M %p')}\n"
+    report += f"Reporting Period: Last 30 Days\n\n"
+    
+    report += f"--- 1. HIGH-LEVEL OVERVIEW ---\n"
+    report += f"Total AI Therapy Messages Exchanged: {chat_count}\n"
+    report += f"Total Mood Check-ins: {len(moods)}\n"
+    report += f"Total Journal Reflections: {len(journals)}\n\n"
+
+    report += f"--- 2. MOOD TRENDS ---\n"
+    if moods:
+        for m in moods:
+            report += f"• {m['timestamp'].strftime('%b %d, %I:%M %p')}: {m['mood']}\n"
+    else:
+        report += "No moods logged in this period.\n"
+    report += "\n"
+
+    report += f"--- 3. JOURNAL REFLECTIONS & EMOTION TAGS ---\n"
+    if journals:
+        for j in journals:
+            report += f"Date: {j['timestamp'].strftime('%b %d, %Y')}\n"
+            report += f"Detected Emotion: [{j['emotion_tag']}]\n"
+            report += f"Entry: \"{j['entry_text']}\"\n"
+            report += f"- - - - - - - - - - - - - - - - - - - - - - - - -\n"
+    else:
+        report += "No journal entries in this period.\n"
+
+    # Tell Flask to send this string back as a downloadable .txt file
+    return report, 200, {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Content-Disposition': f'attachment; filename="SafeMind_Clinical_Report_{username}.txt"'
+    }
 
 # 🌟 ENHANCED JOURNAL SYSTEM 
 @app.route('/save_journal', methods=['POST'])
