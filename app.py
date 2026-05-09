@@ -370,18 +370,19 @@ def save_journal():
     ai_insight = "Thank you for sharing your thoughts today."
     
     from utils.helpers import gemma_client
-    if gemma_client:
+    # 🚀 WE USE THE GOOGLE CLIENT YOU ALREADY INITIALIZED AT THE TOP OF APP.PY
+    if gemini_client:
         try:
-            response = gemma_client.chat.completions.create(
-                model="google/gemma-4-9b-it:free", # 👈 CHANGE THIS LINE RIGHT HERE TOO
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": insight_prompt}
-                ],
-                temperature=0.6,
-                max_tokens=60
+            response = gemini_client.models.generate_content(
+                model="gemma-4-26b-a4b-it", 
+                contents=insight_prompt,
+                config=genai.types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.6,
+                    max_output_tokens=60
+                )
             )
-            content = response.choices[0].message.content.replace('*', '').strip()
+            content = response.text.replace('*', '').strip()
             
             # Parse the specific Emotion and Insight
             for line in content.split('\n'):
