@@ -652,6 +652,7 @@ function togglePanel(panelId, iconElement) {
         document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
     }
 }
+
 /* ==========================================
    🎙️ PREMIUM LIVE AUDIO VISUALIZER (ChatGPT Style)
 ========================================== */
@@ -662,7 +663,6 @@ let visualizerFrame = null;
 
 async function startVoiceVisualizer() {
     try {
-        // Request raw audio data from the mic
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
         
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -677,25 +677,19 @@ async function startVoiceVisualizer() {
         const waveCore = document.querySelector('.wave-core');
 
         function animateVisualizer() {
-            if (!isListening) return; // Stop animating if mic is off
+            if (!isListening) return;
             
             visualizerFrame = requestAnimationFrame(animateVisualizer);
             analyser.getByteFrequencyData(dataArray);
             
-            // Calculate average volume
             let sum = 0;
-            for (let i = 0; i < bufferLength; i++) {
-                sum += dataArray[i];
-            }
+            for (let i = 0; i < bufferLength; i++) { sum += dataArray[i]; }
             let averageVolume = sum / bufferLength;
             
-            // Scale the central orb based on how loud the user speaks
-            // Base scale is 1.0, max scale is around 2.2 for loud noises
             let scaleMultiplier = 1 + (averageVolume / 255) * 1.5; 
             
             if (waveCore) {
                 waveCore.style.transform = `scale(${scaleMultiplier})`;
-                // Intensify the glow when speaking louder
                 waveCore.style.boxShadow = `0 0 ${40 * scaleMultiplier}px var(--primary)`;
             }
         }
@@ -711,51 +705,50 @@ function stopVoiceVisualizer() {
     if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
     if (audioContext) audioContext.close();
     
-    // Reset the orb to normal size
     const waveCore = document.querySelector('.wave-core');
     if (waveCore) {
         waveCore.style.transform = 'scale(1)';
         waveCore.style.boxShadow = '0 0 40px var(--glow-2)';
     }
 }
+
 /* ==========================================
-   🚀 SLIDING VIEW NAVIGATION
+   🚀 UNIVERSAL SLIDING VIEW NAVIGATION
 ========================================== */
 function switchMainView(viewName) {
-    const chatView = document.getElementById('view-chat');
-    const dashView = document.getElementById('view-dashboard');
-    const navChatBtn = document.getElementById('nav-btn-chat');
-    const navDashBtn = document.getElementById('nav-btn-dash');
+    const views = ['dashboard', 'chat', 'journal'];
+    const targetIndex = views.indexOf(viewName);
 
-    if (viewName === 'dashboard') {
-        // Slide Chat out to the left, Slide Dashboard in from the right
-        chatView.classList.remove('active');
-        chatView.classList.add('slide-left');
-        
-        dashView.classList.remove('slide-right');
-        dashView.classList.add('active');
+    views.forEach((v, index) => {
+        const panel = document.getElementById('view-' + v);
+        const btn = document.getElementById('nav-' + v);
 
-        // Update Button colors
-        if(navChatBtn) navChatBtn.classList.remove('active');
-        if(navDashBtn) navDashBtn.classList.add('active');
-        
-    } else if (viewName === 'chat') {
-        // Slide Dashboard out to the right, Slide Chat in from the left
-        dashView.classList.remove('active');
-        dashView.classList.add('slide-right');
-        
-        chatView.classList.remove('slide-left');
-        chatView.classList.add('active');
+        if (!panel || !btn) return;
 
-        // Update Button colors
-        if(navDashBtn) navDashBtn.classList.remove('active');
-        if(navChatBtn) navChatBtn.classList.add('active');
+        // Reset all classes
+        panel.classList.remove('active', 'slide-left', 'slide-right');
+        btn.classList.remove('active');
+
+        // Apply new state based on index math
+        if (index === targetIndex) {
+            panel.classList.add('active');
+            btn.classList.add('active');
+        } else if (index < targetIndex) {
+            panel.classList.add('slide-left');
+        } else {
+            panel.classList.add('slide-right');
+        }
+    });
+
+    // Automatically load journals if they enter that tab
+    if (viewName === 'journal') {
+        loadJournals();
     }
 }
+
 /* ==========================================
    📋 CLINICAL TOOLS & MODALS
 ========================================== */
-
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.add('active');
@@ -766,7 +759,6 @@ function closeModal(modalId) {
     if (modal) modal.classList.remove('active');
 }
 
-// Close clinical modals if user clicks the dark background outside the content
 document.addEventListener('click', function(event) {
     if (event.target.classList.contains('clinical-modal')) {
         event.target.classList.remove('active');
@@ -783,11 +775,7 @@ function submitCBT() {
         return;
     }
 
-    // Normally you would send this to app.py using fetch() here.
-    // For now, we simulate success and feed it into the chat!
     closeModal('cbt-modal');
-    
-    // Switch back to chat view and send a message on their behalf
     switchMainView('chat');
     
     const cbtSummary = `I just completed a CBT exercise. My trigger was: "${situation}". My negative thought was: "${thought}". But I reframed it to: "${reframe}".`;
@@ -810,7 +798,6 @@ function submitPHQ() {
     closeModal('phq-modal');
     alert(`Your PHQ check-in score is ${totalScore}/9. This has been logged to your emotional trends.`);
     
-    // Switch back to chat so the AI can check on them
     switchMainView('chat');
     const inputField = document.getElementById("user-input");
     if(inputField) {
@@ -818,68 +805,51 @@ function submitPHQ() {
         sendMessage();
     }
 }
-// --- NAVIGATION LOGIC ---
-const navChat = document.getElementById('nav-chat'); // Make sure your HTML has this ID
-const navJournal = document.getElementById('nav-journal'); // Make sure your HTML has this ID
-const chatView = document.getElementById('chat-view'); // The wrapper for your chat UI
-const journalView = document.getElementById('journal-view');
 
-// Switch to Journal
-navJournal.addEventListener('click', () => {
-    chatView.style.display = 'none';
-    journalView.style.display = 'block';
-    loadJournals(); // Fetch past journals when they open the tab
-});
-
-// Switch to Chat
-navChat.addEventListener('click', () => {
-    journalView.style.display = 'none';
-    chatView.style.display = 'flex'; // or 'block' depending on your current CSS
-});
-
-
-// --- JOURNAL LOGIC ---
+/* ==========================================
+   📝 JOURNAL LOGIC
+========================================== */
 const saveJournalBtn = document.getElementById('save-journal-btn');
 const journalInput = document.getElementById('journal-input');
 const journalFeed = document.getElementById('journal-feed');
 
-saveJournalBtn.addEventListener('click', async () => {
-    const text = journalInput.value.trim();
-    if (!text) return;
+if (saveJournalBtn) {
+    saveJournalBtn.addEventListener('click', async () => {
+        const text = journalInput.value.trim();
+        if (!text) return;
 
-    // Show loading state
-    saveJournalBtn.innerText = "Reflecting...";
-    saveJournalBtn.disabled = true;
+        saveJournalBtn.innerText = "Reflecting...";
+        saveJournalBtn.disabled = true;
 
-    try {
-        const response = await fetch('/save_journal', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ entry: text })
-        });
-        
-        const data = await response.json();
-        
-        if (data.status === 'success') {
-            journalInput.value = ''; // Clear the text box
-            loadJournals(); // Refresh the feed to show the new entry + AI insight
+        try {
+            const response = await fetch('/save_journal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ entry: text })
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                journalInput.value = ''; 
+                loadJournals(); 
+            }
+        } catch (error) {
+            console.error("Error saving journal:", error);
         }
-    } catch (error) {
-        console.error("Error saving journal:", error);
-    }
 
-    // Restore button
-    saveJournalBtn.innerText = "Save Entry";
-    saveJournalBtn.disabled = false;
-});
+        saveJournalBtn.innerText = "Save Entry";
+        saveJournalBtn.disabled = false;
+    });
+}
 
-// Fetch and display past journals
 async function loadJournals() {
+    if (!journalFeed) return;
     try {
         const response = await fetch('/get_journals');
         const journals = await response.json();
         
-        journalFeed.innerHTML = ''; // Clear current list
+        journalFeed.innerHTML = ''; 
         
         if (journals.length === 0) {
             journalFeed.innerHTML = '<p style="color: #64748b; text-align: center;">Your journal is empty. Start writing above!</p>';
@@ -887,7 +857,6 @@ async function loadJournals() {
         }
 
         journals.forEach(j => {
-            // Format the date nicely
             const dateObj = new Date(j.timestamp);
             const dateString = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             const timeString = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });

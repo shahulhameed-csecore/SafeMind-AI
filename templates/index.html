@@ -64,9 +64,9 @@
             </div>
 
             <div class="header-nav">
-                <button class="header-nav-btn" id="nav-btn-dash" onclick="switchMainView('dashboard')">Dashboard</button>
+                <button class="header-nav-btn" id="nav-dashboard" onclick="switchMainView('dashboard')">Dashboard</button>
                 <button class="header-nav-btn active" id="nav-chat" onclick="switchMainView('chat')">Therapy Chat</button>
-                <button class="header-nav-btn" id="nav-journal">Journal</button>
+                <button class="header-nav-btn" id="nav-journal" onclick="switchMainView('journal')">Journal</button>
             </div>
             
             <div style="display: flex; gap: 15px; align-items: center;">
@@ -148,7 +148,7 @@
 
             <div class="view-container">
                 
-                <main class="glass-panel center-col view-panel active" id="chat-view">
+                <main class="glass-panel center-col view-panel active" id="view-chat">
                     <div class="lungs-container" id="lungs-container">
                         <h2 class="lungs-title" style="margin-top: -50px;">
                             {% set uname = session.get('username') %}
@@ -259,7 +259,7 @@
                     </div>
                 </main>
 
-                <main class="glass-panel view-panel slide-right" id="journal-view" style="display: none; padding: 30px; overflow-y: auto;">
+                <main class="glass-panel view-panel slide-right" id="view-journal" style="padding: 30px; overflow-y: auto;">
                     <div class="journal-composer">
                         <h2>My Private Journal</h2>
                         <p class="journal-subtitle">A safe space to reflect. SafeMind will offer a small thought for every entry.</p>
@@ -397,15 +397,19 @@
         const chatBox = document.getElementById('chat-box');
         const lungsContainer = document.getElementById('lungs-container');
         const observer = new MutationObserver(() => {
-            if (chatBox.children.length > 0) {
-                lungsContainer.style.opacity = '0';
-                setTimeout(() => lungsContainer.style.display = 'none', 800);
-            } else {
-                lungsContainer.style.display = 'flex';
-                setTimeout(() => lungsContainer.style.opacity = '1', 50);
+            if (chatBox && lungsContainer) {
+                if (chatBox.children.length > 0) {
+                    lungsContainer.style.opacity = '0';
+                    setTimeout(() => lungsContainer.style.display = 'none', 800);
+                } else {
+                    lungsContainer.style.display = 'flex';
+                    setTimeout(() => lungsContainer.style.opacity = '1', 50);
+                }
             }
         });
-        observer.observe(chatBox, { childList: true });
+        if(chatBox) {
+            observer.observe(chatBox, { childList: true });
+        }
     </script>
     {% endif %}
 </body>
