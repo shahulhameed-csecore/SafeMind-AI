@@ -373,7 +373,7 @@ def save_journal():
     if gemma_client:
         try:
             response = gemma_client.chat.completions.create(
-                model="google/gemma-4-26b-a4b-it", # Make sure this matches your paid/free setup
+                model="google/gemma-4-9b-it:free", # 👈 CHANGE THIS LINE RIGHT HERE TOO
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": insight_prompt}

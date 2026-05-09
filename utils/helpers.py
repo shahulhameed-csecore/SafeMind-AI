@@ -101,11 +101,12 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
     english_reply = ""
 
     # 🚀 PLAN A: Free Gemma 4 MoE model
+ # 🚀 PLAN A: Free Gemma 4 model (Lightweight & Fast)
     try:
         if not gemma_client: raise ValueError("Client offline.")
         
         chat_completion = gemma_client.chat.completions.create(
-            model="google/gemma-4-9b-it:free", # ✅ Notice the :free tag is back!
+            model="google/gemma-4-9b-it:free", # 👈 CHANGE THIS LINE RIGHT HERE
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": enforced_input}
