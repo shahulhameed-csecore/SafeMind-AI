@@ -671,40 +671,76 @@ function submitPHQ() {
 }
 
 /* ==========================================
-   🔥 BURN EXERCISE LOGIC
+   🔥 BURN EXERCISE LOGIC (Cinematic Edition)
 ========================================== */
 function igniteThought() {
     const input = document.getElementById('burn-input');
+    const container = document.getElementById('paper-container');
     const btn = document.getElementById('ignite-btn');
     
-    if (!input.value.trim()) { alert("Please write a thought you want to let go of first."); return; }
+    if (!input.value.trim()) { 
+        alert("Please write a thought you want to let go of first."); 
+        return; 
+    }
 
+    // 1. Hide the button and ignite the paper
     btn.style.display = "none";
     input.classList.add('burning-paper');
     
+    // 2. Generate 35 glowing floating embers!
+    for (let i = 0; i < 35; i++) {
+        let ember = document.createElement('div');
+        ember.className = 'ember';
+        // Randomize the start position across the width of the paper
+        ember.style.left = (Math.random() * 90 + 5) + '%';
+        // Give each ember a random drift path left or right
+        ember.style.setProperty('--rand-x', (Math.random() * 120 - 60) + 'px');
+        // Randomize the size of the spark
+        let size = (Math.random() * 5 + 3) + 'px';
+        ember.style.width = size;
+        ember.style.height = size;
+        // Randomize how fast they float up and when they spawn
+        ember.style.animationDelay = (Math.random() * 1.5) + 's';
+        ember.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
+        
+        container.appendChild(ember);
+    }
+    
+    // Play a fire sound effect
     let utter = new SpeechSynthesisUtterance("Whoosh.");
     utter.volume = 0.5; utter.rate = 1.5;
     window.speechSynthesis.speak(utter);
 
+    // 3. Wait for the 2.5s animation to finish, then go back to chat
     setTimeout(() => {
         closeModal('burn-modal');
         switchMainView('chat');
+        
         const chatInput = document.getElementById("user-input");
         if(chatInput) {
             chatInput.value = "I just wrote down a negative thought and burned it in the Release Exercise. I feel a bit lighter.";
             sendMessage();
         }
-        setTimeout(resetBurn, 1000);
-    }, 2500);
+        
+        // Clean up the modal in the background
+        setTimeout(resetBurn, 800);
+    }, 2800); // Wait just a tiny bit longer than the CSS animation (2.5s)
 }
 
 function resetBurn() {
     const input = document.getElementById('burn-input');
     const btn = document.getElementById('ignite-btn');
-    if(input) { input.value = ""; input.classList.remove('burning-paper'); }
+    
+    // Remove the paper class and clear text
+    if(input) { 
+        input.value = ""; 
+        input.classList.remove('burning-paper'); 
+    }
     if(btn) btn.style.display = "block";
+    
+    // Remove all the dead embers from the DOM
+    document.querySelectorAll('.ember').forEach(e => e.remove());
 }
-
 
 /* ==========================================
    📝 JOURNAL LOGIC (Mic, AI Tagging, Delete)

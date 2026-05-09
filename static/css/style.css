@@ -358,9 +358,13 @@ input::placeholder { color: var(--text-muted); }
 
 
 /* ==========================================
-   🔥 BURN EXERCISE GAME (Paper Dissolve)
+   🔥 BURN EXERCISE GAME (Cinematic Animation)
 ========================================== */
-.paper-container { width: 100%; position: relative; transition: all 2.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
+.paper-container { 
+    width: 100%; 
+    position: relative; 
+    perspective: 1000px;
+}
 
 .burn-textarea {
     width: 100%; height: 180px;
@@ -368,15 +372,76 @@ input::placeholder { color: var(--text-muted); }
     border: none; border-radius: 12px; padding: 25px;
     font-family: 'Kalam', 'Segoe UI', cursive, sans-serif; font-size: 1.3rem; line-height: 1.5;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3); resize: none; outline: none;
-    transition: all 2.5s ease-in-out;
 }
 
-/* The magic animation class triggered by JavaScript */
+/* The Cinematic Burn Keyframes */
 .burning-paper {
-    transform: translateY(-80px) scale(0.8) rotate(3deg);
-    filter: blur(8px) contrast(2) sepia(1);
+    animation: cinematicBurn 2.5s ease-in-out forwards;
+    pointer-events: none; /* Stop them from typing while burning */
+}
+
+@keyframes cinematicBurn {
+    0% {
+        transform: translateY(0) scale(1) rotateX(0deg);
+        background: #fdfbf7;
+        color: #333;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    15% {
+        background: #ffe8cc; /* Edges scorch */
+        color: #666;
+        box-shadow: inset 0 0 30px 10px #f97316, 0 0 20px #ef4444;
+        transform: translateY(-5px) scale(0.98) rotateX(5deg);
+    }
+    40% {
+        background: #2a110a; /* Charred paper */
+        color: transparent; /* Text melts away */
+        box-shadow: inset 0 0 60px 30px #ea580c, 0 0 60px 20px #ef4444, 0 30px 60px #facc15;
+        transform: translateY(-20px) scale(0.85) rotateX(15deg) rotateZ(-2deg);
+        filter: blur(1px) contrast(1.5);
+    }
+    70% {
+        background: #111; /* Turned to ash */
+        box-shadow: inset 0 0 20px 5px #ef4444, 0 0 20px 5px #ef4444;
+        transform: translateY(-60px) scale(0.6) rotateX(25deg) rotateZ(3deg);
+        filter: blur(4px);
+        opacity: 0.9;
+    }
+    100% {
+        background: transparent;
+        box-shadow: none;
+        transform: translateY(-120px) scale(0.2) rotateX(40deg) rotateZ(-5deg);
+        filter: blur(10px);
+        opacity: 0;
+    }
+}
+
+/* 🎇 Floating Embers Particle System */
+.ember {
+    position: absolute;
+    bottom: 20px;
+    border-radius: 50%;
+    background: #facc15;
+    box-shadow: 0 0 10px 4px #facc15, 0 0 20px 8px #ef4444;
     opacity: 0;
-    box-shadow: 0 0 50px 20px #ef4444, 0 0 100px 40px #f97316;
-    background: #222;
-    color: transparent;
+    pointer-events: none;
+    z-index: 10;
+    animation: floatEmber ease-in forwards;
+}
+
+@keyframes floatEmber {
+    0% { 
+        transform: translateY(0) translateX(0) scale(1); 
+        opacity: 1; 
+        background: #fef08a; 
+    }
+    50% { 
+        opacity: 0.8; 
+        background: #ea580c; 
+    }
+    100% { 
+        transform: translateY(-200px) translateX(var(--rand-x)) scale(0.1); 
+        opacity: 0; 
+        background: #7f1d1d; 
+    }
 }
