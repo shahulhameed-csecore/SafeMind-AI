@@ -30,7 +30,6 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_logs (id SERIAL PRIMARY KEY, session_id TEXT, user_id INTEGER, user_message TEXT, bot_response TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-    # Add this inside init_db() in app.py
     cursor.execute('''CREATE TABLE IF NOT EXISTS journals (id SERIAL PRIMARY KEY, user_id INTEGER, entry_text TEXT, ai_insight TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
     # Indexes for lightning-fast lookups
@@ -56,7 +55,6 @@ except Exception as e:
 def get_embedding(text):
     if not gemini_client: return None
     try:
-        # 🚀 FIX: Updated to Google's active embedding model
         response = gemini_client.models.embed_content(
             model="gemini-embedding-001", 
             contents=text
@@ -72,7 +70,6 @@ def retrieve_past_context(user_text):
         vector = get_embedding(user_text)
         if not vector: return ""
         
-        # Search Pinecone for the 2 most emotionally relevant past messages
         results = pinecone_index.query(vector=vector, top_k=2, include_metadata=True)
         
         if results and results.get('matches'):
@@ -151,7 +148,6 @@ def app_dashboard():
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    print("🚀 STEP 1: Message received from frontend!")
     data = request.json
     user_input = data.get('message')
     chat_history = data.get('history', [])
@@ -159,12 +155,10 @@ def analyze():
     user_id = session.get('user_id')
     user_lang = data.get('language', 'en-US')[:2] 
 
-    print("🚀 STEP 2: Running offline emotional analysis...")
     is_crisis = detect_crisis(user_input)
     sentiment = analyze_sentiment(user_input)
     deep_emotions = analyze_deep_emotion(user_input)
     
-    print("🚀 STEP 3: Querying Pinecone (Long-term memory)...")
     past_memory = retrieve_past_context(user_input)
     
     if past_memory:
@@ -172,10 +166,8 @@ def analyze():
     else:
         augmented_input = user_input
 
-    print("🚀 STEP 4: Calling Main AI API...")
     ai_response = generate_ai_response(augmented_input, chat_history, user_lang)
 
-    print("🚀 STEP 5: Adding new memory to Pinecone...")
     if pinecone_index:
         try:
             vector = get_embedding(user_input)
@@ -186,9 +178,8 @@ def analyze():
                     "metadata": {"text": user_input}
                 }])
         except Exception as e:
-            print(f"⚠️ Pinecone Save Failed: {e}")
+            pass
 
-    print("🚀 STEP 6: Generating Voice Audio (gTTS)...")
     audio_base64 = None
     try:
         lang_code = user_lang
@@ -201,9 +192,8 @@ def analyze():
         fp.seek(0)
         audio_base64 = base64.b64encode(fp.read()).decode('utf-8')
     except Exception as e:
-        print(f"⚠️ Audio Generation Failed: {e}")
+        pass
 
-    print("🚀 STEP 7: Saving to Postgres Database...")
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -214,7 +204,6 @@ def analyze():
     conn.commit()
     conn.close()
 
-    print("✅ STEP 8: Success! Sending reply back to frontend.")
     return jsonify({
         "response": ai_response, 
         "sentiment": sentiment, 
@@ -301,6 +290,7 @@ def get_moods():
     moods_list = [{"mood": row["mood"], "time": row["timestamp"]} for row in moods]
     moods_list.reverse()
     return jsonify(moods_list)
+
 @app.route('/save_journal', methods=['POST'])
 @login_required
 def save_journal():
@@ -308,15 +298,18 @@ def save_journal():
     entry_text = data.get('entry')
     user_id = session.get('user_id')
     
-    # Generate a quick, supportive insight from Gemma 4
     system_prompt = "You are an empathetic journal assistant."
     insight_prompt = f"The user just wrote this in their private journal: '{entry_text}'. Write a single, comforting, 1-sentence insight or 'silver lining' to validate their feelings."
     
     ai_insight = "Thank you for sharing your thoughts today."
+    
+    # Needs to match the variable name in your helpers.py
+    from utils.helpers import gemma_client
+    
     if gemma_client:
         try:
             response = gemma_client.chat.completions.create(
-                model="google/gemma-4-26b-a4b-it",
+                model="google/gemma-4-26b-a4b-it:free",
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": insight_prompt}
@@ -328,7 +321,6 @@ def save_journal():
         except Exception as e:
             print(f"Journal AI Error: {e}")
 
-    # Save everything to the vault
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(

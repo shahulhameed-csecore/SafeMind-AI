@@ -8,16 +8,13 @@ function toggleThemeMenu() {
     menu.classList.toggle('active');
 }
 
-// Close dropdowns if user clicks outside of them
 document.addEventListener('click', function(event) {
-    // Theme Menu
     const themeWrapper = document.getElementById('theme-dropdown-wrapper');
     const themeMenu = document.getElementById('theme-menu');
     if (themeWrapper && themeMenu && !themeWrapper.contains(event.target)) {
         themeMenu.classList.remove('active');
     }
     
-    // Language Menu
     const langWrapper = document.getElementById('lang-dropdown-wrapper');
     const langMenu = document.getElementById('lang-menu');
     if (langWrapper && langMenu && !langWrapper.contains(event.target)) {
@@ -25,22 +22,14 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// Custom Language Menu Logic
 function toggleLangMenu() {
     document.getElementById('lang-menu').classList.toggle('active');
 }
 
 function selectLang(val, label, element) {
-    // 1. Update the hidden input so the AI knows which language to use
     document.getElementById('mic-lang').value = val;
-    
-    // 2. Update the button text (EN, தமிழ், etc)
     document.getElementById('current-lang-display').innerText = label;
-    
-    // 3. Close the menu
     document.getElementById('lang-menu').classList.remove('active');
-    
-    // 4. Highlight the selected option
     document.querySelectorAll('.lang-option').forEach(el => el.classList.remove('active'));
     element.classList.add('active');
 }
@@ -63,7 +52,6 @@ function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     }, 300);
 }
 
-// 🧠 EMOTIONALLY ADAPTIVE CHART COLOR ENGINE
 function getThemeColors() {
     const mood = document.body.getAttribute('data-mood') || 'woods';
     const palettes = {
@@ -419,7 +407,7 @@ function createRecognition() {
         }
 
         toggleVoiceMode(true);
-        startVoiceVisualizer(); // 🚨 START VISUALIZER HERE
+        startVoiceVisualizer(); 
     };
 
     recog.onresult = (event) => {
@@ -512,20 +500,17 @@ function toggleListening() {
     const voiceMode = document.getElementById('mobile-voice-mode');
     const isUIOpen = voiceMode && voiceMode.classList.contains('active');
 
-    // 🚨 SMART INTERRUPTION: Shut the AI up instantly if user taps mic!
     window.speechSynthesis.cancel();
     if (typeof currentCloudAudio !== 'undefined' && currentCloudAudio) {
         currentCloudAudio.pause();
         currentCloudAudio.currentTime = 0;
     }
 
-    // 🚨 STOP MIC or CLOSE STUCK UI
     if (isListening || isUIOpen) {
         stopListening(true);
         return;
     }
 
-    // CLEAN OLD INSTANCE
     if (recognition) {
         try {
             recognition.stop();
@@ -533,7 +518,6 @@ function toggleListening() {
         recognition = null;
     }
 
-    // CREATE NEW INSTANCE
     recognition = createRecognition();
 
     if (!recognition) return;
@@ -564,7 +548,7 @@ function stopListening(sendAfter = true) {
 
 function cleanupVoiceUI(sendAfter = true) {
     toggleVoiceMode(false);
-    stopVoiceVisualizer(); // 🚨 STOP VISUALIZER HERE
+    stopVoiceVisualizer();
 
     const liveTranscript = document.getElementById("live-transcript");
     if (liveTranscript) {
@@ -582,9 +566,6 @@ function cleanupVoiceUI(sendAfter = true) {
     }
 }
 
-/* ==========================================
-   EXTRA SAFETY FIXES
-========================================== */
 window.addEventListener('beforeunload', () => {
     if (recognition) {
         try {
@@ -654,7 +635,7 @@ function togglePanel(panelId, iconElement) {
 }
 
 /* ==========================================
-   🎙️ PREMIUM LIVE AUDIO VISUALIZER (ChatGPT Style)
+   🎙️ PREMIUM LIVE AUDIO VISUALIZER
 ========================================== */
 let audioContext = null;
 let analyser = null;
