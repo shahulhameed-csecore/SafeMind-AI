@@ -70,7 +70,7 @@ function getThemeColors() {
     return palettes[mood] || palettes['woods'];
 }
 
-const icons = { trash: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
+const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
     const savedTheme = localStorage.getItem('safeminds_theme') || 'woods';
@@ -371,8 +371,7 @@ function toggleVoiceMode(show) {
 
 function createRecognition() {
 
-    const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
         alert("Speech Recognition is not supported in this browser. Use Chrome or Edge.");
@@ -386,10 +385,7 @@ function createRecognition() {
     recog.maxAlternatives = 1;
 
     const langSelector = document.getElementById("mic-lang");
-
-    recog.lang = langSelector
-        ? langSelector.value
-        : "en-US";
+    recog.lang = langSelector ? langSelector.value : "en-US";
 
     recog.onstart = () => {
         isListening = true;
@@ -397,14 +393,10 @@ function createRecognition() {
         finalTranscript = '';
 
         const input = document.getElementById("user-input");
-        if (input) {
-            input.value = '';
-        }
+        if (input) input.value = '';
 
         const liveTranscript = document.getElementById("live-transcript");
-        if (liveTranscript) {
-            liveTranscript.innerText = "Listening...";
-        }
+        if (liveTranscript) liveTranscript.innerText = "Listening...";
 
         toggleVoiceMode(true);
         startVoiceVisualizer(); 
@@ -412,7 +404,6 @@ function createRecognition() {
 
     recog.onresult = (event) => {
         let interimTranscript = '';
-
         for (let i = event.resultIndex; i < event.results.length; i++) {
             const transcript = event.results[i][0].transcript;
             if (event.results[i].isFinal) {
@@ -424,75 +415,29 @@ function createRecognition() {
 
         const fullText = finalTranscript + interimTranscript;
         const input = document.getElementById("user-input");
-        if (input) {
-            input.value = fullText;
-        }
+        if (input) input.value = fullText;
 
         const liveTranscript = document.getElementById("live-transcript");
-        if (liveTranscript) {
-            liveTranscript.innerText = fullText || "Listening...";
-        }
+        if (liveTranscript) liveTranscript.innerText = fullText || "Listening...";
     };
 
     recog.onerror = (event) => {
         console.error("🎤 Speech Error:", event.error);
-        const liveTranscript = document.getElementById("live-transcript");
-
-        switch (event.error) {
-            case "not-allowed":
-                if (liveTranscript) {
-                    liveTranscript.innerText = "Microphone permission denied.";
-                }
-                stopListening(false);
-                break;
-            case "audio-capture":
-                if (liveTranscript) {
-                    liveTranscript.innerText = "No microphone detected.";
-                }
-                stopListening(false);
-                break;
-            case "network":
-                if (liveTranscript) {
-                    liveTranscript.innerText = "Network issue detected.";
-                }
-                break;
-            case "no-speech":
-                if (liveTranscript) {
-                    liveTranscript.innerText = "No speech detected...";
-                }
-                break;
-            case "aborted":
-                console.log("🎤 Recognition aborted");
-                break;
-            default:
-                if (liveTranscript) {
-                    liveTranscript.innerText = "Microphone error occurred.";
-                }
-        }
+        stopListening(false);
     };
 
     recog.onend = () => {
-        console.log("🎤 Mic ended");
         isListening = false;
-
         if (!manuallyStopped) {
             setTimeout(() => {
                 if (!isListening && recognition) {
-                    try {
-                        recognition.start();
-                    } catch (e) {
-                        console.error("Restart blocked by browser. Closing UI to prevent freeze.");
-                        cleanupVoiceUI(false); 
-                    }
-                } else if (!recognition) {
-                    cleanupVoiceUI(false);
-                }
+                    try { recognition.start(); } catch (e) { cleanupVoiceUI(false); }
+                } else if (!recognition) { cleanupVoiceUI(false); }
             }, 500);
         } else {
             cleanupVoiceUI(true);
         }
     };
-
     return recog;
 }
 
@@ -512,36 +457,21 @@ function toggleListening() {
     }
 
     if (recognition) {
-        try {
-            recognition.stop();
-        } catch (e) {}
+        try { recognition.stop(); } catch (e) {}
         recognition = null;
     }
 
     recognition = createRecognition();
-
     if (!recognition) return;
 
-    try {
-        recognition.start();
-    } catch (err) {
-        console.error("🎤 Mic start failed:", err);
-        cleanupVoiceUI(false);
-    }
+    try { recognition.start(); } catch (err) { cleanupVoiceUI(false); }
 }
 
 function stopListening(sendAfter = true) {
     manuallyStopped = true;
-
     if (recognition) {
-        try {
-            recognition.onend = null;
-            recognition.stop();
-        } catch (e) {
-            console.error(e);
-        }
+        try { recognition.onend = null; recognition.stop(); } catch (e) { }
     }
-
     isListening = false;
     cleanupVoiceUI(sendAfter);
 }
@@ -550,35 +480,14 @@ function cleanupVoiceUI(sendAfter = true) {
     toggleVoiceMode(false);
     stopVoiceVisualizer();
 
-    const liveTranscript = document.getElementById("live-transcript");
-    if (liveTranscript) {
-        liveTranscript.innerText = "";
-    }
-
     if (sendAfter) {
         const input = document.getElementById("user-input");
-        if (input) {
-            const text = input.value.trim();
-            if (text.length > 0) {
-                sendMessage();
-            }
+        if (input && input.value.trim().length > 0) {
+            sendMessage();
         }
     }
 }
 
-window.addEventListener('beforeunload', () => {
-    if (recognition) {
-        try {
-            recognition.stop();
-        } catch (e) {}
-    }
-});
-
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden && recognition && isListening) {
-        stopListening(false);
-    }
-});
 
 /* ==========================================
    🧘 BREATHE TOOL & NAVIGATION 
@@ -635,67 +544,58 @@ function togglePanel(panelId, iconElement) {
 }
 
 /* ==========================================
-   🎙️ PREMIUM LIVE AUDIO VISUALIZER
+   🎙️ AUDIO VISUALIZER
 ========================================== */
-let audioContext = null;
-let analyser = null;
-let microphoneStream = null;
-let visualizerFrame = null;
+let audioContext = null; let analyser = null; let microphoneStream = null; let visualizerFrame = null;
 
 async function startVoiceVisualizer() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioContext.createAnalyser();
         microphoneStream = audioContext.createMediaStreamSource(stream);
-        
         microphoneStream.connect(analyser);
         analyser.fftSize = 256;
-        
         const bufferLength = analyser.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
         const waveCore = document.querySelector('.wave-core');
 
         function animateVisualizer() {
             if (!isListening) return;
-            
             visualizerFrame = requestAnimationFrame(animateVisualizer);
             analyser.getByteFrequencyData(dataArray);
-            
-            let sum = 0;
-            for (let i = 0; i < bufferLength; i++) { sum += dataArray[i]; }
+            let sum = 0; for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
             let averageVolume = sum / bufferLength;
-            
             let scaleMultiplier = 1 + (averageVolume / 255) * 1.5; 
-            
             if (waveCore) {
                 waveCore.style.transform = `scale(${scaleMultiplier})`;
                 waveCore.style.boxShadow = `0 0 ${40 * scaleMultiplier}px var(--primary)`;
             }
         }
-        
         animateVisualizer();
-        
-    } catch (err) {
-        console.warn("Visualizer could not access raw audio stream:", err);
-    }
+    } catch (err) { console.warn("Visualizer could not access stream:", err); }
 }
 
 function stopVoiceVisualizer() {
     if (visualizerFrame) cancelAnimationFrame(visualizerFrame);
     if (audioContext) audioContext.close();
-    
     const waveCore = document.querySelector('.wave-core');
-    if (waveCore) {
-        waveCore.style.transform = 'scale(1)';
-        waveCore.style.boxShadow = '0 0 40px var(--glow-2)';
-    }
+    if (waveCore) { waveCore.style.transform = 'scale(1)'; waveCore.style.boxShadow = '0 0 40px var(--glow-2)'; }
 }
+
 
 /* ==========================================
    🚀 UNIVERSAL SLIDING VIEW NAVIGATION
 ========================================== */
+const journalPrompts = [
+    "What's on your mind today? Write as much or as little as you want...",
+    "What is one thing you are proud of surviving this week?",
+    "What is a small thing that brought you peace today?",
+    "If your current mood were a landscape, what would it look like?",
+    "What is something you wish you could say out loud right now?",
+    "Write down a worry, and then write down one reason it might not be true."
+];
+
 function switchMainView(viewName) {
     const views = ['dashboard', 'chat', 'journal'];
     const targetIndex = views.indexOf(viewName);
@@ -705,12 +605,9 @@ function switchMainView(viewName) {
         const btn = document.getElementById('nav-' + v);
 
         if (!panel || !btn) return;
-
-        // Reset all classes
         panel.classList.remove('active', 'slide-left', 'slide-right');
         btn.classList.remove('active');
 
-        // Apply new state based on index math
         if (index === targetIndex) {
             panel.classList.add('active');
             btn.classList.add('active');
@@ -721,8 +618,10 @@ function switchMainView(viewName) {
         }
     });
 
-    // Automatically load journals if they enter that tab
     if (viewName === 'journal') {
+        // Random Daily Prompt
+        const randomPrompt = journalPrompts[Math.floor(Math.random() * journalPrompts.length)];
+        document.getElementById('journal-input').placeholder = randomPrompt;
         loadJournals();
     }
 }
@@ -741,29 +640,19 @@ function closeModal(modalId) {
 }
 
 document.addEventListener('click', function(event) {
-    if (event.target.classList.contains('clinical-modal')) {
-        event.target.classList.remove('active');
-    }
+    if (event.target.classList.contains('clinical-modal')) event.target.classList.remove('active');
 });
 
 function submitCBT() {
     const situation = document.getElementById('cbt-situation').value;
     const thought = document.getElementById('cbt-thought').value;
     const reframe = document.getElementById('cbt-reframe').value;
-
-    if (!situation || !thought || !reframe) {
-        alert("Please fill out the Situation, Thought, and Reframe fields to complete the exercise.");
-        return;
-    }
-
+    if (!situation || !thought || !reframe) { alert("Please fill out all fields."); return; }
     closeModal('cbt-modal');
     switchMainView('chat');
-    
-    const cbtSummary = `I just completed a CBT exercise. My trigger was: "${situation}". My negative thought was: "${thought}". But I reframed it to: "${reframe}".`;
-    
     const inputField = document.getElementById("user-input");
     if(inputField) {
-        inputField.value = cbtSummary;
+        inputField.value = `I just completed a CBT exercise. Trigger: "${situation}". Thought: "${thought}". Reframe: "${reframe}".`;
         sendMessage();
     }
 }
@@ -771,29 +660,101 @@ function submitCBT() {
 function submitPHQ() {
     const scores = document.querySelectorAll('.phq-score');
     let totalScore = 0;
-    
-    scores.forEach(select => {
-        totalScore += parseInt(select.value);
-    });
-
+    scores.forEach(select => totalScore += parseInt(select.value));
     closeModal('phq-modal');
     alert(`Your PHQ check-in score is ${totalScore}/9. This has been logged to your emotional trends.`);
-    
     switchMainView('chat');
     const inputField = document.getElementById("user-input");
-    if(inputField) {
-        inputField.value = `I just took a PHQ check-in and scored ${totalScore}.`;
-        sendMessage();
-    }
+    if(inputField) { inputField.value = `I just took a PHQ check-in and scored ${totalScore}.`; sendMessage(); }
 }
 
 /* ==========================================
-   📝 JOURNAL LOGIC
+   🔥 BURN EXERCISE LOGIC
+========================================== */
+function igniteThought() {
+    const input = document.getElementById('burn-input');
+    const btn = document.getElementById('ignite-btn');
+    
+    if (!input.value.trim()) { alert("Please write a thought you want to let go of first."); return; }
+
+    btn.style.display = "none";
+    input.classList.add('burning-paper');
+    
+    let utter = new SpeechSynthesisUtterance("Whoosh.");
+    utter.volume = 0.5; utter.rate = 1.5;
+    window.speechSynthesis.speak(utter);
+
+    setTimeout(() => {
+        closeModal('burn-modal');
+        switchMainView('chat');
+        const chatInput = document.getElementById("user-input");
+        if(chatInput) {
+            chatInput.value = "I just wrote down a negative thought and burned it in the Release Exercise. I feel a bit lighter.";
+            sendMessage();
+        }
+        setTimeout(resetBurn, 1000);
+    }, 2500);
+}
+
+function resetBurn() {
+    const input = document.getElementById('burn-input');
+    const btn = document.getElementById('ignite-btn');
+    if(input) { input.value = ""; input.classList.remove('burning-paper'); }
+    if(btn) btn.style.display = "block";
+}
+
+
+/* ==========================================
+   📝 JOURNAL LOGIC (Mic, AI Tagging, Delete)
 ========================================== */
 const saveJournalBtn = document.getElementById('save-journal-btn');
 const journalInput = document.getElementById('journal-input');
 const journalFeed = document.getElementById('journal-feed');
 
+// 🎙️ Voice-to-Text for Journal
+let journalRecog = null;
+let isJournalMicActive = false;
+
+function toggleJournalMic() {
+    const btn = document.getElementById('journal-mic-btn');
+    const input = document.getElementById('journal-input');
+
+    if (isJournalMicActive && journalRecog) {
+        journalRecog.stop();
+        return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) { alert("Speech recognition not supported in this browser."); return; }
+
+    journalRecog = new SpeechRecognition();
+    journalRecog.continuous = true;
+    journalRecog.interimResults = true;
+
+    journalRecog.onstart = () => {
+        isJournalMicActive = true;
+        btn.classList.add('recording');
+        btn.innerHTML = '🛑';
+    };
+
+    journalRecog.onresult = (event) => {
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
+        }
+        if(final) input.value += final;
+    };
+
+    journalRecog.onend = () => {
+        isJournalMicActive = false;
+        btn.classList.remove('recording');
+        btn.innerHTML = '🎙️';
+    };
+
+    journalRecog.start();
+}
+
+// 💾 Save Journal
 if (saveJournalBtn) {
     saveJournalBtn.addEventListener('click', async () => {
         const text = journalInput.value.trim();
@@ -808,20 +769,35 @@ if (saveJournalBtn) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ entry: text })
             });
-            
             const data = await response.json();
-            
             if (data.status === 'success') {
                 journalInput.value = ''; 
                 loadJournals(); 
             }
-        } catch (error) {
-            console.error("Error saving journal:", error);
-        }
+        } catch (error) { console.error("Error saving journal:", error); }
 
         saveJournalBtn.innerText = "Save Entry";
         saveJournalBtn.disabled = false;
     });
+}
+
+// 🧠 Dynamic Emotion Colors
+function getEmotionColor(emotion) {
+    const e = (emotion || '').toLowerCase();
+    if (e.includes('joy') || e.includes('happy') || e.includes('hope')) return { bg: 'rgba(16, 185, 129, 0.2)', text: '#34d399' }; 
+    if (e.includes('sad') || e.includes('grief')) return { bg: 'rgba(59, 130, 246, 0.2)', text: '#60a5fa' }; 
+    if (e.includes('anxi') || e.includes('stress') || e.includes('fear') || e.includes('overwhelm')) return { bg: 'rgba(139, 92, 246, 0.2)', text: '#a78bfa' }; 
+    if (e.includes('ang') || e.includes('frustrat')) return { bg: 'rgba(239, 68, 68, 0.2)', text: '#f87171' }; 
+    return { bg: 'rgba(255, 255, 255, 0.1)', text: '#cbd5e1' }; 
+}
+
+// 🗑️ Delete Journal
+async function deleteJournal(id) {
+    if (!confirm("Are you sure you want to delete this reflection?")) return;
+    try {
+        await fetch('/delete_journal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
+        loadJournals();
+    } catch (e) { console.error(e); }
 }
 
 async function loadJournals() {
@@ -829,7 +805,6 @@ async function loadJournals() {
     try {
         const response = await fetch('/get_journals');
         const journals = await response.json();
-        
         journalFeed.innerHTML = ''; 
         
         if (journals.length === 0) {
@@ -841,10 +816,15 @@ async function loadJournals() {
             const dateObj = new Date(j.timestamp);
             const dateString = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             const timeString = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            const colors = getEmotionColor(j.emotion_tag);
 
             const card = document.createElement('div');
             card.className = 'journal-card';
             card.innerHTML = `
+                <div class="journal-card-header">
+                    <div class="emotion-pill" style="background: ${colors.bg}; color: ${colors.text};">${j.emotion_tag}</div>
+                    <button class="journal-delete-btn" title="Delete Entry" onclick="deleteJournal(${j.id})">${icons.trash}</button>
+                </div>
                 <div class="journal-date">${dateString} at ${timeString}</div>
                 <div class="journal-text">${j.entry_text}</div>
                 <div class="journal-insight">
@@ -853,7 +833,5 @@ async function loadJournals() {
             `;
             journalFeed.appendChild(card);
         });
-    } catch (error) {
-        console.error("Error loading journals:", error);
-    }
+    } catch (error) { console.error("Error loading journals:", error); }
 }

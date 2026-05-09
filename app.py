@@ -30,7 +30,12 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_logs (id SERIAL PRIMARY KEY, session_id TEXT, user_id INTEGER, user_message TEXT, bot_response TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS journals (id SERIAL PRIMARY KEY, user_id INTEGER, entry_text TEXT, ai_insight TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+    
+    # Updated Journal Table with Emotion Tagging
+    cursor.execute('''CREATE TABLE IF NOT EXISTS journals (id SERIAL PRIMARY KEY, user_id INTEGER, entry_text TEXT, ai_insight TEXT, emotion_tag TEXT DEFAULT 'Reflection', timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+    
+    # Safely add emotion_tag to existing tables without breaking
+    cursor.execute('''ALTER TABLE journals ADD COLUMN IF NOT EXISTS emotion_tag TEXT DEFAULT 'Reflection';''')
     
     # Indexes for lightning-fast lookups
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_logs(session_id);''')
@@ -143,7 +148,6 @@ def landing_page():
 @login_required
 def app_dashboard():
     return render_template('index.html', show_auth=False)
-
 
 @app.route('/analyze', methods=['POST'])
 @login_required
@@ -291,6 +295,7 @@ def get_moods():
     moods_list.reverse()
     return jsonify(moods_list)
 
+# 🌟 ENHANCED JOURNAL SYSTEM 
 @app.route('/save_journal', methods=['POST'])
 @login_required
 def save_journal():
@@ -299,38 +304,45 @@ def save_journal():
     user_id = session.get('user_id')
     
     system_prompt = "You are an empathetic journal assistant."
-    insight_prompt = f"The user just wrote this in their private journal: '{entry_text}'. Write a single, comforting, 1-sentence insight or 'silver lining' to validate their feelings."
+    insight_prompt = f"The user wrote this private journal entry: '{entry_text}'.\n\nTASK:\n1. Identify the core emotion in ONE word (e.g. Joy, Anxiety, Hope, Grief, Frustration, Calm, Overwhelmed).\n2. Write a single, comforting, 1-sentence insight or 'silver lining'.\n\nFORMAT YOUR RESPONSE EXACTLY LIKE THIS:\nEmotion: [Word]\nInsight: [Sentence]"
     
+    emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today."
     
-    # Needs to match the variable name in your helpers.py
     from utils.helpers import gemma_client
-    
     if gemma_client:
         try:
             response = gemma_client.chat.completions.create(
-                model="google/gemma-4-26b-a4b-it:free",
+                model="google/gemma-4-26b-a4b-it", # Make sure this matches your paid/free setup
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": insight_prompt}
                 ],
                 temperature=0.6,
-                max_tokens=40
+                max_tokens=60
             )
-            ai_insight = response.choices[0].message.content.replace('*', '').strip()
+            content = response.choices[0].message.content.replace('*', '').strip()
+            
+            # Parse the specific Emotion and Insight
+            for line in content.split('\n'):
+                if line.lower().startswith('emotion:'):
+                    emotion_tag = line.split(':', 1)[1].strip()
+                elif line.lower().startswith('insight:'):
+                    ai_insight = line.split(':', 1)[1].strip()
+                    
         except Exception as e:
             print(f"Journal AI Error: {e}")
 
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO journals (user_id, entry_text, ai_insight) VALUES (%s, %s, %s)",
-        (user_id, entry_text, ai_insight)
+        "INSERT INTO journals (user_id, entry_text, ai_insight, emotion_tag) VALUES (%s, %s, %s, %s)",
+        (user_id, entry_text, ai_insight, emotion_tag)
     )
     conn.commit()
     conn.close()
     
-    return jsonify({"status": "success", "insight": ai_insight})
+    return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
 
 @app.route('/get_journals', methods=['GET'])
 @login_required
@@ -338,11 +350,25 @@ def get_journals():
     user_id = session.get('user_id')
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    cursor.execute("SELECT entry_text, ai_insight, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    # Added id and emotion_tag to the select
+    cursor.execute("SELECT id, entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
     journals = cursor.fetchall()
     conn.close()
     
     return jsonify(journals)
+
+# Route to delete specific journal entry
+@app.route('/delete_journal', methods=['POST'])
+@login_required
+def delete_journal():
+    journal_id = request.json.get('id')
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM journals WHERE id = %s AND user_id = %s", (journal_id, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success"})
 
 if __name__ == '__main__':
     app.run(debug=True)

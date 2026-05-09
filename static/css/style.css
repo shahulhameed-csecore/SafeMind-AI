@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap'); /* For the Burn feature */
 
 /* ==========================================
    🎨 11-STATE EMOTIONAL THEME ENGINE
@@ -32,7 +33,6 @@ body {
 ========================================== */
 .app-layout { display: flex; flex-direction: column; height: 100vh; padding: 15px 25px; gap: 15px; position: relative; z-index: 1; }
 
-/* 🚨 FIX 1: FORCE HEADER Z-INDEX SO DROPDOWN NEVER CUTS OFF */
 .top-header { 
     display: flex; justify-content: space-between; align-items: center; 
     padding: 12px 25px; border-radius: 100px; flex-shrink: 0; 
@@ -57,7 +57,6 @@ body {
 .theme-toggle-btn:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 10px 20px var(--glow-1); }
 .theme-indicator { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--secondary)); box-shadow: 0 0 8px var(--glow-1); transition: 1s ease;}
 
-/* Dropdown Menu overrides */
 .theme-menu {
     position: absolute; top: calc(100% + 15px); right: 0;
     width: 260px; max-height: 400px; overflow-y: auto;
@@ -74,8 +73,6 @@ body {
 .theme-option { display: flex; align-items: center; gap: 12px; background: transparent; border: none; color: var(--text-main); padding: 12px 14px; border-radius: 12px; cursor: pointer; font-family: inherit; font-size: 0.9rem; font-weight: 500; text-align: left; transition: all 0.3s ease; }
 .theme-option:hover { background: rgba(255, 255, 255, 0.06); transform: translateX(5px); color: var(--primary); }
 .theme-dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-.theme-menu::-webkit-scrollbar { width: 4px; }
-.theme-menu::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
 
 /* 🌟 DYNAMIC ATMOSPHERIC MESH */
 .bg-aurora-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; }
@@ -136,7 +133,7 @@ input::placeholder { color: var(--text-muted); }
 .stop-audio-btn:hover { background: rgba(239, 68, 68, 0.1); transform: scale(1.1); }
 
 
-/* 🚨 FIXED: Beautiful Custom Glass Language Selector */
+/* Language Selector */
 .custom-lang-dropdown { position: relative; display: flex; align-items: center; margin-right: 5px; }
 
 .lang-toggle-btn { 
@@ -148,7 +145,6 @@ input::placeholder { color: var(--text-muted); }
 }
 .lang-toggle-btn:hover { border-color: var(--primary); background: var(--surface-input); transform: translateY(-1px); }
 
-/* The floating glass menu */
 .lang-menu { 
     position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%) translateY(10px) scale(0.95); 
     background: var(--surface-input); 
@@ -160,7 +156,6 @@ input::placeholder { color: var(--text-muted); }
 }
 .lang-menu.active { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0) scale(1); }
 
-/* The options inside the menu */
 .lang-option { 
     background: transparent; border: none; color: var(--text-main); 
     padding: 10px 12px; border-radius: 10px; cursor: pointer; 
@@ -247,216 +242,138 @@ input::placeholder { color: var(--text-muted); }
 .wave-core { 
     position: absolute; width: 60px; height: 60px; 
     background: radial-gradient(circle, var(--primary) 0%, transparent 70%); 
-    border-radius: 50%; 
-    box-shadow: 0 0 40px var(--glow-2); 
-    /* 🚨 The magic transition for smooth voice pulsing */
-    transition: transform 0.05s ease-out, box-shadow 0.05s ease-out; 
+    border-radius: 50%; box-shadow: 0 0 40px var(--glow-2); transition: transform 0.05s ease-out, box-shadow 0.05s ease-out; 
 }
+
 /* ==========================================
    📊 DASHBOARD & SLIDING VIEW SYSTEM
 ========================================== */
-
-.view-container {
-    flex: 1; position: relative; overflow: hidden; 
-    border-radius: var(--border-radius-ui);
-    display: flex;
-}
-
-.view-panel {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-    opacity: 0; pointer-events: none; z-index: 1;
-    display: flex; flex-direction: column; overflow-y: auto;
-}
-
-/* Slide Animation Classes */
+.view-container { flex: 1; position: relative; overflow: hidden; border-radius: var(--border-radius-ui); display: flex; }
+.view-panel { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease; opacity: 0; pointer-events: none; z-index: 1; display: flex; flex-direction: column; overflow-y: auto; }
 .view-panel.active { transform: translateX(0); opacity: 1; pointer-events: all; z-index: 2; position: relative;}
 .view-panel.slide-left { transform: translateX(-100%); }
 .view-panel.slide-right { transform: translateX(100%); }
 
-/* Bento Box Grid Layouts */
 .dash-grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
 .dash-grid-2 { display: grid; grid-template-columns: 2fr 1.5fr; gap: 15px; }
+#view-dashboard { padding: 40px; border-radius: 32px; gap: 25px; }
 
-#view-dashboard {
-    padding: 40px; /* Gives the dashboard breathing room */
-    border-radius: 32px; /* Matches the smooth curves of the chat box */
-    gap: 25px; /* Spaces out the top grid and bottom charts */
-}
-
-/* Dashboard Cards (Matches your image) */
-.dash-card, .metric-card {
-    background: var(--surface-input);
-    border: 1px solid var(--border-soft);
-    border-radius: 24px; /* Smoother inner corners */
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-    transition: transform 0.3s ease, border-color 0.3s ease;
-}
+.dash-card, .metric-card { background: var(--surface-input); border: 1px solid var(--border-soft); border-radius: 24px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: transform 0.3s ease, border-color 0.3s ease; }
 .dash-card:hover, .metric-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-2px); }
-
-/* Metric Card Inner Styling */
 .metric-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 .metric-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; color: var(--text-muted); text-transform: uppercase; }
 .metric-icon { background: rgba(255,255,255,0.05); padding: 5px; border-radius: 8px; font-size: 0.9rem;}
 .metric-value { font-size: 2rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
 .metric-trend { font-size: 0.8rem; font-weight: 600; }
-.metric-trend.positive { color: #10b981; } /* Green */
+.metric-trend.positive { color: #10b981; }
 .metric-trend.neutral { color: var(--text-muted); }
-
 .dash-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;}
 .dash-card-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-main); }
 
-/* Tool List Styling */
 .tool-list { display: flex; flex-direction: column; gap: 12px; }
-
-.tool-item { 
-    display: flex; align-items: center; gap: 15px; 
-    padding: 16px 20px; /* Thicker, more clickable feel */
-    border-radius: 20px; 
-    background: rgba(0,0,0,0.15); 
-    border: 1px solid transparent; 
-    transition: 0.3s; 
-}
+.tool-item { display: flex; align-items: center; gap: 15px; padding: 16px 20px; border-radius: 20px; background: rgba(0,0,0,0.15); border: 1px solid transparent; transition: 0.3s; }
 .tool-item:hover { background: rgba(0,0,0,0.25); border-color: var(--border-soft); }
-.tool-icon { 
-    font-size: 1.5rem; 
-    background: rgba(255,255,255,0.05); /* Softer icon background */
-    width: 48px; height: 48px; 
-    display: flex; align-items: center; justify-content: center; 
-    border-radius: 14px; 
-    border: 1px solid var(--border-soft); 
-}
+.tool-icon { font-size: 1.5rem; background: rgba(255,255,255,0.05); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px solid var(--border-soft); }
 .tool-info { flex: 1; }
 .tool-info h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 3px; }
 .tool-info p { font-size: 0.75rem; color: var(--text-muted); }
 .launch-btn { background: var(--primary); color: var(--bg-base); border: none; padding: 6px 14px; border-radius: 100px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.3s; }
 .launch-btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px var(--glow-1); }
-.clinical-modal {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-    z-index: 10000; display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: 0.4s ease;
-}
+
+/* Clinical Modals */
+.clinical-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.4s ease; }
 .clinical-modal.active { opacity: 1; pointer-events: all; }
-.clinical-modal-content {
-    background: var(--surface-panel); border: 1px solid var(--border-soft);
-    border-radius: 32px; padding: 40px; width: 90vw; max-width: 600px;
-    max-height: 85vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-    position: relative; transform: translateY(20px); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
+.clinical-modal-content { background: var(--surface-panel); border: 1px solid var(--border-soft); border-radius: 32px; padding: 40px; width: 90vw; max-width: 600px; max-height: 85vh; overflow-y: auto; box-shadow: 0 30px 60px rgba(0,0,0,0.5); position: relative; transform: translateY(20px); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 .clinical-modal.active .clinical-modal-content { transform: translateY(0); }
-.modal-close-btn {
-    position: absolute; top: 25px; right: 25px; background: var(--surface-input);
-    border: 1px solid var(--border-soft); color: var(--text-muted);
-    width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: 0.3s;
-}
+.modal-close-btn { position: absolute; top: 25px; right: 25px; background: var(--surface-input); border: 1px solid var(--border-soft); color: var(--text-muted); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 10;}
 .modal-close-btn:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-.clinical-input, .clinical-select {
-    width: 100%; padding: 14px 18px; border-radius: 16px; background: var(--surface-input);
-    border: 1px solid var(--border-soft); color: var(--text-main); font-family: inherit;
-    margin-top: 8px; margin-bottom: 20px; outline: none; transition: 0.3s;
-}
+.clinical-input, .clinical-select { width: 100%; padding: 14px 18px; border-radius: 16px; background: var(--surface-input); border: 1px solid var(--border-soft); color: var(--text-main); font-family: inherit; margin-top: 8px; margin-bottom: 20px; outline: none; transition: 0.3s; }
 .clinical-input:focus, .clinical-select:focus { border-color: var(--primary); }
 .clinical-label { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
-.submit-clinical-btn {
-    width: 100%; padding: 16px; border-radius: 16px; background: var(--primary);
-    color: var(--bg-base); font-weight: 700; font-size: 1rem; border: none; cursor: pointer;
-    transition: 0.3s; margin-top: 10px;
-}
+.submit-clinical-btn { width: 100%; padding: 16px; border-radius: 16px; background: var(--primary); color: var(--bg-base); font-weight: 700; font-size: 1rem; border: none; cursor: pointer; transition: 0.3s; margin-top: 10px; }
 .submit-clinical-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--glow-1); }
 
-/* Mobile fixes for grid */
-@media (max-width: 900px) {
-    .dash-grid-2 { grid-template-columns: 1fr; }
+@media (max-width: 900px) { .dash-grid-2 { grid-template-columns: 1fr; } }
+
+
+/* ==========================================
+   📝 ENHANCED JOURNAL UI 
+========================================== */
+.journal-composer { background-color: var(--surface-input); border-radius: 24px; padding: 30px; margin-bottom: 30px; border: 1px solid var(--border-soft); box-shadow: 0 10px 30px var(--glow-1); }
+.journal-composer h2 { color: var(--text-main); margin-top: 0; margin-bottom: 8px; }
+.journal-subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+
+/* The Wrapper that holds the Textarea AND the Mic Button */
+.journal-input-wrapper { position: relative; width: 100%; }
+
+#journal-input { 
+    width: 100%; min-height: 140px; background-color: rgba(0, 0, 0, 0.2); 
+    border: 1px solid var(--border-soft); border-radius: 16px; padding: 20px; 
+    padding-bottom: 50px; /* Space for the mic button */
+    color: var(--text-main); font-size: 1rem; font-family: inherit; 
+    resize: vertical; outline: none; transition: border-color 0.3s, box-shadow 0.3s; 
 }
-/* --- JOURNAL UI --- */
-.journal-composer {
-    background-color: rgba(20, 35, 58, 0.8);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+#journal-input:focus { border-color: var(--primary); box-shadow: 0 0 15px var(--glow-1); }
+
+/* The new Voice-to-Text Button */
+.journal-mic-btn {
+    position: absolute; bottom: 15px; right: 15px;
+    background: var(--surface-panel); border: 1px solid var(--border-soft);
+    color: var(--text-muted); border-radius: 50%; width: 40px; height: 40px;
+    display: flex; justify-content: center; align-items: center; cursor: pointer;
+    transition: 0.3s; font-size: 1.1rem;
+}
+.journal-mic-btn:hover { background: var(--glow-1); color: var(--primary); border-color: var(--primary); transform: scale(1.1); }
+.journal-mic-btn.recording { background: var(--danger); color: white; border-color: var(--danger); animation: pulse-record 1.5s infinite; }
+@keyframes pulse-record { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+.journal-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+.primary-btn { background-color: var(--primary); color: var(--bg-base); border: none; padding: 12px 24px; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+.primary-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px var(--glow-1); }
+
+.journal-feed { display: flex; flex-direction: column; gap: 20px; padding-bottom: 40px; }
+.journal-card { background-color: var(--surface-input); border-radius: 20px; padding: 25px; border: 1px solid var(--border-soft); position: relative; transition: 0.3s;}
+.journal-card:hover { border-color: rgba(255,255,255,0.1); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2);}
+
+.journal-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+
+/* Dynamic Emotion Tag */
+.emotion-pill { 
+    display: inline-block; padding: 6px 14px; border-radius: 100px; 
+    font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
 }
 
-.journal-composer h2 {
-    color: #ffffff;
-    margin-top: 0;
-    margin-bottom: 8px;
+/* Delete Button */
+.journal-delete-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; transition: 0.3s; padding: 5px; }
+.journal-delete-btn:hover { color: var(--danger); transform: scale(1.1); }
+
+.journal-date { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px; }
+.journal-text { color: var(--text-main); line-height: 1.6; margin-bottom: 20px; white-space: pre-wrap; font-size: 0.95rem; }
+
+.journal-insight { background: linear-gradient(to right, rgba(255,255,255,0.05), transparent); border-left: 4px solid var(--primary); padding: 15px 20px; border-radius: 0 12px 12px 0; color: var(--text-muted); font-size: 0.95rem; font-style: italic; }
+.journal-insight b { color: var(--primary); font-style: normal; }
+
+
+/* ==========================================
+   🔥 BURN EXERCISE GAME (Paper Dissolve)
+========================================== */
+.paper-container { width: 100%; position: relative; transition: all 2.5s cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+.burn-textarea {
+    width: 100%; height: 180px;
+    background: #fdfbf7; color: #333;
+    border: none; border-radius: 12px; padding: 25px;
+    font-family: 'Kalam', 'Segoe UI', cursive, sans-serif; font-size: 1.3rem; line-height: 1.5;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3); resize: none; outline: none;
+    transition: all 2.5s ease-in-out;
 }
 
-.journal-subtitle {
-    color: #94a3b8;
-    font-size: 0.9rem;
-    margin-bottom: 16px;
-}
-
-#journal-input {
-    width: 100%;
-    min-height: 120px;
-    background-color: rgba(10, 20, 35, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 12px;
-    padding: 16px;
-    color: #ffffff;
-    font-size: 1rem;
-    font-family: inherit;
-    resize: vertical;
-    outline: none;
-    transition: border-color 0.3s;
-}
-
-#journal-input:focus {
-    border-color: #3b82f6;
-}
-
-.journal-actions {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 16px;
-}
-
-/* Journal Cards (Past Entries) */
-.journal-feed {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    padding-bottom: 40px;
-}
-
-.journal-card {
-    background-color: rgba(20, 35, 58, 0.6);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.journal-date {
-    color: #64748b;
-    font-size: 0.85rem;
-    margin-bottom: 12px;
-}
-
-.journal-text {
-    color: #f8fafc;
-    line-height: 1.6;
-    margin-bottom: 16px;
-    white-space: pre-wrap; /* Keeps user's line breaks */
-}
-
-/* The AI Insight Highlight */
-.journal-insight {
-    background: linear-gradient(to right, rgba(59, 130, 246, 0.1), transparent);
-    border-left: 4px solid #3b82f6;
-    padding: 12px 16px;
-    border-radius: 0 8px 8px 0;
-    color: #cbd5e1;
-    font-size: 0.95rem;
-    font-style: italic;
-}
-
-.journal-insight b {
-    color: #60a5fa;
-    font-style: normal;
+/* The magic animation class triggered by JavaScript */
+.burning-paper {
+    transform: translateY(-80px) scale(0.8) rotate(3deg);
+    filter: blur(8px) contrast(2) sepia(1);
+    opacity: 0;
+    box-shadow: 0 0 50px 20px #ef4444, 0 0 100px 40px #f97316;
+    background: #222;
+    color: transparent;
 }
