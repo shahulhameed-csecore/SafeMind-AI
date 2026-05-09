@@ -11,6 +11,7 @@ import psycopg2
 import psycopg2.extras
 from pinecone import Pinecone
 from google import genai
+from google.genai import types
 from datetime import datetime, timedelta
 
 load_dotenv()
@@ -32,13 +33,9 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_logs (id SERIAL PRIMARY KEY, session_id TEXT, user_id INTEGER, user_message TEXT, bot_response TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
-    # Updated Journal Table with Emotion Tagging
     cursor.execute('''CREATE TABLE IF NOT EXISTS journals (id SERIAL PRIMARY KEY, user_id INTEGER, entry_text TEXT, ai_insight TEXT, emotion_tag TEXT DEFAULT 'Reflection', timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-    
-    # Safely add emotion_tag to existing tables without breaking
     cursor.execute('''ALTER TABLE journals ADD COLUMN IF NOT EXISTS emotion_tag TEXT DEFAULT 'Reflection';''')
     
-    # Indexes for lightning-fast lookups
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_logs(session_id);''')
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_logs(user_id);''')
     
@@ -62,7 +59,7 @@ def get_embedding(text):
     if not gemini_client: return None
     try:
         response = gemini_client.models.embed_content(
-            model="gemini-embedding-001", 
+            model="text-embedding-004", 
             contents=text
         )
         return response.embeddings[0].values
@@ -82,7 +79,7 @@ def retrieve_past_context(user_text):
             past_messages = [match['metadata']['text'] for match in results['matches'] if 'text' in match['metadata']]
             return "\n".join(past_messages)
     except Exception as e:
-        print(f"Pinecone retrieval error: {e}")
+        pass
     return ""
 
 def login_required(f):
@@ -296,7 +293,6 @@ def get_moods():
     moods_list.reverse()
     return jsonify(moods_list)
 
-# 🌟 REAL-TIME DASHBOARD STATS
 @app.route('/get_dashboard_stats', methods=['GET'])
 @login_required
 def get_dashboard_stats():
@@ -304,18 +300,15 @@ def get_dashboard_stats():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    # 1. Total Unique Sessions
     cursor.execute("SELECT COUNT(DISTINCT session_id) as total FROM chat_logs WHERE user_id = %s", (user_id,))
     total_sessions = cursor.fetchone()['total']
 
-    # 2. Crisis Alerts (Checks chat history for trigger keywords)
     crisis_keywords = ["die", "suicide", "kill", "end my life", "hopeless", "end it", "worthless", "give up", "dead"]
     query_conditions = " OR ".join(["user_message ILIKE %s" for _ in crisis_keywords])
     params = [f"%{kw}%" for kw in crisis_keywords]
     cursor.execute(f"SELECT COUNT(*) as alerts FROM chat_logs WHERE user_id = %s AND ({query_conditions})", [user_id] + params)
     crisis_alerts = cursor.fetchone()['alerts']
 
-    # 3. Mood Streak & Average Sentiment
     cursor.execute("SELECT mood, timestamp FROM mood_logs WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
     moods = cursor.fetchall()
 
@@ -323,7 +316,6 @@ def get_dashboard_stats():
     avg_sentiment = "Analyzing"
 
     if moods:
-        # Calculate Streak
         unique_dates = sorted(list(set([m['timestamp'].date() for m in moods])), reverse=True)
         today = datetime.now().date()
         
@@ -335,9 +327,8 @@ def get_dashboard_stats():
                 else:
                     break
                     
-        # Calculate Avg Sentiment
         mood_scores = {'Happy': 4, 'Calm': 3, 'Sad': 2, 'Stressed': 1}
-        recent_moods = moods[:5] # Averages the last 5 moods
+        recent_moods = moods[:5]
         score_sum = sum([mood_scores.get(m['mood'], 2.5) for m in recent_moods])
         avg_score = score_sum / len(recent_moods)
         
@@ -354,8 +345,79 @@ def get_dashboard_stats():
         "avg_sentiment": avg_sentiment,
         "crisis_alerts": crisis_alerts
     })
+
+# 🌟 ENHANCED JOURNAL SYSTEM (Using Google API)
+@app.route('/save_journal', methods=['POST'])
+@login_required
+def save_journal():
+    data = request.json
+    entry_text = data.get('entry')
+    user_id = session.get('user_id')
     
-    # 🌟 CLINICAL REPORT EXPORT
+    system_prompt = "You are an empathetic journal assistant."
+    insight_prompt = f"The user wrote this private journal entry: '{entry_text}'.\n\nTASK:\n1. Identify the core emotion in ONE word (e.g. Joy, Anxiety, Hope, Grief, Frustration, Calm, Overwhelmed).\n2. Write a single, comforting, 1-sentence insight or 'silver lining'.\n\nFORMAT YOUR RESPONSE EXACTLY LIKE THIS:\nEmotion: [Word]\nInsight: [Sentence]"
+    
+    emotion_tag = "Reflection"
+    ai_insight = "Thank you for sharing your thoughts today."
+    
+    # 🚀 Connecting to Google AI Studio directly instead of OpenRouter
+    if gemini_client:
+        try:
+            response = gemini_client.models.generate_content(
+                model="gemini-1.5-flash", 
+                contents=insight_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    temperature=0.6,
+                    max_output_tokens=60
+                )
+            )
+            content = response.text.replace('*', '').strip()
+            
+            for line in content.split('\n'):
+                if line.lower().startswith('emotion:'):
+                    emotion_tag = line.split(':', 1)[1].strip()
+                elif line.lower().startswith('insight:'):
+                    ai_insight = line.split(':', 1)[1].strip()
+                    
+        except Exception as e:
+            print(f"Journal AI Error: {e}")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO journals (user_id, entry_text, ai_insight, emotion_tag) VALUES (%s, %s, %s, %s)",
+        (user_id, entry_text, ai_insight, emotion_tag)
+    )
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
+
+@app.route('/get_journals', methods=['GET'])
+@login_required
+def get_journals():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT id, entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    journals = cursor.fetchall()
+    conn.close()
+    
+    return jsonify(journals)
+
+@app.route('/delete_journal', methods=['POST'])
+@login_required
+def delete_journal():
+    journal_id = request.json.get('id')
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM journals WHERE id = %s AND user_id = %s", (journal_id, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success"})
+
 @app.route('/export_report', methods=['GET'])
 @login_required
 def export_report():
@@ -364,24 +426,19 @@ def export_report():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-    # Calculate the date for 30 days ago
     thirty_days_ago = datetime.now() - timedelta(days=30)
 
-    # 1. Fetch recent Moods
     cursor.execute("SELECT mood, timestamp FROM mood_logs WHERE user_id = %s AND timestamp >= %s ORDER BY timestamp DESC", (user_id, thirty_days_ago))
     moods = cursor.fetchall()
 
-    # 2. Fetch recent Journals
     cursor.execute("SELECT entry_text, emotion_tag, timestamp FROM journals WHERE user_id = %s AND timestamp >= %s ORDER BY timestamp DESC", (user_id, thirty_days_ago))
     journals = cursor.fetchall()
 
-    # 3. Count Chat Messages
     cursor.execute("SELECT COUNT(*) as msg_count FROM chat_logs WHERE user_id = %s AND timestamp >= %s", (user_id, thirty_days_ago))
     chat_count = cursor.fetchone()['msg_count']
 
     conn.close()
 
-    # 📝 Format the Text Report
     report = f"====================================================\n"
     report += f"   SAFEMIND AI - 30-DAY CLINICAL SUMMARY REPORT     \n"
     report += f"====================================================\n\n"
@@ -412,87 +469,10 @@ def export_report():
     else:
         report += "No journal entries in this period.\n"
 
-    # Tell Flask to send this string back as a downloadable .txt file
     return report, 200, {
         'Content-Type': 'text/plain; charset=utf-8',
         'Content-Disposition': f'attachment; filename="SafeMind_Clinical_Report_{username}.txt"'
     }
-
-# 🌟 ENHANCED JOURNAL SYSTEM 
-@app.route('/save_journal', methods=['POST'])
-@login_required
-def save_journal():
-    data = request.json
-    entry_text = data.get('entry')
-    user_id = session.get('user_id')
-    
-    system_prompt = "You are an empathetic journal assistant."
-    insight_prompt = f"The user wrote this private journal entry: '{entry_text}'.\n\nTASK:\n1. Identify the core emotion in ONE word (e.g. Joy, Anxiety, Hope, Grief, Frustration, Calm, Overwhelmed).\n2. Write a single, comforting, 1-sentence insight or 'silver lining'.\n\nFORMAT YOUR RESPONSE EXACTLY LIKE THIS:\nEmotion: [Word]\nInsight: [Sentence]"
-    
-    emotion_tag = "Reflection"
-    ai_insight = "Thank you for sharing your thoughts today."
-    
-    from utils.helpers import gemma_client
-    # 🚀 WE USE THE GOOGLE CLIENT YOU ALREADY INITIALIZED AT THE TOP OF APP.PY
-    if gemini_client:
-        try:
-            response = gemini_client.models.generate_content(
-                model="gemma-4-26b-a4b-it", 
-                contents=insight_prompt,
-                config=genai.types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    temperature=0.6,
-                    max_output_tokens=60
-                )
-            )
-            content = response.text.replace('*', '').strip()
-            
-            # Parse the specific Emotion and Insight
-            for line in content.split('\n'):
-                if line.lower().startswith('emotion:'):
-                    emotion_tag = line.split(':', 1)[1].strip()
-                elif line.lower().startswith('insight:'):
-                    ai_insight = line.split(':', 1)[1].strip()
-                    
-        except Exception as e:
-            print(f"Journal AI Error: {e}")
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        "INSERT INTO journals (user_id, entry_text, ai_insight, emotion_tag) VALUES (%s, %s, %s, %s)",
-        (user_id, entry_text, ai_insight, emotion_tag)
-    )
-    conn.commit()
-    conn.close()
-    
-    return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
-
-@app.route('/get_journals', methods=['GET'])
-@login_required
-def get_journals():
-    user_id = session.get('user_id')
-    conn = get_db_connection()
-    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-    # Added id and emotion_tag to the select
-    cursor.execute("SELECT id, entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
-    journals = cursor.fetchall()
-    conn.close()
-    
-    return jsonify(journals)
-
-# Route to delete specific journal entry
-@app.route('/delete_journal', methods=['POST'])
-@login_required
-def delete_journal():
-    journal_id = request.json.get('id')
-    user_id = session.get('user_id')
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM journals WHERE id = %s AND user_id = %s", (journal_id, user_id))
-    conn.commit()
-    conn.close()
-    return jsonify({"status": "success"})
 
 if __name__ == '__main__':
     app.run(debug=True)
