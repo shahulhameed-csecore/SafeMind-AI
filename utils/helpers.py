@@ -25,9 +25,9 @@ def analyze_deep_emotion(user_text):
         'sadness': 0.1, 'fear': 0.1, 'disgust': 0.1, 'anger': 0.1
     }
     
-    sad_words = ['sad', 'down', 'depressed', 'demotivated', 'cry', 'lonely', 'tired', 'hopeless', 'bad', 'hurt']
+    sad_words = ['sad', 'down', 'depressed', 'demotivated', 'cry', 'lonely', 'tired', 'hopeless', 'bad', 'hurt', 'messed up', 'incompetent']
     joy_words = ['happy', 'good', 'great', 'joy', 'motivated', 'excited', 'awesome', 'love', 'smile']
-    fear_words = ['scared', 'anxious', 'fear', 'terrified', 'nervous', 'panic', 'worry', 'stress']
+    fear_words = ['scared', 'anxious', 'fear', 'terrified', 'nervous', 'panic', 'worry', 'stress', 'fired', 'trouble']
     anger_words = ['angry', 'mad', 'frustrated', 'hate', 'annoyed', 'furious', 'irritated']
     surprise_words = ['wow', 'omg', 'amazed', 'shocked', 'sudden', 'unexpected']
     disgust_words = ['gross', 'disgusting', 'sick', 'vile', 'awful']
