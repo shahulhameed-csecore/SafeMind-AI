@@ -120,18 +120,20 @@ def retrieve_past_context(user_text):
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
+    print("🚀 STEP 1: Message received from frontend!")
     data = request.json
     user_input = data.get('message')
     chat_history = data.get('history', [])
     session_id = data.get('session_id')
     user_id = session.get('user_id')
-    
     user_lang = data.get('language', 'en-US')[:2] 
 
+    print("🚀 STEP 2: Running offline emotional analysis...")
     is_crisis = detect_crisis(user_input)
     sentiment = analyze_sentiment(user_input)
     deep_emotions = analyze_deep_emotion(user_input)
     
+    print("🚀 STEP 3: Querying ChromaDB (Long-term memory)...")
     past_memory = retrieve_past_context(user_input)
     
     if past_memory:
@@ -139,16 +141,19 @@ def analyze():
     else:
         augmented_input = user_input
 
+    print("🚀 STEP 4: Calling Gemma 4 API...")
     ai_response = generate_ai_response(augmented_input, chat_history, user_lang)
 
+    print("🚀 STEP 5: Adding new memory to ChromaDB...")
     try:
         memory_collection.add(
             documents=[user_input], 
             ids=[f"{session_id}_{len(chat_history)}"]
         )
-    except:
-        pass
+    except Exception as e:
+        print(f"Chroma error: {e}")
 
+    print("🚀 STEP 6: Generating Voice Audio (gTTS)...")
     audio_base64 = None
     try:
         lang_code = user_lang
@@ -159,12 +164,11 @@ def analyze():
         fp = BytesIO()
         tts.write_to_fp(fp)
         fp.seek(0)
-        
         audio_base64 = base64.b64encode(fp.read()).decode('utf-8')
     except Exception as e:
         print(f"⚠️ Audio Generation Failed: {e}")
 
-    # 🌟 NEW: Postgres Insert with RETURNING id
+    print("🚀 STEP 7: Saving to Postgres Database...")
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
@@ -175,6 +179,7 @@ def analyze():
     conn.commit()
     conn.close()
 
+    print("✅ STEP 8: Success! Sending reply back to frontend.")
     return jsonify({
         "response": ai_response, 
         "sentiment": sentiment, 
@@ -183,7 +188,6 @@ def analyze():
         "emotions": deep_emotions,
         "audio": audio_base64
     })
-
 @app.route('/get_sessions', methods=['GET'])
 @login_required
 def get_sessions():
