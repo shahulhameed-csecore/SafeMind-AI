@@ -818,3 +818,92 @@ function submitPHQ() {
         sendMessage();
     }
 }
+// --- NAVIGATION LOGIC ---
+const navChat = document.getElementById('nav-chat'); // Make sure your HTML has this ID
+const navJournal = document.getElementById('nav-journal'); // Make sure your HTML has this ID
+const chatView = document.getElementById('chat-view'); // The wrapper for your chat UI
+const journalView = document.getElementById('journal-view');
+
+// Switch to Journal
+navJournal.addEventListener('click', () => {
+    chatView.style.display = 'none';
+    journalView.style.display = 'block';
+    loadJournals(); // Fetch past journals when they open the tab
+});
+
+// Switch to Chat
+navChat.addEventListener('click', () => {
+    journalView.style.display = 'none';
+    chatView.style.display = 'flex'; // or 'block' depending on your current CSS
+});
+
+
+// --- JOURNAL LOGIC ---
+const saveJournalBtn = document.getElementById('save-journal-btn');
+const journalInput = document.getElementById('journal-input');
+const journalFeed = document.getElementById('journal-feed');
+
+saveJournalBtn.addEventListener('click', async () => {
+    const text = journalInput.value.trim();
+    if (!text) return;
+
+    // Show loading state
+    saveJournalBtn.innerText = "Reflecting...";
+    saveJournalBtn.disabled = true;
+
+    try {
+        const response = await fetch('/save_journal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ entry: text })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            journalInput.value = ''; // Clear the text box
+            loadJournals(); // Refresh the feed to show the new entry + AI insight
+        }
+    } catch (error) {
+        console.error("Error saving journal:", error);
+    }
+
+    // Restore button
+    saveJournalBtn.innerText = "Save Entry";
+    saveJournalBtn.disabled = false;
+});
+
+// Fetch and display past journals
+async function loadJournals() {
+    try {
+        const response = await fetch('/get_journals');
+        const journals = await response.json();
+        
+        journalFeed.innerHTML = ''; // Clear current list
+        
+        if (journals.length === 0) {
+            journalFeed.innerHTML = '<p style="color: #64748b; text-align: center;">Your journal is empty. Start writing above!</p>';
+            return;
+        }
+
+        journals.forEach(j => {
+            // Format the date nicely
+            const dateObj = new Date(j.timestamp);
+            const dateString = dateObj.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const timeString = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+            const card = document.createElement('div');
+            card.className = 'journal-card';
+            card.innerHTML = `
+                <div class="journal-date">${dateString} at ${timeString}</div>
+                <div class="journal-text">${j.entry_text}</div>
+                <div class="journal-insight">
+                    ✨ <b>SafeMind Insight:</b> ${j.ai_insight}
+                </div>
+            `;
+            journalFeed.appendChild(card);
+        });
+    } catch (error) {
+        console.error("Error loading journals:", error);
+    }
+}

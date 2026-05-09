@@ -30,6 +30,8 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_logs (id SERIAL PRIMARY KEY, session_id TEXT, user_id INTEGER, user_message TEXT, bot_response TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
+    # Add this inside init_db() in app.py
+    cursor.execute('''CREATE TABLE IF NOT EXISTS journals (id SERIAL PRIMARY KEY, user_id INTEGER, entry_text TEXT, ai_insight TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
     # Indexes for lightning-fast lookups
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_logs(session_id);''')
@@ -144,6 +146,7 @@ def landing_page():
 @login_required
 def app_dashboard():
     return render_template('index.html', show_auth=False)
+
 
 @app.route('/analyze', methods=['POST'])
 @login_required
@@ -298,6 +301,56 @@ def get_moods():
     moods_list = [{"mood": row["mood"], "time": row["timestamp"]} for row in moods]
     moods_list.reverse()
     return jsonify(moods_list)
+@app.route('/save_journal', methods=['POST'])
+@login_required
+def save_journal():
+    data = request.json
+    entry_text = data.get('entry')
+    user_id = session.get('user_id')
+    
+    # Generate a quick, supportive insight from Gemma 4
+    system_prompt = "You are an empathetic journal assistant."
+    insight_prompt = f"The user just wrote this in their private journal: '{entry_text}'. Write a single, comforting, 1-sentence insight or 'silver lining' to validate their feelings."
+    
+    ai_insight = "Thank you for sharing your thoughts today."
+    if gemma_client:
+        try:
+            response = gemma_client.chat.completions.create(
+                model="google/gemma-4-26b-a4b-it",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": insight_prompt}
+                ],
+                temperature=0.6,
+                max_tokens=40
+            )
+            ai_insight = response.choices[0].message.content.replace('*', '').strip()
+        except Exception as e:
+            print(f"Journal AI Error: {e}")
+
+    # Save everything to the vault
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO journals (user_id, entry_text, ai_insight) VALUES (%s, %s, %s)",
+        (user_id, entry_text, ai_insight)
+    )
+    conn.commit()
+    conn.close()
+    
+    return jsonify({"status": "success", "insight": ai_insight})
+
+@app.route('/get_journals', methods=['GET'])
+@login_required
+def get_journals():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT entry_text, ai_insight, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    journals = cursor.fetchall()
+    conn.close()
+    
+    return jsonify(journals)
 
 if __name__ == '__main__':
     app.run(debug=True)
