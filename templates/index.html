@@ -193,26 +193,25 @@
                     <div class="dash-grid-4">
                         <div class="metric-card">
                             <div class="metric-header"><span class="metric-title">TOTAL SESSIONS</span><span class="metric-icon">💬</span></div>
-                            <div class="metric-value">24</div>
-                            <div class="metric-trend positive">↗ +3 this week</div>
+                            <div class="metric-value" id="stat-sessions">0</div>
+                            <div class="metric-trend neutral" id="stat-sessions-trend">Just starting out</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-header"><span class="metric-title">MOOD STREAK</span><span class="metric-icon">🔥</span></div>
-                            <div class="metric-value">5 Days</div>
-                            <div class="metric-trend positive">↗ Looking good</div>
+                            <div class="metric-value" id="stat-streak">0 Days</div>
+                            <div class="metric-trend neutral" id="stat-streak-trend">Log a mood today!</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-header"><span class="metric-title">AVG SENTIMENT</span><span class="metric-icon">🧠</span></div>
-                            <div class="metric-value">Calm</div>
-                            <div class="metric-trend neutral">→ Stable baseline</div>
+                            <div class="metric-value" id="stat-sentiment">Analyzing</div>
+                            <div class="metric-trend neutral" id="stat-sentiment-trend">→ Stable baseline</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-header"><span class="metric-title">CRISIS ALERTS</span><span class="metric-icon">⚠️</span></div>
-                            <div class="metric-value" style="color: var(--primary);">0</div>
-                            <div class="metric-trend positive">No recent triggers</div>
+                            <div class="metric-value" id="stat-crisis" style="color: var(--primary);">0</div>
+                            <div class="metric-trend positive" id="stat-crisis-trend">No recent triggers</div>
                         </div>
                     </div>
-
                     <div class="dash-grid-2" style="margin-top: 20px;">
                         <div class="dash-card">
                             <div class="dash-card-header">

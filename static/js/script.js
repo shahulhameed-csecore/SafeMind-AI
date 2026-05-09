@@ -99,6 +99,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
         await loadMoodChart();
+        await loadDashboardStats();     // 🚀 ADD THIS
+        await loadMainDashboardChart();
     }
 });
 
@@ -834,4 +836,93 @@ async function loadJournals() {
             journalFeed.appendChild(card);
         });
     } catch (error) { console.error("Error loading journals:", error); }
+}
+/* ==========================================
+   📊 REAL-TIME DASHBOARD DATA
+========================================== */
+async function loadDashboardStats() {
+    try {
+        const response = await fetch('/get_dashboard_stats');
+        const data = await response.json();
+        
+        // Update top metrics
+        document.getElementById('stat-sessions').innerText = data.total_sessions;
+        document.getElementById('stat-streak').innerText = `${data.streak} Days`;
+        document.getElementById('stat-sentiment').innerText = data.avg_sentiment;
+        
+        const crisisEl = document.getElementById('stat-crisis');
+        const crisisTrend = document.getElementById('stat-crisis-trend');
+        crisisEl.innerText = data.crisis_alerts;
+        
+        // Dynamic Crisis Alert Styling
+        if (data.crisis_alerts > 0) {
+            crisisEl.style.color = "var(--danger)";
+            crisisTrend.innerText = "Action recommended";
+            crisisTrend.className = "metric-trend danger";
+        } else {
+            crisisEl.style.color = "var(--primary)";
+            crisisTrend.innerText = "No recent triggers";
+            crisisTrend.className = "metric-trend positive";
+        }
+        
+        // Dynamic Streak Styling
+        if (data.streak > 2) {
+            document.getElementById('stat-streak-trend').innerText = "↗ Looking good";
+            document.getElementById('stat-streak-trend').className = "metric-trend positive";
+        } else {
+            document.getElementById('stat-streak-trend').innerText = "Keep logging!";
+            document.getElementById('stat-streak-trend').className = "metric-trend neutral";
+        }
+
+        // Dynamic Session Styling
+        if (data.total_sessions > 0) {
+            document.getElementById('stat-sessions-trend').innerText = "Active user";
+            document.getElementById('stat-sessions-trend').className = "metric-trend positive";
+        }
+    } catch (e) { console.error("Error loading dashboard stats:", e); }
+}
+
+let mainDashChartInstance = null;
+async function loadMainDashboardChart() {
+    const canvas = document.getElementById('mainDashboardChart');
+    if (!canvas) return;
+    try {
+        const response = await fetch('/get_moods');
+        const data = await response.json();
+        if(data.length === 0) return;
+
+        const labels = data.map(log => {
+            const date = new Date(log.time);
+            return `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+        });
+        const plotData = data.map(log => moodValues[log.mood] || 2);
+        
+        const ctx = canvas.getContext('2d');
+        const theme = getThemeColors(); 
+
+        if (mainDashChartInstance) mainDashChartInstance.destroy();
+        mainDashChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { 
+                labels: labels, 
+                datasets: [{ 
+                    label: 'Mood Level', data: plotData, 
+                    borderColor: theme.line, backgroundColor: theme.bg, 
+                    borderWidth: 3, tension: 0.4, fill: true, 
+                    pointBackgroundColor: theme.bg, pointBorderColor: theme.point, 
+                    pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 7
+                }] 
+            },
+            options: { 
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
+                scales: { 
+                    x: { display: true, ticks: { color: theme.text } }, 
+                    y: { min: 0.5, max: 4.5, ticks: { stepSize: 1, color: theme.text, callback: function(value) {
+                        if(value === 1) return 'Stressed'; if(value === 2) return 'Sad';
+                        if(value === 3) return 'Calm'; if(value === 4) return 'Happy'; return '';
+                    } }, grid: { color: theme.grid } } 
+                } 
+            }
+        });
+    } catch (error) { console.error("Main chart error:", error); }
 }

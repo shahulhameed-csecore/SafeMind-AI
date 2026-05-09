@@ -11,6 +11,7 @@ import psycopg2
 import psycopg2.extras
 from pinecone import Pinecone
 from google import genai
+from datetime import datetime, timedelta
 
 load_dotenv()
 from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, analyze_deep_emotion
@@ -294,6 +295,65 @@ def get_moods():
     moods_list = [{"mood": row["mood"], "time": row["timestamp"]} for row in moods]
     moods_list.reverse()
     return jsonify(moods_list)
+
+# 🌟 REAL-TIME DASHBOARD STATS
+@app.route('/get_dashboard_stats', methods=['GET'])
+@login_required
+def get_dashboard_stats():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    # 1. Total Unique Sessions
+    cursor.execute("SELECT COUNT(DISTINCT session_id) as total FROM chat_logs WHERE user_id = %s", (user_id,))
+    total_sessions = cursor.fetchone()['total']
+
+    # 2. Crisis Alerts (Checks chat history for trigger keywords)
+    crisis_keywords = ["die", "suicide", "kill", "end my life", "hopeless", "end it", "worthless", "give up", "dead"]
+    query_conditions = " OR ".join(["user_message ILIKE %s" for _ in crisis_keywords])
+    params = [f"%{kw}%" for kw in crisis_keywords]
+    cursor.execute(f"SELECT COUNT(*) as alerts FROM chat_logs WHERE user_id = %s AND ({query_conditions})", [user_id] + params)
+    crisis_alerts = cursor.fetchone()['alerts']
+
+    # 3. Mood Streak & Average Sentiment
+    cursor.execute("SELECT mood, timestamp FROM mood_logs WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    moods = cursor.fetchall()
+
+    streak = 0
+    avg_sentiment = "Analyzing"
+
+    if moods:
+        # Calculate Streak
+        unique_dates = sorted(list(set([m['timestamp'].date() for m in moods])), reverse=True)
+        today = datetime.now().date()
+        
+        if unique_dates and (unique_dates[0] == today or unique_dates[0] == today - timedelta(days=1)):
+            streak = 1
+            for i in range(1, len(unique_dates)):
+                if unique_dates[i-1] - unique_dates[i] == timedelta(days=1):
+                    streak += 1
+                else:
+                    break
+                    
+        # Calculate Avg Sentiment
+        mood_scores = {'Happy': 4, 'Calm': 3, 'Sad': 2, 'Stressed': 1}
+        recent_moods = moods[:5] # Averages the last 5 moods
+        score_sum = sum([mood_scores.get(m['mood'], 2.5) for m in recent_moods])
+        avg_score = score_sum / len(recent_moods)
+        
+        if avg_score >= 3.5: avg_sentiment = "Joyful"
+        elif avg_score >= 2.5: avg_sentiment = "Calm"
+        elif avg_score >= 1.5: avg_sentiment = "Down"
+        else: avg_sentiment = "Stressed"
+
+    conn.close()
+
+    return jsonify({
+        "total_sessions": total_sessions,
+        "streak": streak,
+        "avg_sentiment": avg_sentiment,
+        "crisis_alerts": crisis_alerts
+    })
 
 # 🌟 ENHANCED JOURNAL SYSTEM 
 @app.route('/save_journal', methods=['POST'])
