@@ -760,6 +760,7 @@ function toggleJournalMic() {
     journalRecog = new SpeechRecognition();
     journalRecog.continuous = true;
     journalRecog.interimResults = true;
+    journalRecog.lang = document.getElementById('journal-mic-lang') ? document.getElementById('journal-mic-lang').value : 'en-US';
 
     journalRecog.onstart = () => {
         isJournalMicActive = true;
@@ -850,10 +851,12 @@ async function loadJournals() {
 
             const card = document.createElement('div');
             card.className = 'journal-card';
-            card.innerHTML = `
+           card.innerHTML = `
                 <div class="journal-card-header">
-                    <div class="emotion-pill" style="background: ${colors.bg}; color: ${colors.text};">${j.emotion_tag}</div>
-                    <button class="journal-delete-btn" title="Delete Entry" onclick="deleteJournal(${j.id})">${icons.trash}</button>
+                    <div class="emotion-pill" style="background: ${colors.bg}; color: ${colors.text}; border-color: ${colors.text}50;">${j.emotion_tag}</div>
+                    <button class="journal-delete-btn" title="Delete Entry" onclick="deleteJournal(${j.id})">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    </button>
                 </div>
                 <div class="journal-date">${dateString} at ${timeString}</div>
                 <div class="journal-text">${j.entry_text}</div>
@@ -954,3 +957,23 @@ async function loadMainDashboardChart() {
         });
     } catch (error) { console.error("Main chart error:", error); }
 }
+// 🌍 Journal Language Functions
+function toggleJournalLangMenu() {
+    document.getElementById('journal-lang-menu').classList.toggle('active');
+}
+function selectJournalLang(val, label, element) {
+    document.getElementById('journal-mic-lang').value = val;
+    document.getElementById('journal-current-lang-display').innerText = label;
+    document.getElementById('journal-lang-menu').classList.remove('active');
+    document.querySelectorAll('#journal-lang-menu .lang-option').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+}
+
+// Ensure clicking outside closes the journal lang menu
+document.addEventListener('click', function(event) {
+    const jLangWrapper = document.getElementById('journal-lang-dropdown-wrapper');
+    const jLangMenu = document.getElementById('journal-lang-menu');
+    if (jLangWrapper && jLangMenu && !jLangWrapper.contains(event.target)) {
+        jLangMenu.classList.remove('active');
+    }
+});

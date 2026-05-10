@@ -299,7 +299,21 @@
                             <button id="journal-mic-btn" class="journal-mic-btn" title="Voice Journal" onclick="toggleJournalMic()">🎙️</button>
                         </div>
                         
-                        <div class="journal-actions">
+                        <div class="journal-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                            
+                            <div class="custom-lang-dropdown" id="journal-lang-dropdown-wrapper">
+                                <button class="lang-toggle-btn" id="journal-lang-toggle-btn" onclick="toggleJournalLangMenu()" type="button">
+                                    <span id="journal-current-lang-display">EN</span>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                </button>
+                                <div class="lang-menu" id="journal-lang-menu">
+                                    <button class="lang-option active" type="button" onclick="selectJournalLang('en-US', 'EN', this)">English (EN)</button>
+                                    <button class="lang-option" type="button" onclick="selectJournalLang('ta-IN', 'தமிழ்', this)">தமிழ் (TA)</button>
+                                    <button class="lang-option" type="button" onclick="selectJournalLang('hi-IN', 'हिंदी', this)">हिंदी (HI)</button>
+                                </div>
+                                <input type="hidden" id="journal-mic-lang" value="en-US">
+                            </div>
+
                             <button id="save-journal-btn" class="primary-btn">Save Entry</button>
                         </div>
                     </div>
