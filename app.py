@@ -59,14 +59,13 @@ def get_embedding(text):
     if not gemini_client: return None
     try:
         response = gemini_client.models.embed_content(
-            model="text-embedding-001", 
+            model="gemini-embedding-001", # 👈 MUST BE EXACTLY THIS
             contents=text
         )
         return response.embeddings[0].values
     except Exception as e:
         print(f"Embedding error: {e}")
         return None
-
 def retrieve_past_context(user_text):
     if not pinecone_index: return ""
     try:
