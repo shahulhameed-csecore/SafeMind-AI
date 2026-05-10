@@ -201,6 +201,9 @@ input::placeholder { color: var(--text-muted); }
 /* =========================================
    📱 MODERN MOBILE UI OVERRIDES
 ========================================= */
+/* Hide the mobile nav on desktop */
+.mobile-bottom-nav { display: none; }
+
 @media (max-width: 768px) {
     .right-col, .side-nav-icons, .desktop-avatar, .header-nav, .breathe-sos-btn span { display: none !important; }
     .app-layout { padding: 10px; padding-bottom: 75px; } 
@@ -210,13 +213,27 @@ input::placeholder { color: var(--text-muted); }
     .logo-icon { width: 30px; height: 30px; }
     .breathe-sos-btn { padding: 10px; border-radius: 50%; }
     .breathe-sos-btn svg { margin: 0; width: 18px; height: 18px; }
+    
     .lungs-container { position: absolute; top: 15%; left: 0; width: 100%; height: auto; z-index: 0; }
     .lungs-title { font-size: 1.3rem; padding: 0 15px; margin-top: 0;}
+    
     .side-panel { width: 100vw; left: 0; top: 65px; height: calc(100vh - 140px); border-radius: var(--border-radius-ui); padding: 20px; z-index: 500; }
+    
+    /* 🚨 FIXED: Dashboard and Journal Padding so they don't hide under the nav bar */
+    #view-dashboard, #view-journal { padding: 15px; padding-bottom: 110px; }
+    .dash-card, .metric-card { padding: 15px; }
+    
     .chat-box { flex-grow: 1; padding: 15px; z-index: 1; margin: 0; overflow-y: auto; padding-bottom: 90px; }
     .msg { max-width: 90%; border-radius: 20px; font-size: 0.9rem; }
-    .input-area { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); width: 95vw; background: transparent; padding: 0; z-index: 9999; }
-    .input-wrapper { width: 100%; border-radius: 30px; }
+    
+    /* 🚨 FIXED: Input Area and Send Button Cramping */
+    .input-area { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 95vw; background: transparent; padding: 0; z-index: 9999; }
+    .input-wrapper { width: 100%; border-radius: 30px; padding: 8px 10px 8px 16px; gap: 8px; align-items: center; }
+    .input-wrapper input { min-width: 0; font-size: 0.95rem; } /* min-width: 0 is the magic flexbox fix */
+    .send-btn, .icon-btn { width: 38px; height: 38px; flex-shrink: 0; }
+    .lang-toggle-btn { padding: 6px 10px; font-size: 0.75rem; flex-shrink: 0; }
+
+    /* 🚨 Show the mobile nav bar */
     .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: var(--surface-panel); backdrop-filter: blur(15px); border-top: 1px solid var(--border-soft); justify-content: space-around; align-items: center; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); transition: 1s ease; }
     .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); background: transparent; border: none; font-size: 0.65rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
     .mobile-nav-item.active { color: var(--text-main); transform: translateY(-2px); }

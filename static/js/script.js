@@ -589,15 +589,6 @@ function stopVoiceVisualizer() {
 /* ==========================================
    🚀 UNIVERSAL SLIDING VIEW NAVIGATION
 ========================================== */
-const journalPrompts = [
-    "What's on your mind today? Write as much or as little as you want...",
-    "What is one thing you are proud of surviving this week?",
-    "What is a small thing that brought you peace today?",
-    "If your current mood were a landscape, what would it look like?",
-    "What is something you wish you could say out loud right now?",
-    "Write down a worry, and then write down one reason it might not be true."
-];
-
 function switchMainView(viewName) {
     const views = ['dashboard', 'chat', 'journal'];
     const targetIndex = views.indexOf(viewName);
@@ -605,29 +596,30 @@ function switchMainView(viewName) {
     views.forEach((v, index) => {
         const panel = document.getElementById('view-' + v);
         const btn = document.getElementById('nav-' + v);
+        const mobileBtn = document.getElementById('nav-mobile-' + v); // Target mobile icons
 
-        if (!panel || !btn) return;
-        panel.classList.remove('active', 'slide-left', 'slide-right');
-        btn.classList.remove('active');
+        if (panel) panel.classList.remove('active', 'slide-left', 'slide-right');
+        if (btn) btn.classList.remove('active');
+        if (mobileBtn) mobileBtn.classList.remove('active');
 
         if (index === targetIndex) {
-            panel.classList.add('active');
-            btn.classList.add('active');
+            if (panel) panel.classList.add('active');
+            if (btn) btn.classList.add('active');
+            if (mobileBtn) mobileBtn.classList.add('active'); // Highlight active mobile icon
         } else if (index < targetIndex) {
-            panel.classList.add('slide-left');
+            if (panel) panel.classList.add('slide-left');
         } else {
-            panel.classList.add('slide-right');
+            if (panel) panel.classList.add('slide-right');
         }
     });
 
-    if (viewName === 'journal') {
-        // Random Daily Prompt
-        const randomPrompt = journalPrompts[Math.floor(Math.random() * journalPrompts.length)];
-        document.getElementById('journal-input').placeholder = randomPrompt;
-        loadJournals();
+    // Automatically load journals or scroll chat
+    if (viewName === 'journal') loadJournals();
+    if (viewName === 'chat') { 
+        const chatBox = document.getElementById("chat-box"); 
+        if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50); 
     }
 }
-
 /* ==========================================
    📋 CLINICAL TOOLS & MODALS
 ========================================== */
