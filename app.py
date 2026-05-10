@@ -59,7 +59,7 @@ def get_embedding(text):
     if not gemini_client: return None
     try:
         response = gemini_client.models.embed_content(
-            model="text-embedding-004", 
+            model="text-embedding-001", 
             contents=text
         )
         return response.embeddings[0].values
