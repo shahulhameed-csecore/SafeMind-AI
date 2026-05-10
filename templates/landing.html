@@ -280,8 +280,7 @@
         .cta-btn:hover svg {
             transform: translateX(4px) translateY(-4px);
         }
-
-        /* ==========================================
+/* ==========================================
            📱 MOBILE RESPONSIVENESS
         ========================================== */
         @media (max-width: 1024px) {
@@ -291,32 +290,34 @@
 
         @media (max-width: 768px) {
             nav {
-                top: 20px;
-                padding: 16px 24px;
+                top: 15px;
+                padding: 12px 20px;
                 width: 92%;
             }
+            .logo { font-size: 1.2rem; }
+            .nav-btn { padding: 8px 16px; font-size: 0.85rem; }
             .nav-links { display: none; } 
             
-            .giant-bg-text { font-size: 18vw; top: 35%; } 
+            .giant-bg-text { font-size: 22vw; top: 25%; } 
             
-            .hero-image-container { height: 60%; bottom: 15%; } 
+            .hero-image-container { height: 50%; bottom: 22%; } 
             .hero-image-container img { height: 100%; }
             
             .hero-bottom {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                left: 20px; right: 20px; bottom: 30px; 
-                gap: 25px;
+                left: 15px; right: 15px; bottom: 20px; 
+                gap: 15px;
             }
-            .tagline { font-size: 1.8rem; max-width: 100%; }
-            .cta-btn { width: 100%; justify-content: center; padding: 18px; font-size: 1.1rem; }
+            .tagline { font-size: 1.6rem; max-width: 100%; }
+            .cta-btn { width: 100%; justify-content: center; padding: 15px; font-size: 1rem; }
         }
 
         @media (max-width: 480px) {
-            .hero-image-container { height: 50%; bottom: 22%; }
-            .giant-bg-text { font-size: 20vw; top: 30%; }
-            .tagline { font-size: 1.5rem; }
+            .hero-image-container { height: 45%; bottom: 25%; }
+            .giant-bg-text { font-size: 24vw; top: 25%; }
+            .tagline { font-size: 1.4rem; }
         }
     </style>
 </head>
