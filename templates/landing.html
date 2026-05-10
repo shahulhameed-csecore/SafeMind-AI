@@ -2,79 +2,119 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeMinds</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SafeMind AI | Emotional Sanctuary</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-dark: #050508;
+            --bg-dark: #03050a;
             --neon-blue: #4A90E2;
             --neon-purple: #8b5cf6;
             --text-light: #f8fafc;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-highlight: rgba(255, 255, 255, 0.15);
+            --glow-primary: rgba(74, 144, 226, 0.3);
+            --glow-secondary: rgba(139, 92, 246, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            /* The light blue "Dribbble-style" outer presentation background */
-            background: linear-gradient(135deg, #a8c0ff 0%, #3f2b96 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg-dark);
             height: 100vh;
+            width: 100vw;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            color: var(--text-light);
+            /* Prevents pull-to-refresh on mobile */
+            overscroll-behavior: none; 
         }
 
-        /* The actual Website/App Window */
+        /* ==========================================
+           🌌 CINEMATIC ATMOSPHERE & NOISE
+        ========================================== */
+        .ambient-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; overflow: hidden; pointer-events: none; }
+        
+        .orb-1 { position: absolute; top: -20%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--glow-primary) 0%, transparent 60%); filter: blur(120px); animation: drift 20s infinite alternate ease-in-out; }
+        .orb-2 { position: absolute; bottom: -20%; right: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, var(--glow-secondary) 0%, transparent 60%); filter: blur(130px); animation: drift-reverse 25s infinite alternate ease-in-out; }
+        .orb-3 { position: absolute; top: 30%; left: 30%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(74, 144, 226, 0.15) 0%, transparent 60%); filter: blur(100px); animation: drift 30s infinite alternate-reverse ease-in-out; }
+
+        .glass-noise-overlay {
+            position: absolute; inset: 0; z-index: 1; pointer-events: none;
+            background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="n"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23n)" opacity="0.04"/%3E%3C/svg%3E');
+            mix-blend-mode: overlay; opacity: 0.6;
+        }
+
+        @keyframes drift { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5%, 8%) scale(1.1); } }
+        @keyframes drift-reverse { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(-5%, -8%) scale(1.1); } }
+
+        /* The App Container */
         .premium-frame {
-            width: 95vw;
-            height: 90vh;
-            background: var(--bg-dark);
-            border-radius: 32px;
-            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            width: 100vw;
+            height: 100vh;
             position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
-        /* Ambient Background Glow */
-        .glow-sphere {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80vw;
-            height: 80vh;
-            background: radial-gradient(circle, rgba(74, 144, 226, 0.25) 0%, rgba(139, 92, 246, 0.15) 30%, transparent 70%);
-            filter: blur(80px);
-            z-index: 1;
-            animation: pulseGlow 8s infinite alternate ease-in-out;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
-        }
-
-        /* Top Navigation */
+        /* ==========================================
+           🔮 FLOATING GLASS NAVBAR
+        ========================================== */
         nav {
             position: absolute;
-            top: 0; left: 0; right: 0;
-            padding: 35px 50px;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1200px;
+            padding: 16px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 10;
+            z-index: 100;
+            
+            /* True Glass Properties */
+            background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px) saturate(150%);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid var(--glass-highlight);
+            border-radius: 100px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        nav:hover {
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.15);
         }
 
         .logo {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 700;
             color: var(--text-light);
             letter-spacing: -0.5px;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2));
+            border: 1px solid var(--neon-blue);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 0 15px rgba(74, 144, 226, 0.3);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--neon-blue);
         }
 
         .nav-links {
@@ -84,34 +124,44 @@
         }
 
         .nav-links li a {
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: color 0.3s;
+            transition: color 0.3s, text-shadow 0.3s;
         }
 
-        .nav-links li a:hover { color: var(--text-light); }
+        .nav-links li a:hover { 
+            color: var(--text-light); 
+            text-shadow: 0 0 15px rgba(255,255,255,0.4);
+        }
 
         .nav-btn {
-            background: transparent;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
             color: var(--text-light);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255,255,255,0.2);
             padding: 10px 24px;
             border-radius: 100px;
             font-family: inherit;
             font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-decoration: none;
+            box-shadow: inset 0 2px 5px rgba(255,255,255,0.1);
         }
 
         .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 2px 5px rgba(255,255,255,0.2);
         }
 
-        /* Massive Background Text */
+        /* ==========================================
+           🌌 MASSIVE BACKGROUND TEXT
+        ========================================== */
         .giant-bg-text {
             position: absolute;
             top: 45%;
@@ -122,16 +172,22 @@
             font-family: 'Space Grotesk', sans-serif;
             font-size: 18vw;
             font-weight: 900;
-            color: #4A90E2;
-            opacity: 0.9;
-            z-index: 2;
             line-height: 0.8;
             letter-spacing: -2px;
-            text-shadow: 0 0 40px rgba(74, 144, 226, 0.3);
+            z-index: 2;
             pointer-events: none;
+            
+            /* Cinematic Glass Typography */
+            background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 40px rgba(74, 144, 226, 0.2));
+            mix-blend-mode: plus-lighter;
         }
 
-        /* Center 3D Object / Robot Hand */
+        /* ==========================================
+           🤖 ROBOT HAND LAYER
+        ========================================== */
         .hero-image-container {
             position: absolute;
             bottom: -5%;
@@ -139,123 +195,172 @@
             transform: translateX(-50%);
             height: 85%;
             z-index: 3;
-            animation: floatImage 6s ease-in-out infinite;
+            animation: floatImage 8s ease-in-out infinite;
         }
-.hero-image-container img {
+
+        .hero-image-container img {
             height: 120%;
             object-fit: contain;
-            /* Creates a glowing, premium drop shadow that matches the background */
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(74, 144, 226, 0.4));
-            transition: transform 0.3s ease;
+            /* Enhanced volumetric shadow & ambient rim lighting */
+            filter: drop-shadow(0 30px 60px rgba(0,0,0,0.8)) drop-shadow(0 -10px 40px rgba(74, 144, 226, 0.3));
+            transition: transform 0.5s ease;
         }
 
         @keyframes floatImage {
             0%, 100% { transform: translateX(-50%) translateY(0); }
-            50% { transform: translateX(-50%) translateY(-20px); }
+            50% { transform: translateX(-50%) translateY(-25px); }
         }
 
-        /* Bottom Hero Content */
+        /* ==========================================
+           📝 HERO CONTENT LAYER
+        ========================================== */
         .hero-bottom {
             position: absolute;
-            bottom: 50px;
-            left: 50px;
-            right: 50px;
+            bottom: 60px;
+            left: 60px;
+            right: 60px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            z-index: 4;
+            z-index: 10;
         }
 
         .tagline {
             color: var(--text-light);
-            font-size: 2rem;
+            font-size: 2.8rem;
             font-weight: 400;
-            line-height: 1.3;
-            max-width: 400px;
+            line-height: 1.2;
+            max-width: 500px;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            letter-spacing: -1px;
         }
 
         .tagline span {
-            font-weight: 600;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #a8c0ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
+        /* ==========================================
+           ✨ TRUE GLASS CTA BUTTON
+        ========================================== */
         .cta-btn {
-            background: var(--text-light);
-            color: var(--bg-dark);
-            padding: 18px 36px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 100%);
+            backdrop-filter: blur(30px) saturate(150%);
+            -webkit-backdrop-filter: blur(30px);
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-top: 1px solid rgba(255,255,255,0.3);
+            border-left: 1px solid rgba(255,255,255,0.2);
+            padding: 18px 40px;
             border-radius: 100px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 1.05rem;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
         .cta-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(255, 255, 255, 0.25);
+            transform: translateY(-4px) scale(1.02);
+            background: linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 30px rgba(74, 144, 226, 0.3), inset 0 2px 5px rgba(255,255,255,0.2);
         }
+
+        .cta-btn svg {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cta-btn:hover svg {
+            transform: translateX(4px) translateY(-4px);
+        }
+
         /* ==========================================
-           📱 MOBILE POLISH (LANDING PAGE)
+           📱 MOBILE RESPONSIVENESS
         ========================================== */
-       /* ==========================================
-           📱 MOBILE POLISH (LANDING PAGE)
-        ========================================== */
+        @media (max-width: 1024px) {
+            .hero-bottom { left: 40px; right: 40px; }
+            .tagline { font-size: 2.2rem; max-width: 400px; }
+        }
+
         @media (max-width: 768px) {
-            /* Uses 'svh' (Small Viewport Height) to prevent phone menus from hiding the button */
-            .premium-frame { height: 92svh; } 
-            nav { padding: 15px 20px; }
+            nav {
+                top: 20px;
+                padding: 16px 24px;
+                width: 92%;
+            }
             .nav-links { display: none; } 
             
-            /* Shrink the giant text so it fits perfectly on one line */
-            .giant-bg-text { font-size: 15vw; top: 30%; } 
+            .giant-bg-text { font-size: 18vw; top: 35%; } 
             
-            /* Shrink the hand and pull it up slightly */
-            .hero-image-container { height: 55%; bottom: 18%; } 
+            .hero-image-container { height: 60%; bottom: 15%; } 
+            .hero-image-container img { height: 100%; }
             
-            /* Stack the text and pull the button safely into view */
             .hero-bottom {
                 flex-direction: column;
                 align-items: center;
                 text-align: center;
-                left: 15px; right: 15px; bottom: 20px; 
-                gap: 15px;
+                left: 20px; right: 20px; bottom: 30px; 
+                gap: 25px;
             }
-            .tagline { font-size: 1.4rem; max-width: 100%; }
-            .cta-btn { width: 100%; justify-content: center; padding: 15px; }
+            .tagline { font-size: 1.8rem; max-width: 100%; }
+            .cta-btn { width: 100%; justify-content: center; padding: 18px; font-size: 1.1rem; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-image-container { height: 50%; bottom: 22%; }
+            .giant-bg-text { font-size: 20vw; top: 30%; }
+            .tagline { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
+    <div class="ambient-bg">
+        <div class="orb-1"></div>
+        <div class="orb-2"></div>
+        <div class="orb-3"></div>
+        <div class="glass-noise-overlay"></div>
+    </div>
+
     <div class="premium-frame">
-        <div class="glow-sphere"></div>
 
         <nav>
-            <div class="logo">SafeMinds</div>
-          <ul class="nav-links">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                SafeMind <span>AI</span>
+            </div>
+            <ul class="nav-links">
                 <li><a href="#">Home</a></li>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#privacy">Privacy & Security</a></li>
-                <li><a href="#" style="color: #e17070; font-weight: 600;">Emergency Help</a></li>
+                <li><a href="#" style="color: #ef4444; font-weight: 600; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);">Emergency Help</a></li>
             </ul>
             <a href="{{ url_for('login') }}" class="nav-btn">Launch App</a>
         </nav>
 
         <div class="giant-bg-text">SAFEMINDS</div>
 
-       <div class="hero-image-container">
+        <div class="hero-image-container">
             <img src="{{ url_for('static', filename='images/robot-hand1.png') }}" alt="SafeMinds AI">
         </div>
+
         <div class="hero-bottom">
             <h1 class="tagline">Your intelligent <span>shield</span><br>for a safer digital mind.</h1>
             <a href="{{ url_for('register') }}" class="cta-btn">
-                Try SafeMinds for free 
+                Try SafeMind for free 
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
             </a>
         </div>
+
     </div>
 
 </body>
