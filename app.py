@@ -345,7 +345,7 @@ def get_dashboard_stats():
         "crisis_alerts": crisis_alerts
     })
 
-# 🌟 ENHANCED JOURNAL SYSTEM (Using Google API)
+# 🌟 ENHANCED JOURNAL SYSTEM (With Auto-Retry)
 @app.route('/save_journal', methods=['POST'])
 @login_required
 def save_journal():
@@ -359,29 +359,41 @@ def save_journal():
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today."
     
-    # 🚀 Connecting to Google AI Studio directly instead of OpenRouter
-    # 🚀 Connecting to Google AI Studio directly
+    # 🚀 Connecting to Google AI Studio directly with Retry Logic
     if gemini_client:
-        try:
-            response = gemini_client.models.generate_content(
-                model="gemma-4-26b-a4b-it", # 👈 CHANGED BACK TO GEMMA 4!
-                contents=insight_prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=system_prompt,
-                    temperature=0.6,
-                    max_output_tokens=60
+        max_retries = 3
+        import time
+        
+        for attempt in range(max_retries):
+            try:
+                response = gemini_client.models.generate_content(
+                    model="gemma-4-26b-a4b-it", # 👈 The correct, stable Hackathon model
+                    contents=insight_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=system_prompt,
+                        temperature=0.6,
+                        max_output_tokens=60
+                    )
                 )
-            )
-            content = response.text.replace('*', '').strip()
-            
-            for line in content.split('\n'):
-                if line.lower().startswith('emotion:'):
-                    emotion_tag = line.split(':', 1)[1].strip()
-                elif line.lower().startswith('insight:'):
-                    ai_insight = line.split(':', 1)[1].strip()
-                    
-        except Exception as e:
-            print(f"Journal AI Error: {e}")
+                
+                content = response.text.replace('*', '').strip() 
+                
+                for line in content.split('\n'):
+                    if line.lower().startswith('emotion:'):
+                        emotion_tag = line.split(':', 1)[1].strip()
+                    elif line.lower().startswith('insight:'):
+                        ai_insight = line.split(':', 1)[1].strip()
+                
+                break # Success! Exit the retry loop
+                        
+            except Exception as e:
+                error_str = str(e)
+                if "500" in error_str or "503" in error_str:
+                    print(f"⚠️ Journal Server Hiccup (Attempt {attempt + 1}/{max_retries}). Retrying...")
+                    time.sleep(2)
+                else:
+                    print(f"❌ Journal AI Error: {e}")
+                    break
 
     conn = get_db_connection()
     cursor = conn.cursor()
