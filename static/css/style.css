@@ -485,22 +485,23 @@ input::placeholder { color: rgba(255,255,255,0.4); }
     .icebreaker-chip { font-size: 0.8rem; padding: 6px 14px; }
 }
 /* 🚨 EMERGENCY QUICK EXIT BUTTON */
+/* 🚨 EMERGENCY QUICK EXIT BUTTON (Updated: Reduced Size and New Safe Position) */
 .emergency-exit-btn {
     position: fixed;
-    bottom: 25px;
-    right: 25px;
+    bottom: 60px; /* Moved further up from the chat inputs */
+    right: 60px; /* Moved further into the corner */
     background: #ef4444;
     color: #fff;
-    padding: 12px 24px;
+    padding: 8px 16px; /* Reduced padding for a sleeker look */
     border-radius: 100px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.8rem; /* Reduced font size from 0.9rem */
     text-decoration: none;
     box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
     z-index: 100000;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px; /* Reduced gap from 8px */
     transition: all 0.3s ease;
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
@@ -509,6 +510,13 @@ input::placeholder { color: rgba(255,255,255,0.4); }
     transform: scale(1.05);
     box-shadow: 0 15px 35px rgba(239, 68, 68, 0.6);
 }
+/* Mobile overrides (Made very small and tucked to the edge) */
 @media (max-width: 768px) {
-    .emergency-exit-btn { bottom: 100px; right: 15px; padding: 10px 16px; font-size: 0.8rem; }
+    .emergency-exit-btn {
+        bottom: 110px; /* Placed above the bottom mobile nav dock */
+        right: 10px; /* Very close to the edge to be out of the way of chat pills */
+        padding: 6px 12px; /* Super small padding */
+        font-size: 0.75rem; /* Super small font */
+        gap: 4px; /* Tiny gap */
+    }
 }
