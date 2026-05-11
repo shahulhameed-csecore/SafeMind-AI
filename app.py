@@ -72,12 +72,19 @@ def retrieve_past_context(user_text):
         vector = get_embedding(user_text)
         if not vector: return ""
         
+        # We still ask for the top 2 closest memories...
         results = pinecone_index.query(vector=vector, top_k=2, include_metadata=True)
         
         if results and results.get('matches'):
-            past_messages = [match['metadata']['text'] for match in results['matches'] if 'text' in match['metadata']]
+            past_messages = []
+            for match in results['matches']:
+                # 🚨 THE FIX: Only keep the memory if Pinecone is >75% confident it matches the current topic!
+                if match.get('score', 0) > 0.75 and 'text' in match['metadata']:
+                    past_messages.append(match['metadata']['text'])
+            
             return "\n".join(past_messages)
     except Exception as e:
+        print(f"Pinecone Retrieval Error: {e}")
         pass
     return ""
 
@@ -371,7 +378,7 @@ def save_journal():
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
-                        temperature=0.6,
+                        temperature=0.2,
                         max_output_tokens=60
                     )
                 )
