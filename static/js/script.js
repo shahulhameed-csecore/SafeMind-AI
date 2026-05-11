@@ -73,6 +73,12 @@ function getThemeColors() {
 const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
+    // ✨ MEDICAL SAFETY CHECK (FTUE)
+    if (!localStorage.getItem('safeminds_ftue_accepted')) {
+        const safetyModal = document.getElementById('safety-modal');
+        if (safetyModal) safetyModal.classList.add('active');
+    }
+
     const savedTheme = localStorage.getItem('safeminds_theme') || 'woods';
     document.body.setAttribute('data-mood', savedTheme);
     
@@ -99,10 +105,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
         await loadMoodChart();
-        await loadDashboardStats();     // 🚀 ADD THIS
+        await loadDashboardStats();     
         await loadMainDashboardChart();
     }
 });
+
+function acceptSafety() {
+    localStorage.setItem('safeminds_ftue_accepted', 'true');
+    closeModal('safety-modal');
+}
 
 function getBestTherapistVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
@@ -259,7 +270,17 @@ async function loadChatThread(sessionId) {
         const response = await fetch(`/get_chat/${sessionId}`);
         const chats = await response.json();
         chatBox.innerHTML = "";
-        if (!chats || chats.length === 0) { chatBox.innerHTML = '<div class="msg bot">This conversation is empty.</div>'; return; }
+        
+        const icebreakers = document.getElementById("chat-icebreakers");
+
+        if (!chats || chats.length === 0) { 
+            chatBox.innerHTML = '<div class="msg bot">This conversation is empty.</div>'; 
+            if (icebreakers) icebreakers.style.display = "flex";
+            return; 
+        }
+
+        if (icebreakers) icebreakers.style.display = "none";
+
         chats.forEach(chat => {
             if (chat.user) { addMessage(chat.user, "user"); sessionMemory.push({ role: "User", text: chat.user }); }
             if (chat.bot) { addMessage(chat.bot, "bot"); sessionMemory.push({ role: "SafeMind AI", text: chat.bot }); }
@@ -268,11 +289,25 @@ async function loadChatThread(sessionId) {
     } catch (error) { chatBox.innerHTML = '<div class="msg bot" style="color: #ef4444;">Error loading chat.</div>'; }
 }
 
+// ✨ UX Icebreaker Function
+function sendIcebreaker(text) {
+    const input = document.getElementById("user-input");
+    if (input) {
+        input.value = text;
+        sendMessage();
+    }
+}
+
 async function sendMessage() {
     const input = document.getElementById("user-input");
     const message = input.value.trim();
     if (!message) return;
     const isFirstMessage = document.querySelectorAll('.msg.user').length === 0;
+    
+    // Hide the icebreakers once a message is sent
+    const icebreakers = document.getElementById("chat-icebreakers");
+    if (icebreakers) icebreakers.style.display = "none";
+
     addMessage(message, "user");
     sessionMemory.push({ role: "User", text: message });
     input.value = "";
@@ -308,12 +343,53 @@ async function sendMessage() {
     } catch (error) { loadingBubble.innerText = "Connection lost."; }
 }
 
+// ✨ INTELLIGENT PROACTIVE UX ROUTING
 function addMessage(text, sender) {
     const chatBox = document.getElementById("chat-box");
     if (!chatBox) return;
-    const msgDiv = document.createElement("div"); msgDiv.className = `msg ${sender}`;
-    const textSpan = document.createElement("span"); textSpan.innerText = text;
-    msgDiv.appendChild(textSpan); chatBox.appendChild(msgDiv); chatBox.scrollTop = chatBox.scrollHeight;
+    
+    const msgDiv = document.createElement("div"); 
+    msgDiv.className = `msg ${sender}`;
+    
+    const textSpan = document.createElement("span"); 
+    textSpan.innerText = text;
+    msgDiv.appendChild(textSpan); 
+    
+    // Proactive Clinical Tool Routing Check
+    if (sender === "bot") {
+        const lowerText = text.toLowerCase();
+        
+        // Suggest Release Exercise
+        if (lowerText.includes("burn") || lowerText.includes("release") || lowerText.includes("let go of this thought") || lowerText.includes("intrusive thought")) {
+            const btn = document.createElement("button");
+            btn.className = "inline-action-btn danger-action";
+            btn.innerHTML = "🔥 Try Release Exercise";
+            btn.onclick = () => openModal('burn-modal');
+            msgDiv.appendChild(document.createElement("br"));
+            msgDiv.appendChild(btn);
+        }
+        // Suggest CBT
+        else if (lowerText.includes("cbt") || lowerText.includes("cognitive distortion") || lowerText.includes("reframe") || lowerText.includes("thought record")) {
+            const btn = document.createElement("button");
+            btn.className = "inline-action-btn";
+            btn.innerHTML = "📝 Start CBT Record";
+            btn.onclick = () => openModal('cbt-modal');
+            msgDiv.appendChild(document.createElement("br"));
+            msgDiv.appendChild(btn);
+        }
+        // Suggest PHQ-9
+        else if (lowerText.includes("phq") || lowerText.includes("depression assessment") || lowerText.includes("mood tracker") || lowerText.includes("check-in")) {
+            const btn = document.createElement("button");
+            btn.className = "inline-action-btn";
+            btn.innerHTML = "📋 Take PHQ-9 Check-in";
+            btn.onclick = () => openModal('phq-modal');
+            msgDiv.appendChild(document.createElement("br"));
+            msgDiv.appendChild(btn);
+        }
+    }
+
+    chatBox.appendChild(msgDiv); 
+    chatBox.scrollTop = chatBox.scrollHeight;
     return msgDiv;
 }
 
@@ -328,6 +404,11 @@ function clearChat() {
     const chatBox = document.getElementById("chat-box");
     if(chatBox) chatBox.innerHTML = '';
     sessionMemory = []; currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
+    
+    // Show Icebreakers again on new chat
+    const icebreakers = document.getElementById("chat-icebreakers");
+    if (icebreakers) icebreakers.style.display = "flex";
+
     const lungsContainer = document.getElementById('lungs-container');
     if (lungsContainer) {
         lungsContainer.style.display = 'flex';

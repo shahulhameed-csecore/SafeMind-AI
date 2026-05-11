@@ -442,3 +442,45 @@ input::placeholder { color: rgba(255,255,255,0.4); }
 .auth-submit-btn:hover { background: #e1ff33; transform: translateY(-3px); box-shadow: 0 15px 30px rgba(212, 255, 0, 0.3); }
 .auth-switch-link { display: block; margin-top: 30px; color: rgba(255, 255, 255, 0.6); font-size: 0.9rem; text-decoration: none; }
 .auth-switch-link span { color: white; font-weight: 600; text-decoration: underline; margin-left: 5px; }
+/* ✨ ONE-TAP UX ICEBREAKERS */
+.chat-icebreakers {
+    display: flex; gap: 10px; margin-bottom: 15px; width: 85%;
+    overflow-x: auto; padding-bottom: 5px; 
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    /* Hide scrollbar for a clean swipe experience */
+    -ms-overflow-style: none; scrollbar-width: none; 
+}
+.chat-icebreakers::-webkit-scrollbar { display: none; }
+
+.icebreaker-chip {
+    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-soft);
+    color: var(--text-main); padding: 8px 18px; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 500; font-family: inherit;
+    white-space: nowrap; cursor: pointer; backdrop-filter: blur(10px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.icebreaker-chip:hover {
+    background: var(--surface-input); border-color: var(--primary);
+    color: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px var(--glow-1);
+}
+
+/* ✨ PROACTIVE TOOL ROUTING BUTTONS (Inside Chat) */
+.inline-action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border-soft);
+    color: var(--text-main); padding: 8px 16px; border-radius: 100px;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; margin-top: 12px;
+    transition: all 0.3s ease; text-decoration: none; font-family: inherit;
+}
+.inline-action-btn:hover {
+    background: var(--surface-input); border-color: var(--primary); color: var(--primary);
+    transform: translateY(-2px); box-shadow: 0 5px 15px var(--glow-1);
+}
+.inline-action-btn.danger-action:hover {
+    border-color: var(--danger); color: var(--danger); box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+}
+
+@media (max-width: 768px) {
+    .chat-icebreakers { width: 100%; padding-left: 5px; padding-right: 5px; margin-bottom: 10px; }
+    .icebreaker-chip { font-size: 0.8rem; padding: 6px 14px; }
+}

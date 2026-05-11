@@ -71,7 +71,7 @@
         </div>
     </div>
     {% else %}
-  <div class="bg-aurora-container">
+    <div class="bg-aurora-container">
         <div class="ambient-glow"></div>
         <div class="ambient-glow-2"></div>
         <div class="ambient-glow-3"></div>
@@ -181,8 +181,16 @@
 
                     <div class="chat-box" id="chat-box" onclick="closeAllPanels(null)"></div>
 
-                    <div class="input-area" onclick="closeAllPanels(null)">
+                    <div class="input-area" style="flex-direction: column; align-items: center;" onclick="closeAllPanels(null)">
                         <div id="voice-status" style="display: none; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: var(--primary); font-size: 0.8rem; font-weight: 600;">🎙️ Listening... Speak now.</div>
+                        
+                        <div class="chat-icebreakers" id="chat-icebreakers">
+                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('I am feeling really anxious right now.')">I'm feeling anxious</button>
+                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('I just need to vent, please listen.')">I need to vent</button>
+                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('Help me reframe a negative thought.')">Reframe a thought</button>
+                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('I feel overwhelmed with everything.')">I feel overwhelmed</button>
+                        </div>
+
                         <div class="input-wrapper">
                             <input type="text" id="user-input" placeholder="Share what's on your mind..." autocomplete="off">
 
@@ -351,6 +359,17 @@
                 <span>Exit</span>
             </a>
         </nav>
+    </div>
+
+    <div id="safety-modal" class="clinical-modal">
+        <div class="clinical-modal-content" style="text-align: center;">
+            <h2 style="margin-bottom: 15px; font-size: 1.8rem;">Welcome to SafeMind</h2>
+            <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; line-height: 1.6;">
+                SafeMind is an AI companion designed for emotional support, <strong>not a licensed medical professional</strong>.<br><br>
+                If you are in immediate danger or experiencing a medical emergency, please use the <strong>Emergency Help</strong> button or contact local authorities.
+            </p>
+            <button class="submit-clinical-btn" onclick="acceptSafety()">I understand, enter sanctuary</button>
+        </div>
     </div>
 
     <div id="breathe-modal" class="breathe-modal">
