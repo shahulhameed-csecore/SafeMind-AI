@@ -2,7 +2,6 @@ let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
 
-// 🎨 PREMIUM FLOATING THEME LOGIC
 function toggleThemeMenu() {
     const menu = document.getElementById('theme-menu');
     menu.classList.toggle('active');
@@ -70,10 +69,9 @@ function getThemeColors() {
     return palettes[mood] || palettes['woods'];
 }
 
-const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
+const icons = { trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>` };
 
 document.addEventListener("DOMContentLoaded", async () => {
-    // ✨ MEDICAL SAFETY CHECK (FTUE)
     if (!localStorage.getItem('safeminds_ftue_accepted')) {
         const safetyModal = document.getElementById('safety-modal');
         if (safetyModal) safetyModal.classList.add('active');
@@ -265,7 +263,9 @@ async function loadSidebarSessions() {
 async function loadChatThread(sessionId) {
     currentSessionId = sessionId; sessionMemory = [];
     const chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML = '<div class="msg bot">Loading previous session...</div>';
+    chatBox.innerHTML = '';
+    addMessage("Loading previous session...", "bot", true);
+    
     try {
         const response = await fetch(`/get_chat/${sessionId}`);
         const chats = await response.json();
@@ -274,7 +274,7 @@ async function loadChatThread(sessionId) {
         const icebreakers = document.getElementById("chat-icebreakers");
 
         if (!chats || chats.length === 0) { 
-            chatBox.innerHTML = '<div class="msg bot">This conversation is empty.</div>'; 
+            addMessage("This conversation is empty.", "bot", true);
             if (icebreakers) icebreakers.style.display = "flex";
             return; 
         }
@@ -282,14 +282,13 @@ async function loadChatThread(sessionId) {
         if (icebreakers) icebreakers.style.display = "none";
 
         chats.forEach(chat => {
-            if (chat.user) { addMessage(chat.user, "user"); sessionMemory.push({ role: "User", text: chat.user }); }
-            if (chat.bot) { addMessage(chat.bot, "bot"); sessionMemory.push({ role: "SafeMind AI", text: chat.bot }); }
+            if (chat.user) { addMessage(chat.user, "user", true); sessionMemory.push({ role: "User", text: chat.user }); }
+            if (chat.bot) { addMessage(chat.bot, "bot", true); sessionMemory.push({ role: "SafeMind AI", text: chat.bot }); }
         });
         setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
     } catch (error) { chatBox.innerHTML = '<div class="msg bot" style="color: #ef4444;">Error loading chat.</div>'; }
 }
 
-// ✨ UX Icebreaker Function
 function sendIcebreaker(text) {
     const input = document.getElementById("user-input");
     if (input) {
@@ -304,7 +303,6 @@ async function sendMessage() {
     if (!message) return;
     const isFirstMessage = document.querySelectorAll('.msg.user').length === 0;
     
-    // Hide the icebreakers once a message is sent
     const icebreakers = document.getElementById("chat-icebreakers");
     if (icebreakers) icebreakers.style.display = "none";
 
@@ -315,7 +313,7 @@ async function sendMessage() {
     const liveTranscript = document.getElementById("live-transcript");
     if(liveTranscript) liveTranscript.innerText = "Analyzing...";
 
-    const loadingBubble = addMessage("Thinking...", "bot");
+    const loadingBubble = addMessage("Thinking...", "bot", true);
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
 
@@ -325,8 +323,11 @@ async function sendMessage() {
         });
         const data = await response.json();
         loadingBubble.remove();
+        
+        // 🚀 UX TYPEWRITER / STREAMING EFFECT FOR THE BOT RESPONSE
         addMessage(data.response, "bot");
         sessionMemory.push({ role: "SafeMind AI", text: data.response });
+        
         if (data.emotions) updateEmotionRadar(data.emotions);
         
        if (data.audio) {
@@ -340,11 +341,14 @@ async function sendMessage() {
             speakResponse(data.response);
         }
         if (isFirstMessage) loadSidebarSessions();
-    } catch (error) { loadingBubble.innerText = "Connection lost."; }
+    } catch (error) { 
+        loadingBubble.remove();
+        addMessage("Connection lost.", "bot", true); 
+    }
 }
 
-// ✨ INTELLIGENT PROACTIVE UX ROUTING
-function addMessage(text, sender) {
+// ✨ INTELLIGENT PROACTIVE UX ROUTING & TYPEWRITER UX
+function addMessage(text, sender, skipTyping = false) {
     const chatBox = document.getElementById("chat-box");
     if (!chatBox) return;
     
@@ -352,40 +356,56 @@ function addMessage(text, sender) {
     msgDiv.className = `msg ${sender}`;
     
     const textSpan = document.createElement("span"); 
-    textSpan.innerText = text;
     msgDiv.appendChild(textSpan); 
     
-    // Proactive Clinical Tool Routing Check
-    if (sender === "bot") {
-        const lowerText = text.toLowerCase();
-        
-        // Suggest Release Exercise
-        if (lowerText.includes("burn") || lowerText.includes("release") || lowerText.includes("let go of this thought") || lowerText.includes("intrusive thought")) {
-            const btn = document.createElement("button");
-            btn.className = "inline-action-btn danger-action";
-            btn.innerHTML = "🔥 Try Release Exercise";
-            btn.onclick = () => openModal('burn-modal');
-            msgDiv.appendChild(document.createElement("br"));
-            msgDiv.appendChild(btn);
+    // Helper function to append proactive buttons
+    function injectProactiveButtons() {
+        if (sender === "bot") {
+            const lowerText = text.toLowerCase();
+            if (lowerText.includes("burn") || lowerText.includes("release") || lowerText.includes("let go of this thought") || lowerText.includes("intrusive thought")) {
+                const btn = document.createElement("button");
+                btn.className = "inline-action-btn danger-action";
+                btn.innerHTML = "🔥 Try Release Exercise";
+                btn.onclick = () => openModal('burn-modal');
+                msgDiv.appendChild(document.createElement("br"));
+                msgDiv.appendChild(btn);
+            }
+            else if (lowerText.includes("cbt") || lowerText.includes("cognitive distortion") || lowerText.includes("reframe") || lowerText.includes("thought record")) {
+                const btn = document.createElement("button");
+                btn.className = "inline-action-btn";
+                btn.innerHTML = "📝 Start CBT Record";
+                btn.onclick = () => openModal('cbt-modal');
+                msgDiv.appendChild(document.createElement("br"));
+                msgDiv.appendChild(btn);
+            }
+            else if (lowerText.includes("phq") || lowerText.includes("depression assessment") || lowerText.includes("mood tracker") || lowerText.includes("check-in")) {
+                const btn = document.createElement("button");
+                btn.className = "inline-action-btn";
+                btn.innerHTML = "📋 Take PHQ-9 Check-in";
+                btn.onclick = () => openModal('phq-modal');
+                msgDiv.appendChild(document.createElement("br"));
+                msgDiv.appendChild(btn);
+            }
         }
-        // Suggest CBT
-        else if (lowerText.includes("cbt") || lowerText.includes("cognitive distortion") || lowerText.includes("reframe") || lowerText.includes("thought record")) {
-            const btn = document.createElement("button");
-            btn.className = "inline-action-btn";
-            btn.innerHTML = "📝 Start CBT Record";
-            btn.onclick = () => openModal('cbt-modal');
-            msgDiv.appendChild(document.createElement("br"));
-            msgDiv.appendChild(btn);
+    }
+
+    // 🚀 UX TYPEWRITER LOGIC
+    if (sender === "bot" && !skipTyping && text !== "Thinking..." && text !== "Connection lost." && text !== "Loading previous session..." && text !== "This conversation is empty.") {
+        let i = 0;
+        function typeWriter() {
+            if (i < text.length) {
+                textSpan.innerHTML += text.charAt(i);
+                i++;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                setTimeout(typeWriter, 12); // Speed of typewriter
+            } else {
+                injectProactiveButtons();
+            }
         }
-        // Suggest PHQ-9
-        else if (lowerText.includes("phq") || lowerText.includes("depression assessment") || lowerText.includes("mood tracker") || lowerText.includes("check-in")) {
-            const btn = document.createElement("button");
-            btn.className = "inline-action-btn";
-            btn.innerHTML = "📋 Take PHQ-9 Check-in";
-            btn.onclick = () => openModal('phq-modal');
-            msgDiv.appendChild(document.createElement("br"));
-            msgDiv.appendChild(btn);
-        }
+        typeWriter();
+    } else {
+        textSpan.innerText = text;
+        injectProactiveButtons();
     }
 
     chatBox.appendChild(msgDiv); 
@@ -405,7 +425,6 @@ function clearChat() {
     if(chatBox) chatBox.innerHTML = '';
     sessionMemory = []; currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
     
-    // Show Icebreakers again on new chat
     const icebreakers = document.getElementById("chat-icebreakers");
     if (icebreakers) icebreakers.style.display = "flex";
 
@@ -418,10 +437,6 @@ function clearChat() {
 
 document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
-
-/* ==========================================
-   🎤 FIXED STABLE VOICE ENGINE 🎤
-========================================== */
 
 let recognition = null;
 let isListening = false;
@@ -571,10 +586,6 @@ function cleanupVoiceUI(sendAfter = true) {
     }
 }
 
-
-/* ==========================================
-   🧘 BREATHE TOOL & NAVIGATION 
-========================================== */
 let breathInterval; let breathTimeouts = [];
 function startBreathing() {
     const modal = document.getElementById('breathe-modal'); const circle = document.getElementById('breathe-circle'); const text = document.getElementById('breathe-text');
@@ -626,9 +637,6 @@ function togglePanel(panelId, iconElement) {
     }
 }
 
-/* ==========================================
-   🎙️ AUDIO VISUALIZER
-========================================== */
 let audioContext = null; let analyser = null; let microphoneStream = null; let visualizerFrame = null;
 
 async function startVoiceVisualizer() {
@@ -666,10 +674,6 @@ function stopVoiceVisualizer() {
     if (waveCore) { waveCore.style.transform = 'scale(1)'; waveCore.style.boxShadow = '0 0 40px var(--glow-2)'; }
 }
 
-
-/* ==========================================
-   🚀 UNIVERSAL SLIDING VIEW NAVIGATION
-========================================== */
 function switchMainView(viewName) {
     const views = ['dashboard', 'chat', 'journal'];
     const targetIndex = views.indexOf(viewName);
@@ -677,7 +681,7 @@ function switchMainView(viewName) {
     views.forEach((v, index) => {
         const panel = document.getElementById('view-' + v);
         const btn = document.getElementById('nav-' + v);
-        const mobileBtn = document.getElementById('nav-mobile-' + v); // Target mobile icons
+        const mobileBtn = document.getElementById('nav-mobile-' + v);
 
         if (panel) panel.classList.remove('active', 'slide-left', 'slide-right');
         if (btn) btn.classList.remove('active');
@@ -686,7 +690,7 @@ function switchMainView(viewName) {
         if (index === targetIndex) {
             if (panel) panel.classList.add('active');
             if (btn) btn.classList.add('active');
-            if (mobileBtn) mobileBtn.classList.add('active'); // Highlight active mobile icon
+            if (mobileBtn) mobileBtn.classList.add('active'); 
         } else if (index < targetIndex) {
             if (panel) panel.classList.add('slide-left');
         } else {
@@ -694,16 +698,13 @@ function switchMainView(viewName) {
         }
     });
 
-    // Automatically load journals or scroll chat
     if (viewName === 'journal') loadJournals();
     if (viewName === 'chat') { 
         const chatBox = document.getElementById("chat-box"); 
         if (chatBox) setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50); 
     }
 }
-/* ==========================================
-   📋 CLINICAL TOOLS & MODALS
-========================================== */
+
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.add('active');
@@ -743,9 +744,6 @@ function submitPHQ() {
     if(inputField) { inputField.value = `I just took a PHQ check-in and scored ${totalScore}.`; sendMessage(); }
 }
 
-/* ==========================================
-   🔥 BURN EXERCISE LOGIC (Cinematic Edition)
-========================================== */
 function igniteThought() {
     const input = document.getElementById('burn-input');
     const container = document.getElementById('paper-container');
@@ -756,35 +754,27 @@ function igniteThought() {
         return; 
     }
 
-    // 1. Hide the button and ignite the paper
     btn.style.display = "none";
     input.classList.add('burning-paper');
     
-    // 2. Generate 35 glowing floating embers!
     for (let i = 0; i < 35; i++) {
         let ember = document.createElement('div');
         ember.className = 'ember';
-        // Randomize the start position across the width of the paper
         ember.style.left = (Math.random() * 90 + 5) + '%';
-        // Give each ember a random drift path left or right
         ember.style.setProperty('--rand-x', (Math.random() * 120 - 60) + 'px');
-        // Randomize the size of the spark
         let size = (Math.random() * 5 + 3) + 'px';
         ember.style.width = size;
         ember.style.height = size;
-        // Randomize how fast they float up and when they spawn
         ember.style.animationDelay = (Math.random() * 1.5) + 's';
         ember.style.animationDuration = (Math.random() * 1.5 + 1.5) + 's';
         
         container.appendChild(ember);
     }
     
-    // Play a fire sound effect
     let utter = new SpeechSynthesisUtterance("Whoosh.");
     utter.volume = 0.5; utter.rate = 1.5;
     window.speechSynthesis.speak(utter);
 
-    // 3. Wait for the 2.5s animation to finish, then go back to chat
     setTimeout(() => {
         closeModal('burn-modal');
         switchMainView('chat');
@@ -795,34 +785,27 @@ function igniteThought() {
             sendMessage();
         }
         
-        // Clean up the modal in the background
         setTimeout(resetBurn, 800);
-    }, 2800); // Wait just a tiny bit longer than the CSS animation (2.5s)
+    }, 2800);
 }
 
 function resetBurn() {
     const input = document.getElementById('burn-input');
     const btn = document.getElementById('ignite-btn');
     
-    // Remove the paper class and clear text
     if(input) { 
         input.value = ""; 
         input.classList.remove('burning-paper'); 
     }
     if(btn) btn.style.display = "block";
     
-    // Remove all the dead embers from the DOM
     document.querySelectorAll('.ember').forEach(e => e.remove());
 }
 
-/* ==========================================
-   📝 JOURNAL LOGIC (Mic, AI Tagging, Delete)
-========================================== */
 const saveJournalBtn = document.getElementById('save-journal-btn');
 const journalInput = document.getElementById('journal-input');
 const journalFeed = document.getElementById('journal-feed');
 
-// 🎙️ Voice-to-Text for Journal
 let journalRecog = null;
 let isJournalMicActive = false;
 
@@ -866,7 +849,6 @@ function toggleJournalMic() {
     journalRecog.start();
 }
 
-// 💾 Save Journal
 if (saveJournalBtn) {
     saveJournalBtn.addEventListener('click', async () => {
         const text = journalInput.value.trim();
@@ -893,7 +875,6 @@ if (saveJournalBtn) {
     });
 }
 
-// 🧠 Dynamic Emotion Colors
 function getEmotionColor(emotion) {
     const e = (emotion || '').toLowerCase();
     if (e.includes('joy') || e.includes('happy') || e.includes('hope')) return { bg: 'rgba(16, 185, 129, 0.2)', text: '#34d399' }; 
@@ -903,7 +884,6 @@ function getEmotionColor(emotion) {
     return { bg: 'rgba(255, 255, 255, 0.1)', text: '#cbd5e1' }; 
 }
 
-// 🗑️ Delete Journal
 async function deleteJournal(id) {
     if (!confirm("Are you sure you want to delete this reflection?")) return;
     try {
@@ -949,15 +929,12 @@ async function loadJournals() {
         });
     } catch (error) { console.error("Error loading journals:", error); }
 }
-/* ==========================================
-   📊 REAL-TIME DASHBOARD DATA
-========================================== */
+
 async function loadDashboardStats() {
     try {
         const response = await fetch('/get_dashboard_stats');
         const data = await response.json();
         
-        // Update top metrics
         document.getElementById('stat-sessions').innerText = data.total_sessions;
         document.getElementById('stat-streak').innerText = `${data.streak} Days`;
         document.getElementById('stat-sentiment').innerText = data.avg_sentiment;
@@ -966,7 +943,6 @@ async function loadDashboardStats() {
         const crisisTrend = document.getElementById('stat-crisis-trend');
         crisisEl.innerText = data.crisis_alerts;
         
-        // Dynamic Crisis Alert Styling
         if (data.crisis_alerts > 0) {
             crisisEl.style.color = "var(--danger)";
             crisisTrend.innerText = "Action recommended";
@@ -977,7 +953,6 @@ async function loadDashboardStats() {
             crisisTrend.className = "metric-trend positive";
         }
         
-        // Dynamic Streak Styling
         if (data.streak > 2) {
             document.getElementById('stat-streak-trend').innerText = "↗ Looking good";
             document.getElementById('stat-streak-trend').className = "metric-trend positive";
@@ -986,7 +961,6 @@ async function loadDashboardStats() {
             document.getElementById('stat-streak-trend').className = "metric-trend neutral";
         }
 
-        // Dynamic Session Styling
         if (data.total_sessions > 0) {
             document.getElementById('stat-sessions-trend').innerText = "Active user";
             document.getElementById('stat-sessions-trend').className = "metric-trend positive";
@@ -1038,7 +1012,7 @@ async function loadMainDashboardChart() {
         });
     } catch (error) { console.error("Main chart error:", error); }
 }
-// 🌍 Journal Language Functions
+
 function toggleJournalLangMenu() {
     document.getElementById('journal-lang-menu').classList.toggle('active');
 }
@@ -1050,7 +1024,6 @@ function selectJournalLang(val, label, element) {
     element.classList.add('active');
 }
 
-// Ensure clicking outside closes the journal lang menu
 document.addEventListener('click', function(event) {
     const jLangWrapper = document.getElementById('journal-lang-dropdown-wrapper');
     const jLangMenu = document.getElementById('journal-lang-menu');

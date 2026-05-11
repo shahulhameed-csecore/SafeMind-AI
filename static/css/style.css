@@ -484,3 +484,31 @@ input::placeholder { color: rgba(255,255,255,0.4); }
     .chat-icebreakers { width: 100%; padding-left: 5px; padding-right: 5px; margin-bottom: 10px; }
     .icebreaker-chip { font-size: 0.8rem; padding: 6px 14px; }
 }
+/* 🚨 EMERGENCY QUICK EXIT BUTTON */
+.emergency-exit-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #ef4444;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.emergency-exit-btn:hover {
+    background: #dc2626;
+    transform: scale(1.05);
+    box-shadow: 0 15px 35px rgba(239, 68, 68, 0.6);
+}
+@media (max-width: 768px) {
+    .emergency-exit-btn { bottom: 100px; right: 15px; padding: 10px 16px; font-size: 0.8rem; }
+}

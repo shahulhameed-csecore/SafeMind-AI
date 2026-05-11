@@ -14,7 +14,7 @@
     {% if show_auth %}
     <div class="auth-fullscreen-bg">
         <div class="auth-glass-card">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 15px; color: #D4FF00;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 15px; color: #D4FF00;" aria-hidden="true">
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
             </svg>
 
@@ -24,20 +24,20 @@
                 <form action="/login" method="POST">
                     <div class="auth-input-group">
                         <label>Username</label>
-                        <input type="text" name="username" placeholder="Enter your username" required>
-                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <input type="text" name="username" placeholder="Enter your username" aria-label="Username" required>
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </div>
                     <div class="auth-input-group">
                         <label>Password</label>
-                        <input type="password" name="password" placeholder="••••••••" required>
-                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <input type="password" name="password" placeholder="••••••••" aria-label="Password" required>
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     </div>
-                    <button type="submit" class="auth-submit-btn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <button type="submit" class="auth-submit-btn" aria-label="Sign in">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         Enter Sanctuary
                     </button>
                 </form>
-                <a href="/register" class="auth-switch-link">New here? <span>Begin healing</span></a>
+                <a href="/register" class="auth-switch-link" aria-label="Switch to create account">New here? <span>Begin healing</span></a>
                 
             {% else %}
                 <h2>Create Account</h2>
@@ -45,20 +45,20 @@
                 <form action="/register" method="POST">
                     <div class="auth-input-group">
                         <label>Choose Username</label>
-                        <input type="text" name="username" placeholder="Enter a secure username" required>
-                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <input type="text" name="username" placeholder="Enter a secure username" aria-label="Choose Username" required>
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </div>
                     <div class="auth-input-group">
                         <label>Create Password</label>
-                        <input type="password" name="password" placeholder="••••••••" required>
-                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <input type="password" name="password" placeholder="••••••••" aria-label="Create Password" required>
+                        <svg class="auth-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     </div>
-                    <button type="submit" class="auth-submit-btn">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <button type="submit" class="auth-submit-btn" aria-label="Create Account">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                         Create Account
                     </button>
                 </form>
-                <a href="/login" class="auth-switch-link">Already a member? <span>Sign in</span></a>
+                <a href="/login" class="auth-switch-link" aria-label="Switch to sign in">Already a member? <span>Sign in</span></a>
             {% endif %}
             
             {% with messages = get_flashed_messages(with_categories=true) %}
@@ -71,32 +71,37 @@
         </div>
     </div>
     {% else %}
-    <div class="bg-aurora-container">
+    <div class="bg-aurora-container" aria-hidden="true">
         <div class="ambient-glow"></div>
         <div class="ambient-glow-2"></div>
         <div class="ambient-glow-3"></div>
         <div class="glass-noise-overlay"></div>
     </div>
 
+    <a href="https://www.google.com" class="emergency-exit-btn" aria-label="Emergency Quick Exit">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        Quick Exit
+    </a>
+
     <div class="app-layout">
         <header class="glass-panel top-header">
             <div class="logo-container">
-                <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+                <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
                 <div class="logo">SafeMind <span>AI</span></div>
             </div>
 
             <div class="header-nav">
-                <button class="header-nav-btn" id="nav-dashboard" onclick="switchMainView('dashboard')">Dashboard</button>
-                <button class="header-nav-btn active" id="nav-chat" onclick="switchMainView('chat')">Therapy Chat</button>
-                <button class="header-nav-btn" id="nav-journal" onclick="switchMainView('journal')">Journal</button>
+                <button class="header-nav-btn" id="nav-dashboard" onclick="switchMainView('dashboard')" aria-label="Go to Dashboard">Dashboard</button>
+                <button class="header-nav-btn active" id="nav-chat" onclick="switchMainView('chat')" aria-label="Go to Therapy Chat">Therapy Chat</button>
+                <button class="header-nav-btn" id="nav-journal" onclick="switchMainView('journal')" aria-label="Go to Journal">Journal</button>
             </div>
             
             <div style="display: flex; gap: 15px; align-items: center;">
                 <div class="theme-dropdown-container" id="theme-dropdown-wrapper">
-                    <button class="theme-toggle-btn" onclick="toggleThemeMenu()">
+                    <button class="theme-toggle-btn" onclick="toggleThemeMenu()" aria-label="Toggle visual theme">
                         <span class="theme-indicator" id="current-theme-dot"></span>
                         <span id="current-theme-name" style="margin-right: 5px;">Into the Woods</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </button>
                     <div class="theme-menu" id="theme-menu">
                         <button class="theme-option" onclick="applyTheme('woods', 'Into the Woods', '#848871', '#464b37')"><div class="theme-dot" style="background: linear-gradient(135deg, #848871, #464b37);"></div>Into the Woods</button>
@@ -113,11 +118,11 @@
                     </div>
                 </div>
 
-                <button class="breathe-sos-btn" onclick="startBreathing()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <button class="breathe-sos-btn" onclick="startBreathing()" aria-label="Start Guided Breathing">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     <span>Breathe</span>
                 </button>
-                <div class="desktop-avatar" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                <div class="desktop-avatar" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;" aria-hidden="true">
                     <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: var(--bg-base); display: flex; align-items: center; justify-content: center; font-weight: bold; transition: background 0.8s ease;">
                         {% set uname = session.get('username') %}
                         {% if uname %}
@@ -132,16 +137,16 @@
 
         <div class="workspace">
             <aside class="glass-panel side-nav-icons">
-                <div class="icon-pill active" title="Chat" onclick="closeAllPanels(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></div>
-                <div class="icon-pill" title="History" onclick="togglePanel('panel-history', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>
-                <div class="icon-pill" title="Mood Tracker" onclick="togglePanel('panel-analytics', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></div>
-                <div class="icon-pill" title="Emotion Radar" onclick="togglePanel('panel-radar', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></div>
+                <button class="icon-pill active" aria-label="Chat Area" onclick="closeAllPanels(this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg></button>
+                <button class="icon-pill" aria-label="Chat History" onclick="togglePanel('panel-history', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></button>
+                <button class="icon-pill" aria-label="Mood Tracker Panel" onclick="togglePanel('panel-analytics', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg></button>
+                <button class="icon-pill" aria-label="Emotion Radar Panel" onclick="togglePanel('panel-radar', this)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg></button>
                 <div style="flex-grow:1"></div>
-                <a href="{{ url_for('logout') }}" class="icon-pill" style="color: var(--danger);" title="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></a>
+                <a href="{{ url_for('logout') }}" class="icon-pill" style="color: var(--danger);" aria-label="Logout"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg></a>
             </aside>
 
             <div id="panel-history" class="glass-panel side-panel">
-                <div class="panel-title">History Chat <button class="new-chat-btn" onclick="clearChat()">+ New Chat</button></div>
+                <div class="panel-title">History Chat <button class="new-chat-btn" aria-label="Start a new chat" onclick="clearChat()">+ New Chat</button></div>
                 <div id="history-list" style="display: flex; flex-direction: column; gap: 10px; overflow-y: auto;"></div>
             </div>
 
@@ -149,13 +154,13 @@
                 <div style="margin-top: 10px;">
                     <div class="panel-title">Mood Tracker</div>
                     <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Happy')">😊</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Calm')">🧘</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Sad')">😢</button>
-                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" onclick="saveMood('Stressed')">😫</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" aria-label="Log Happy Mood" onclick="saveMood('Happy')">😊</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" aria-label="Log Calm Mood" onclick="saveMood('Calm')">🧘</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" aria-label="Log Sad Mood" onclick="saveMood('Sad')">😢</button>
+                        <button class="icon-pill" style="border: 1px solid var(--border-soft);" aria-label="Log Stressed Mood" onclick="saveMood('Stressed')">😫</button>
                     </div>
-                    <div class="chart-container" style="height: 110px;"><canvas id="moodChart"></canvas></div>
-                    <div class="insight-box" id="mood-insight-box"><span class="insight-icon">💡</span><p id="mood-insight-text">Log your mood to see your insights.</p></div>
+                    <div class="chart-container" style="height: 110px;"><canvas id="moodChart" aria-label="Mood history chart"></canvas></div>
+                    <div class="insight-box" id="mood-insight-box"><span class="insight-icon" aria-hidden="true">💡</span><p id="mood-insight-text">Log your mood to see your insights.</p></div>
                 </div>
             </div>
 
@@ -163,8 +168,8 @@
                 <div style="margin-top: 10px; flex: 1;">
                     <div class="panel-title">Live Emotion Radar</div>
                     <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;">Analyzes your conversation in real-time to map your current emotional state.</p>
-                    <div class="chart-container radar-container"><canvas id="emotionRadarChart"></canvas></div>
-                    <div class="insight-box" id="radar-insight-box" style="display: none;"><span class="insight-icon">🧠</span><p id="radar-insight-text">Chat to analyze emotions.</p></div>
+                    <div class="chart-container radar-container"><canvas id="emotionRadarChart" aria-label="Real-time emotion radar chart"></canvas></div>
+                    <div class="insight-box" id="radar-insight-box" style="display: none;"><span class="insight-icon" aria-hidden="true">🧠</span><p id="radar-insight-text">Chat to analyze emotions.</p></div>
                 </div>
             </div>
 
@@ -179,25 +184,25 @@
                         </h2>
                     </div>
 
-                    <div class="chat-box" id="chat-box" onclick="closeAllPanels(null)"></div>
+                    <div class="chat-box" id="chat-box" onclick="closeAllPanels(null)" aria-live="polite"></div>
 
                     <div class="input-area" style="flex-direction: column; align-items: center;" onclick="closeAllPanels(null)">
                         <div id="voice-status" style="display: none; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: var(--primary); font-size: 0.8rem; font-weight: 600;">🎙️ Listening... Speak now.</div>
                         
                         <div class="chat-icebreakers" id="chat-icebreakers">
-                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('I am feeling really anxious right now.')">I'm feeling anxious</button>
-                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('I just need to vent, please listen.')">I need to vent</button>
-                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('Help me reframe a negative thought.')">Reframe a thought</button>
-                            <button class="icebreaker-chip" type="button" onclick="sendIcebreaker('I feel overwhelmed with everything.')">I feel overwhelmed</button>
+                            <button class="icebreaker-chip" type="button" aria-label="Quick prompt: I'm feeling anxious" onclick="sendIcebreaker('I am feeling really anxious right now.')">I'm feeling anxious</button>
+                            <button class="icebreaker-chip" type="button" aria-label="Quick prompt: I need to vent" onclick="sendIcebreaker('I just need to vent, please listen.')">I need to vent</button>
+                            <button class="icebreaker-chip" type="button" aria-label="Quick prompt: Reframe a thought" onclick="sendIcebreaker('Help me reframe a negative thought.')">Reframe a thought</button>
+                            <button class="icebreaker-chip" type="button" aria-label="Quick prompt: I feel overwhelmed" onclick="sendIcebreaker('I feel overwhelmed with everything.')">I feel overwhelmed</button>
                         </div>
 
                         <div class="input-wrapper">
-                            <input type="text" id="user-input" placeholder="Share what's on your mind..." autocomplete="off">
+                            <input type="text" id="user-input" aria-label="Type your message" placeholder="Share what's on your mind..." autocomplete="off">
 
                             <div class="custom-lang-dropdown" id="lang-dropdown-wrapper">
-                                <button class="lang-toggle-btn" id="lang-toggle-btn" onclick="toggleLangMenu()" type="button">
+                                <button class="lang-toggle-btn" id="lang-toggle-btn" onclick="toggleLangMenu()" type="button" aria-label="Change voice recognition language">
                                     <span id="current-lang-display">EN</span>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div class="lang-menu" id="lang-menu">
                                     <button class="lang-option active" type="button" onclick="selectLang('en-US', 'EN', this)">English (EN)</button>
@@ -207,9 +212,9 @@
                                 <input type="hidden" id="mic-lang" value="en-US">
                             </div>
 
-                            <button class="icon-btn stop-audio-btn" id="stop-audio-btn" onclick="stopSpeech()" style="display: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg></button>
-                            <button class="icon-btn mic-btn" id="mic-btn" onclick="toggleListening()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
-                            <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button>
+                            <button class="icon-btn stop-audio-btn" id="stop-audio-btn" aria-label="Stop text-to-speech audio" onclick="stopSpeech()" style="display: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect></svg></button>
+                            <button class="icon-btn mic-btn" id="mic-btn" aria-label="Start voice dictation" onclick="toggleListening()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
+                            <button class="send-btn" id="send-btn" aria-label="Send message" onclick="sendMessage()"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></button>
                         </div>
                     </div>
                 </main>
@@ -222,22 +227,22 @@
 
                     <div class="dash-grid-4">
                         <div class="metric-card">
-                            <div class="metric-header"><span class="metric-title">TOTAL SESSIONS</span><span class="metric-icon">💬</span></div>
+                            <div class="metric-header"><span class="metric-title">TOTAL SESSIONS</span><span class="metric-icon" aria-hidden="true">💬</span></div>
                             <div class="metric-value" id="stat-sessions">0</div>
                             <div class="metric-trend neutral" id="stat-sessions-trend">Just starting out</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-header"><span class="metric-title">MOOD STREAK</span><span class="metric-icon">🔥</span></div>
+                            <div class="metric-header"><span class="metric-title">MOOD STREAK</span><span class="metric-icon" aria-hidden="true">🔥</span></div>
                             <div class="metric-value" id="stat-streak">0 Days</div>
                             <div class="metric-trend neutral" id="stat-streak-trend">Log a mood today!</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-header"><span class="metric-title">AVG SENTIMENT</span><span class="metric-icon">🧠</span></div>
+                            <div class="metric-header"><span class="metric-title">AVG SENTIMENT</span><span class="metric-icon" aria-hidden="true">🧠</span></div>
                             <div class="metric-value" id="stat-sentiment">Analyzing</div>
                             <div class="metric-trend neutral" id="stat-sentiment-trend">→ Stable baseline</div>
                         </div>
                         <div class="metric-card">
-                            <div class="metric-header"><span class="metric-title">CRISIS ALERTS</span><span class="metric-icon">⚠️</span></div>
+                            <div class="metric-header"><span class="metric-title">CRISIS ALERTS</span><span class="metric-icon" aria-hidden="true">⚠️</span></div>
                             <div class="metric-value" id="stat-crisis" style="color: var(--primary);">0</div>
                             <div class="metric-trend positive" id="stat-crisis-trend">No recent triggers</div>
                         </div>
@@ -246,10 +251,9 @@
                         <div class="dash-card">
                             <div class="dash-card-header">
                                 <h3>Emotional Trends</h3>
-                                <button class="icon-btn" style="width:24px; height:24px;">⋮</button>
                             </div>
                             <div style="height: 250px; width: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-                                <canvas id="mainDashboardChart"></canvas>
+                                <canvas id="mainDashboardChart" aria-label="Main emotional trends chart"></canvas>
                             </div>
                         </div>
 
@@ -259,38 +263,38 @@
                             </div>
                             <div class="tool-list">
                                 <div class="tool-item">
-                                    <div class="tool-icon">📝</div>
+                                    <div class="tool-icon" aria-hidden="true">📝</div>
                                     <div class="tool-info">
                                         <h4>CBT Thought Record</h4>
                                         <p>Challenge cognitive distortions</p>
                                     </div>
-                                  <button class="launch-btn" onclick="openModal('cbt-modal')">Launch</button>
+                                  <button class="launch-btn" aria-label="Launch CBT Tool" onclick="openModal('cbt-modal')">Launch</button>
                                 </div>
                                 <div class="tool-item">
-                                    <div class="tool-icon">📋</div>
+                                    <div class="tool-icon" aria-hidden="true">📋</div>
                                     <div class="tool-info">
-                                        <h4>PHQ-9 & GAD-7 Forms</h4>
-                                        <p>Standardized clinical assessments</p>
+                                        <h4>PHQ-9 Check-in</h4>
+                                        <p>Standardized clinical assessment</p>
                                     </div>
-                                   <button class="launch-btn" onclick="openModal('phq-modal')">Start</button>
+                                   <button class="launch-btn" aria-label="Start PHQ-9 Tool" onclick="openModal('phq-modal')">Start</button>
                                 </div>
                                 
                                 <div class="tool-item">
-                                    <div class="tool-icon" style="color: #ef4444;">🔥</div>
+                                    <div class="tool-icon" style="color: #ef4444;" aria-hidden="true">🔥</div>
                                     <div class="tool-info">
                                         <h4>Release Exercise</h4>
                                         <p>Burn negative or intrusive thoughts</p>
                                     </div>
-                                    <button class="launch-btn" style="background: #ef4444;" onclick="openModal('burn-modal')">Burn</button>
+                                    <button class="launch-btn" style="background: #ef4444;" aria-label="Start Release Exercise" onclick="openModal('burn-modal')">Burn</button>
                                 </div>
                                 
                                 <div class="tool-item">
-                                    <div class="tool-icon">📄</div>
+                                    <div class="tool-icon" aria-hidden="true">📄</div>
                                     <div class="tool-info">
                                         <h4>Therapist Report Export</h4>
                                         <p>Download 30-day medical summary</p>
                                     </div>
-                                    <button class="launch-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);" onclick="window.location.href='/export_report'">Export</button>
+                                    <button class="launch-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary);" aria-label="Export Clinical Report" onclick="window.location.href='/export_report'">Export</button>
                                 </div>
                             </div>
                         </div>
@@ -303,16 +307,16 @@
                         <p class="journal-subtitle">A safe space to reflect. SafeMind will offer a small thought for every entry.</p>
                         
                         <div class="journal-input-wrapper">
-                            <textarea id="journal-input" placeholder="What's on your mind today? Write as much or as little as you want..."></textarea>
-                            <button id="journal-mic-btn" class="journal-mic-btn" title="Voice Journal" onclick="toggleJournalMic()">🎙️</button>
+                            <textarea id="journal-input" aria-label="Journal text area" placeholder="What's on your mind today? Write as much or as little as you want..."></textarea>
+                            <button id="journal-mic-btn" class="journal-mic-btn" title="Voice Journal" aria-label="Voice journal mic" onclick="toggleJournalMic()">🎙️</button>
                         </div>
                         
                         <div class="journal-actions" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
                             
                             <div class="custom-lang-dropdown" id="journal-lang-dropdown-wrapper">
-                                <button class="lang-toggle-btn" id="journal-lang-toggle-btn" onclick="toggleJournalLangMenu()" type="button">
+                                <button class="lang-toggle-btn" id="journal-lang-toggle-btn" onclick="toggleJournalLangMenu()" type="button" aria-label="Journal voice language">
                                     <span id="journal-current-lang-display">EN</span>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
                                 </button>
                                 <div class="lang-menu" id="journal-lang-menu">
                                     <button class="lang-option active" type="button" onclick="selectJournalLang('en-US', 'EN', this)">English (EN)</button>
@@ -322,7 +326,7 @@
                                 <input type="hidden" id="journal-mic-lang" value="en-US">
                             </div>
 
-                            <button id="save-journal-btn" class="primary-btn">Save Entry</button>
+                            <button id="save-journal-btn" class="primary-btn" aria-label="Save Journal Entry">Save Entry</button>
                         </div>
                     </div>
 
@@ -330,7 +334,7 @@
                         <h3>Past Reflections</h3>
                     </div>
                     
-                    <div id="journal-feed" class="journal-feed">
+                    <div id="journal-feed" class="journal-feed" aria-live="polite">
                     </div>
                 </main>
 
@@ -338,62 +342,62 @@
         </div>
 
         <nav class="mobile-bottom-nav" id="mobile-nav">
-            <button class="mobile-nav-item" id="nav-mobile-dashboard" onclick="closeAllPanels(null); switchMainView('dashboard')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <button class="mobile-nav-item" id="nav-mobile-dashboard" onclick="closeAllPanels(null); switchMainView('dashboard')" aria-label="Dashboard">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 <span>Dashboard</span>
             </button>
-            <button class="mobile-nav-item active" id="nav-mobile-chat" onclick="closeAllPanels(null); switchMainView('chat')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+            <button class="mobile-nav-item active" id="nav-mobile-chat" onclick="closeAllPanels(null); switchMainView('chat')" aria-label="Chat">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                 <span>Chat</span>
             </button>
-            <button class="mobile-nav-item" id="nav-mobile-journal" onclick="closeAllPanels(null); switchMainView('journal')">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <button class="mobile-nav-item" id="nav-mobile-journal" onclick="closeAllPanels(null); switchMainView('journal')" aria-label="Journal">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                 <span>Journal</span>
             </button>
-            <button class="mobile-nav-item" id="nav-mobile-history" onclick="togglePanel('panel-history', this);">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <button class="mobile-nav-item" id="nav-mobile-history" onclick="togglePanel('panel-history', this);" aria-label="History">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <span>History</span>
             </button>
-            <a href="{{ url_for('logout') }}" class="mobile-nav-item" style="color: var(--danger); text-decoration: none;">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <a href="{{ url_for('logout') }}" class="mobile-nav-item" style="color: var(--danger); text-decoration: none;" aria-label="Exit App">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 <span>Exit</span>
             </a>
         </nav>
     </div>
 
-    <div id="safety-modal" class="clinical-modal">
+    <div id="safety-modal" class="clinical-modal" aria-modal="true" role="dialog">
         <div class="clinical-modal-content" style="text-align: center;">
             <h2 style="margin-bottom: 15px; font-size: 1.8rem;">Welcome to SafeMind</h2>
             <p style="color: var(--text-muted); margin-bottom: 25px; font-size: 1rem; line-height: 1.6;">
                 SafeMind is an AI companion designed for emotional support, <strong>not a licensed medical professional</strong>.<br><br>
                 If you are in immediate danger or experiencing a medical emergency, please use the <strong>Emergency Help</strong> button or contact local authorities.
             </p>
-            <button class="submit-clinical-btn" onclick="acceptSafety()">I understand, enter sanctuary</button>
+            <button class="submit-clinical-btn" aria-label="Accept safety disclaimer" onclick="acceptSafety()">I understand, enter sanctuary</button>
         </div>
     </div>
 
-    <div id="breathe-modal" class="breathe-modal">
-        <button class="close-breathe-btn" onclick="stopBreathing()">✕</button>
+    <div id="breathe-modal" class="breathe-modal" aria-modal="true" role="dialog">
+        <button class="close-breathe-btn" aria-label="Close breathing tool" onclick="stopBreathing()">✕</button>
         <div class="breathe-container">
             <div class="breathe-circle" id="breathe-circle"></div>
-            <p id="breathe-text" class="breathe-text">Ready?</p>
+            <p id="breathe-text" class="breathe-text" aria-live="polite">Ready?</p>
         </div>
     </div>
 
-    <div id="cbt-modal" class="clinical-modal">
+    <div id="cbt-modal" class="clinical-modal" aria-modal="true" role="dialog">
         <div class="clinical-modal-content">
-            <button class="modal-close-btn" onclick="closeModal('cbt-modal')">✕</button>
+            <button class="modal-close-btn" aria-label="Close CBT Tool" onclick="closeModal('cbt-modal')">✕</button>
             <h2 style="margin-bottom: 10px; font-size: 1.8rem;">CBT Thought Record</h2>
             <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Challenge and reframe your cognitive distortions.</p>
             
             <label class="clinical-label">1. The Situation (Trigger)</label>
-            <textarea class="clinical-input" id="cbt-situation" rows="2" placeholder="What happened?"></textarea>
+            <textarea class="clinical-input" id="cbt-situation" rows="2" aria-label="Situation" placeholder="What happened?"></textarea>
 
             <label class="clinical-label">2. Automatic Negative Thought</label>
-            <textarea class="clinical-input" id="cbt-thought" rows="2" placeholder="What immediately crossed your mind?"></textarea>
+            <textarea class="clinical-input" id="cbt-thought" rows="2" aria-label="Automatic Negative Thought" placeholder="What immediately crossed your mind?"></textarea>
 
             <label class="clinical-label">3. Cognitive Distortion</label>
-            <select class="clinical-select" id="cbt-distortion">
+            <select class="clinical-select" id="cbt-distortion" aria-label="Cognitive Distortion">
                 <option value="all-or-nothing">All-or-Nothing Thinking</option>
                 <option value="catastrophizing">Catastrophizing</option>
                 <option value="mind-reading">Mind Reading</option>
@@ -401,60 +405,60 @@
             </select>
 
             <label class="clinical-label">4. Rational Challenge (Reframe)</label>
-            <textarea class="clinical-input" id="cbt-reframe" rows="2" placeholder="What is a more balanced way to look at this?"></textarea>
+            <textarea class="clinical-input" id="cbt-reframe" rows="2" aria-label="Rational Challenge" placeholder="What is a more balanced way to look at this?"></textarea>
 
-            <button class="submit-clinical-btn" onclick="submitCBT()">Save to Journal</button>
+            <button class="submit-clinical-btn" aria-label="Save CBT to Journal" onclick="submitCBT()">Save to Journal</button>
         </div>
     </div>
 
-    <div id="phq-modal" class="clinical-modal">
+    <div id="phq-modal" class="clinical-modal" aria-modal="true" role="dialog">
         <div class="clinical-modal-content">
-            <button class="modal-close-btn" onclick="closeModal('phq-modal')">✕</button>
+            <button class="modal-close-btn" aria-label="Close PHQ-9 Check-in" onclick="closeModal('phq-modal')">✕</button>
             <h2 style="margin-bottom: 10px; font-size: 1.8rem;">PHQ-9 Check-in</h2>
             <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Over the last 2 weeks, how often have you been bothered by the following?</p>
             
             <label class="clinical-label">1. Little interest or pleasure in doing things</label>
-            <select class="clinical-select phq-score">
+            <select class="clinical-select phq-score" aria-label="Question 1">
                 <option value="0">Not at all</option><option value="1">Several days</option><option value="2">More than half the days</option><option value="3">Nearly every day</option>
             </select>
 
             <label class="clinical-label">2. Feeling down, depressed, or hopeless</label>
-            <select class="clinical-select phq-score">
+            <select class="clinical-select phq-score" aria-label="Question 2">
                 <option value="0">Not at all</option><option value="1">Several days</option><option value="2">More than half the days</option><option value="3">Nearly every day</option>
             </select>
             
             <label class="clinical-label">3. Feeling tired or having little energy</label>
-            <select class="clinical-select phq-score">
+            <select class="clinical-select phq-score" aria-label="Question 3">
                 <option value="0">Not at all</option><option value="1">Several days</option><option value="2">More than half the days</option><option value="3">Nearly every day</option>
             </select>
 
-            <button class="submit-clinical-btn" onclick="submitPHQ()">Calculate & Save Score</button>
+            <button class="submit-clinical-btn" aria-label="Calculate Score" onclick="submitPHQ()">Calculate & Save Score</button>
         </div>
     </div>
 
-    <div id="burn-modal" class="clinical-modal">
+    <div id="burn-modal" class="clinical-modal" aria-modal="true" role="dialog">
         <div class="clinical-modal-content" style="text-align: center; overflow: hidden; position: relative;">
-            <button class="modal-close-btn" onclick="closeModal('burn-modal'); resetBurn()">✕</button>
+            <button class="modal-close-btn" aria-label="Close Release Exercise" onclick="closeModal('burn-modal'); resetBurn()">✕</button>
             <h2 style="margin-bottom: 10px; font-size: 1.8rem;">Release Your Thoughts</h2>
             <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Write down whatever is giving you anxiety, pain, or stress. Then, let it go.</p>
             
             <div id="paper-container" class="paper-container">
-                <textarea id="burn-input" class="burn-textarea" placeholder="I am feeling overwhelmed by..."></textarea>
+                <textarea id="burn-input" class="burn-textarea" aria-label="Type your negative thought" placeholder="I am feeling overwhelmed by..."></textarea>
             </div>
             
-            <button id="ignite-btn" class="submit-clinical-btn" style="background: #ef4444; margin-top: 30px;" onclick="igniteThought()">🔥 Burn It Away</button>
+            <button id="ignite-btn" class="submit-clinical-btn" style="background: #ef4444; margin-top: 30px;" aria-label="Burn the thought" onclick="igniteThought()">🔥 Burn It Away</button>
         </div>
     </div>
 
     <div id="mobile-voice-mode" class="mobile-voice-mode">
         <div class="voice-top-bar">
-            <button class="icon-btn" onclick="toggleVoiceMode(false)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
+            <button class="icon-btn" aria-label="Close voice mode" onclick="toggleVoiceMode(false)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg></button>
             <span>SafeMind AI Audio Therapy</span>
             <div style="width: 24px;"></div>
         </div>
 
         <div id="mobile-avatar-placeholder" style="flex: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; perspective: 1000px;">
-            <div class="wave-container">
+            <div class="wave-container" aria-hidden="true">
                 <div class="wave-ring" style="transform: rotateY(0deg);"></div>
                 <div class="wave-ring" style="transform: rotateY(30deg);"></div>
                 <div class="wave-ring" style="transform: rotateY(60deg);"></div>
@@ -465,10 +469,10 @@
             </div>
         </div>
 
-        <div class="voice-text-container"><h2 id="live-transcript">I'm listening...</h2></div>
+        <div class="voice-text-container"><h2 id="live-transcript" aria-live="polite">I'm listening...</h2></div>
         <div class="voice-bottom-dock">
             <div class="mic-ring-container">
-                <button class="big-mic-btn" id="big-mic-btn" onclick="toggleListening()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
+                <button class="big-mic-btn" id="big-mic-btn" aria-label="Toggle Microphone" onclick="toggleListening()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg></button>
             </div>
         </div>
     </div>

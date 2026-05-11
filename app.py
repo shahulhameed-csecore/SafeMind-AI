@@ -1,5 +1,6 @@
 import os
 import base64
+import time
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -15,17 +16,15 @@ from google.genai import types
 from datetime import datetime, timedelta
 
 load_dotenv()
-from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, analyze_deep_emotion
+from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, analyze_deep_emotion, strip_pii
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "super_secret_safeminds_key")
 
-# 🌟 Connect to Neon.tech Cloud Database
 def get_db_connection():
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     return conn
 
-# 🌟 Initialize Postgres Tables
 def init_db():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -44,7 +43,6 @@ def init_db():
 
 init_db()
 
-# 🌟 PRO MEMORY SYSTEM: Pinecone + Gemini API
 try:
     pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
     pinecone_index = pc.Index("safemind")
@@ -59,32 +57,29 @@ def get_embedding(text):
     if not gemini_client: return None
     try:
         response = gemini_client.models.embed_content(
-            model="gemini-embedding-001", # 👈 MUST BE EXACTLY THIS
+            model="gemini-embedding-001",
             contents=text
         )
         return response.embeddings[0].values
     except Exception as e:
         print(f"Embedding error: {e}")
         return None
+
 def retrieve_past_context(user_text):
     if not pinecone_index: return ""
     try:
         vector = get_embedding(user_text)
         if not vector: return ""
         
-        # We still ask for the top 2 closest memories...
         results = pinecone_index.query(vector=vector, top_k=2, include_metadata=True)
         
         if results and results.get('matches'):
             past_messages = []
             for match in results['matches']:
-                # 🚨 THE FIX: Only keep the memory if Pinecone is >75% confident it matches the current topic!
                 if match.get('score', 0) > 0.75 and 'text' in match['metadata']:
                     past_messages.append(match['metadata']['text'])
-            
             return "\n".join(past_messages)
     except Exception as e:
-        print(f"Pinecone Retrieval Error: {e}")
         pass
     return ""
 
@@ -156,6 +151,16 @@ def app_dashboard():
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
+    # 🛡️ ANTI-ABUSE RATE LIMITING (Prevent spam clicking)
+    last_req = session.get('last_msg_time', 0)
+    current_time = time.time()
+    if current_time - last_req < 1.5:
+        return jsonify({
+            "response": "I'm still processing your last thought. Take a deep breath and try again in a moment.", 
+            "sentiment": "neutral", "crisis": False, "emotions": [], "audio": None
+        })
+    session['last_msg_time'] = current_time
+
     data = request.json
     user_input = data.get('message')
     chat_history = data.get('history', [])
@@ -176,14 +181,17 @@ def analyze():
 
     ai_response = generate_ai_response(augmented_input, chat_history, user_lang)
 
+    # 🛡️ PII STRIPPING BEFORE SAVING TO MEMORY
+    clean_memory_text = strip_pii(user_input)
+
     if pinecone_index:
         try:
-            vector = get_embedding(user_input)
+            vector = get_embedding(clean_memory_text)
             if vector:
                 pinecone_index.upsert(vectors=[{
                     "id": f"{session_id}_{len(chat_history)}", 
                     "values": vector, 
-                    "metadata": {"text": user_input}
+                    "metadata": {"text": clean_memory_text}
                 }])
         except Exception as e:
             pass
@@ -352,7 +360,6 @@ def get_dashboard_stats():
         "crisis_alerts": crisis_alerts
     })
 
-# 🌟 ENHANCED JOURNAL SYSTEM (With Auto-Retry)
 @app.route('/save_journal', methods=['POST'])
 @login_required
 def save_journal():
@@ -366,7 +373,6 @@ def save_journal():
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today."
     
-    # 🚀 Connecting to Google AI Studio directly with Retry Logic
     if gemini_client:
         max_retries = 3
         import time
@@ -374,7 +380,7 @@ def save_journal():
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
-                    model="gemma-4-26b-a4b-it", # 👈 The correct, stable Hackathon model
+                    model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
@@ -391,15 +397,13 @@ def save_journal():
                     elif line.lower().startswith('insight:'):
                         ai_insight = line.split(':', 1)[1].strip()
                 
-                break # Success! Exit the retry loop
+                break 
                         
             except Exception as e:
                 error_str = str(e)
                 if "500" in error_str or "503" in error_str:
-                    print(f"⚠️ Journal Server Hiccup (Attempt {attempt + 1}/{max_retries}). Retrying...")
                     time.sleep(2)
                 else:
-                    print(f"❌ Journal AI Error: {e}")
                     break
 
     conn = get_db_connection()
