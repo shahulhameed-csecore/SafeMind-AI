@@ -317,15 +317,16 @@ async function sendMessage() {
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
 
+        // 🧠 Pass up to the last 12 messages so the backend can summarize them intelligently
         const response = await fetch("/analyze", { 
             method: "POST", headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ message: message, history: sessionMemory.slice(-6), session_id: currentSessionId, language: selectedLang }) 
+            body: JSON.stringify({ message: message, history: sessionMemory.slice(-12), session_id: currentSessionId, language: selectedLang }) 
         });
         const data = await response.json();
         loadingBubble.remove();
         
-        // 🚀 UX TYPEWRITER / STREAMING EFFECT FOR THE BOT RESPONSE
-        addMessage(data.response, "bot");
+        // 🚀 TYPEWRITER & AGENTIC TOOL PASSING
+        addMessage(data.response, "bot", false, data.tool);
         sessionMemory.push({ role: "SafeMind AI", text: data.response });
         
         if (data.emotions) updateEmotionRadar(data.emotions);
@@ -347,8 +348,8 @@ async function sendMessage() {
     }
 }
 
-// ✨ INTELLIGENT PROACTIVE UX ROUTING & TYPEWRITER UX
-function addMessage(text, sender, skipTyping = false) {
+// ✨ TRUE AGENTIC ROUTING & TYPEWRITER UX
+function addMessage(text, sender, skipTyping = false, tool = null) {
     const chatBox = document.getElementById("chat-box");
     if (!chatBox) return;
     
@@ -358,38 +359,27 @@ function addMessage(text, sender, skipTyping = false) {
     const textSpan = document.createElement("span"); 
     msgDiv.appendChild(textSpan); 
     
-    // Helper function to append proactive buttons
+    // 🧠 AUTONOMOUS AGENT LOGIC (No more hardcoded keywords)
     function injectProactiveButtons() {
-        if (sender === "bot") {
-            const lowerText = text.toLowerCase();
-            if (lowerText.includes("burn") || lowerText.includes("release") || lowerText.includes("let go of this thought") || lowerText.includes("intrusive thought")) {
-                const btn = document.createElement("button");
-                btn.className = "inline-action-btn danger-action";
+        if (sender === "bot" && tool) {
+            const btn = document.createElement("button");
+            btn.className = tool === "BURN" ? "inline-action-btn danger-action" : "inline-action-btn";
+            
+            if (tool === "BURN") {
                 btn.innerHTML = "🔥 Try Release Exercise";
                 btn.onclick = () => openModal('burn-modal');
-                msgDiv.appendChild(document.createElement("br"));
-                msgDiv.appendChild(btn);
-            }
-            else if (lowerText.includes("cbt") || lowerText.includes("cognitive distortion") || lowerText.includes("reframe") || lowerText.includes("thought record")) {
-                const btn = document.createElement("button");
-                btn.className = "inline-action-btn";
+            } else if (tool === "CBT") {
                 btn.innerHTML = "📝 Start CBT Record";
                 btn.onclick = () => openModal('cbt-modal');
-                msgDiv.appendChild(document.createElement("br"));
-                msgDiv.appendChild(btn);
-            }
-            else if (lowerText.includes("phq") || lowerText.includes("depression assessment") || lowerText.includes("mood tracker") || lowerText.includes("check-in")) {
-                const btn = document.createElement("button");
-                btn.className = "inline-action-btn";
+            } else if (tool === "PHQ9") {
                 btn.innerHTML = "📋 Take PHQ-9 Check-in";
                 btn.onclick = () => openModal('phq-modal');
-                msgDiv.appendChild(document.createElement("br"));
-                msgDiv.appendChild(btn);
             }
+            msgDiv.appendChild(document.createElement("br"));
+            msgDiv.appendChild(btn);
         }
     }
 
-    // 🚀 UX TYPEWRITER LOGIC
     if (sender === "bot" && !skipTyping && text !== "Thinking..." && text !== "Connection lost." && text !== "Loading previous session..." && text !== "This conversation is empty.") {
         let i = 0;
         function typeWriter() {
@@ -397,7 +387,7 @@ function addMessage(text, sender, skipTyping = false) {
                 textSpan.innerHTML += text.charAt(i);
                 i++;
                 chatBox.scrollTop = chatBox.scrollHeight;
-                setTimeout(typeWriter, 12); // Speed of typewriter
+                setTimeout(typeWriter, 12);
             } else {
                 injectProactiveButtons();
             }
@@ -412,7 +402,6 @@ function addMessage(text, sender, skipTyping = false) {
     chatBox.scrollTop = chatBox.scrollHeight;
     return msgDiv;
 }
-
 async function deleteEntireSession(sessionId) {
     if(!confirm("Delete this conversation permanently?")) return;
     await fetch("/delete_session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId }) });
