@@ -484,39 +484,49 @@ input::placeholder { color: rgba(255,255,255,0.4); }
     .chat-icebreakers { width: 100%; padding-left: 5px; padding-right: 5px; margin-bottom: 10px; }
     .icebreaker-chip { font-size: 0.8rem; padding: 6px 14px; }
 }
-/* 🚨 EMERGENCY QUICK EXIT BUTTON */
-/* 🚨 EMERGENCY QUICK EXIT BUTTON (Updated: Reduced Size and New Safe Position) */
-.emergency-exit-btn {
-    position: fixed;
-    bottom: 60px; /* Moved further up from the chat inputs */
-    right: 60px; /* Moved further into the corner */
-    background: #ef4444;
-    color: #fff;
-    padding: 8px 16px; /* Reduced padding for a sleeker look */
-    border-radius: 100px;
-    font-weight: 700;
-    font-size: 0.8rem; /* Reduced font size from 0.9rem */
-    text-decoration: none;
+/* ==========================================
+   🚨 ADAPTIVE QUICK EXIT BUTTONS
+========================================== */
+/* Desktop Sidebar Exit Button */
+.quick-exit-desktop {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.quick-exit-desktop:hover {
+    background: #ef4444 !important;
+    color: #fff !important;
+    border-color: #ef4444 !important;
     box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    gap: 6px; /* Reduced gap from 8px */
-    transition: all 0.3s ease;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    transform: translateY(-4px) scale(1.1);
 }
-.emergency-exit-btn:hover {
-    background: #dc2626;
-    transform: scale(1.05);
-    box-shadow: 0 15px 35px rgba(239, 68, 68, 0.6);
+
+/* Hide Mobile Exit Button on Desktop */
+.mobile-quick-exit-btn {
+    display: none;
 }
-/* Mobile overrides (Made very small and tucked to the edge) */
+
+/* Mobile Adjustments */
 @media (max-width: 768px) {
-    .emergency-exit-btn {
-        bottom: 110px; /* Placed above the bottom mobile nav dock */
-        right: 10px; /* Very close to the edge to be out of the way of chat pills */
-        padding: 6px 12px; /* Super small padding */
-        font-size: 0.75rem; /* Super small font */
-        gap: 4px; /* Tiny gap */
+    /* Hide Desktop Side Nav Version */
+    .quick-exit-desktop { display: none !important; }
+    
+    /* Show Mobile Header Version as a matching circular icon */
+    .mobile-quick-exit-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        text-decoration: none;
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.1);
+        transition: all 0.3s ease;
+    }
+    .mobile-quick-exit-btn:hover {
+        background: #ef4444;
+        color: #ffffff;
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
     }
 }
