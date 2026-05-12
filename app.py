@@ -373,14 +373,16 @@ def save_journal():
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today."
     
+    # 🚀 Connecting to Google AI Studio directly with Exponential Backoff
     if gemini_client:
         max_retries = 3
+        base_wait_time = 2
         import time
         
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
-                    model="gemma-4-26b-a4b-it", 
+                    model="gemma-4-26b-a4b-it", # 👈 The correct, stable Hackathon model
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
@@ -397,13 +399,17 @@ def save_journal():
                     elif line.lower().startswith('insight:'):
                         ai_insight = line.split(':', 1)[1].strip()
                 
-                break 
+                print("✅ Journal tagged successfully.")
+                break # Success! Exit the retry loop
                         
             except Exception as e:
                 error_str = str(e)
-                if "500" in error_str or "503" in error_str:
-                    time.sleep(2)
+                if "429" in error_str or "500" in error_str or "503" in error_str:
+                    wait_time = base_wait_time * (2 ** attempt)
+                    print(f"⚠️ Journal API Limit Hit (Attempt {attempt + 1}/{max_retries}). Retrying in {wait_time}s...")
+                    time.sleep(wait_time)
                 else:
+                    print(f"❌ Journal AI Error: {e}")
                     break
 
     conn = get_db_connection()
