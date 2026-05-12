@@ -30,17 +30,17 @@ def init_db():
     cursor = conn.cursor()
     cursor.execute('''CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, username TEXT UNIQUE, password TEXT)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS chat_logs (id SERIAL PRIMARY KEY, session_id TEXT, user_id INTEGER, user_message TEXT, bot_response TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
-    cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     
+    # 🧠 Add Reasoning column for Chain-of-Thought
+    cursor.execute('''ALTER TABLE chat_logs ADD COLUMN IF NOT EXISTS reasoning TEXT;''')
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS mood_logs (id SERIAL PRIMARY KEY, user_id INTEGER, mood TEXT, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''CREATE TABLE IF NOT EXISTS journals (id SERIAL PRIMARY KEY, user_id INTEGER, entry_text TEXT, ai_insight TEXT, emotion_tag TEXT DEFAULT 'Reflection', timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
     cursor.execute('''ALTER TABLE journals ADD COLUMN IF NOT EXISTS emotion_tag TEXT DEFAULT 'Reflection';''')
-    
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_session ON chat_logs(session_id);''')
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_logs(user_id);''')
-    
     conn.commit()
     conn.close()
-
 init_db()
 
 try:
@@ -151,13 +151,12 @@ def app_dashboard():
 @app.route('/analyze', methods=['POST'])
 @login_required
 def analyze():
-    # 🛡️ ANTI-ABUSE RATE LIMITING (Prevent spam clicking)
     last_req = session.get('last_msg_time', 0)
     current_time = time.time()
     if current_time - last_req < 1.5:
         return jsonify({
             "response": "I'm still processing your last thought. Take a deep breath and try again in a moment.", 
-            "sentiment": "neutral", "crisis": False, "emotions": [], "audio": None
+            "sentiment": "neutral", "crisis": False, "emotions": [], "audio": None, "tool": None
         })
     session['last_msg_time'] = current_time
 
@@ -173,48 +172,36 @@ def analyze():
     deep_emotions = analyze_deep_emotion(user_input)
     
     past_memory = retrieve_past_context(user_input)
-    
-    if past_memory:
-        augmented_input = f"[Recall from past: {past_memory}]\nUser says: {user_input}"
-    else:
-        augmented_input = user_input
+    augmented_input = f"[Recall from past: {past_memory}]\nUser says: {user_input}" if past_memory else user_input
 
-    ai_response = generate_ai_response(augmented_input, chat_history, user_lang)
+    # 🧠 Unpack the new AI Engine variables
+    ai_response, reasoning, agentic_tool = generate_ai_response(augmented_input, chat_history, user_lang)
 
-    # 🛡️ PII STRIPPING BEFORE SAVING TO MEMORY
     clean_memory_text = strip_pii(user_input)
 
     if pinecone_index:
         try:
             vector = get_embedding(clean_memory_text)
             if vector:
-                pinecone_index.upsert(vectors=[{
-                    "id": f"{session_id}_{len(chat_history)}", 
-                    "values": vector, 
-                    "metadata": {"text": clean_memory_text}
-                }])
-        except Exception as e:
-            pass
+                pinecone_index.upsert(vectors=[{"id": f"{session_id}_{len(chat_history)}", "values": vector, "metadata": {"text": clean_memory_text}}])
+        except Exception: pass
 
     audio_base64 = None
     try:
-        lang_code = user_lang
-        if lang_code not in ['ta', 'hi', 'en']:
-            lang_code = 'en'
-            
+        lang_code = 'en' if user_lang not in ['ta', 'hi', 'en'] else user_lang
         tts = gTTS(text=ai_response, lang=lang_code, slow=False)
         fp = BytesIO()
         tts.write_to_fp(fp)
         fp.seek(0)
         audio_base64 = base64.b64encode(fp.read()).decode('utf-8')
-    except Exception as e:
-        pass
+    except Exception: pass
 
+    # 🧠 Log the Model's Reasoning securely to the database
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
-        "INSERT INTO chat_logs (session_id, user_id, user_message, bot_response) VALUES (%s, %s, %s, %s) RETURNING id",
-        (session_id, user_id, user_input, ai_response)
+        "INSERT INTO chat_logs (session_id, user_id, user_message, bot_response, reasoning) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+        (session_id, user_id, user_input, ai_response, reasoning)
     )
     chat_id = cursor.fetchone()[0]
     conn.commit()
@@ -226,7 +213,8 @@ def analyze():
         "crisis": is_crisis,
         "chat_id": chat_id, 
         "emotions": deep_emotions,
-        "audio": audio_base64
+        "audio": audio_base64,
+        "tool": agentic_tool # 🧠 Pass the tool decision to the frontend
     })
 
 @app.route('/get_sessions', methods=['GET'])
