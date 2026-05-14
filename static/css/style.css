@@ -297,13 +297,17 @@ input::placeholder { color: rgba(255,255,255,0.4); }
 
 @media (max-width: 768px) {
     .right-col, .side-nav-icons, .desktop-avatar, .header-nav, .breathe-sos-btn span { display: none !important; }
+    
     /* 🚀 OPTIMIZATION: Forces iOS to respect your layout and not auto-zoom */
     .input-wrapper input, .clinical-input, .clinical-select, #journal-input, .burn-textarea { 
         font-size: 16px !important; 
     }
+    
+    /* 🚀 OPTIMIZATION: Hides all themes EXCEPT the first two on mobile */
     .theme-option:nth-child(n+3) {
         display: none !important;
     }
+    
     .app-layout { padding: 12px; padding-bottom: 90px; } 
     .workspace { padding: 0; gap: 0; flex-direction: column; }
     
@@ -363,10 +367,12 @@ input::placeholder { color: rgba(255,255,255,0.4); }
 .close-breathe-btn:hover { transform: scale(1.2) rotate(90deg); }
 .breathe-container { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
 .breathe-circle { position: absolute; width: 140px; height: 140px; background: radial-gradient(circle, var(--primary) 0%, var(--secondary) 100%); border-radius: 50%; transition: box-shadow 4s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0.9; }
-/* 🚀 FIX 2: Reduced shadow spread so mobile GPUs don't clip it into a square when scaling 3x */
+
+/* 🚀 OPTIMIZATION: Reduced shadow spread so mobile GPUs don't clip it */
 .breathe-circle.pulse { 
     box-shadow: 0 0 0 10px var(--glow-1), 0 0 0 20px var(--glow-2), 0 0 0 35px rgba(255,255,255,0.05); 
 }
+
 .breathe-text { position: relative; z-index: 10; color: var(--text-main); font-weight: 700; font-size: 3rem; text-align: center; margin: 0; pointer-events: none; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 
 .clinical-modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 10000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1); }

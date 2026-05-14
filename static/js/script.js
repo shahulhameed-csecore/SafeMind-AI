@@ -364,7 +364,7 @@ function addMessage(text, sender, skipTyping = false, tool = null) {
     const textSpan = document.createElement("span"); 
     msgDiv.appendChild(textSpan); 
     
-    // 🧠 AUTONOMOUS AGENT LOGIC (No more hardcoded keywords)
+    // 🧠 AUTONOMOUS AGENT LOGIC
     function injectProactiveButtons() {
         if (sender === "bot" && tool) {
             const btn = document.createElement("button");
@@ -407,6 +407,7 @@ function addMessage(text, sender, skipTyping = false, tool = null) {
     chatBox.scrollTop = chatBox.scrollHeight;
     return msgDiv;
 }
+
 async function deleteEntireSession(sessionId) {
     if(!confirm("Delete this conversation permanently?")) return;
     await fetch("/delete_session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId }) });
@@ -522,16 +523,8 @@ function createRecognition() {
         isListening = false;
         
         if (!manuallyStopped) {
-            // The browser stopped listening automatically (user paused).
-            // Let's check if they actually said something.
-            const input = document.getElementById("user-input");
-            if (input && input.value.trim().length > 0) {
-                // If they spoke, SEND the message to the AI
-                cleanupVoiceUI(true); 
-            } else {
-                // If it stopped and they said nothing, just close gracefully
-                cleanupVoiceUI(false);
-            }
+            // 🚀 OPTIMIZATION: Android stopped it automatically. SEND whatever was captured!
+            cleanupVoiceUI(true); 
         } else {
             // User manually clicked the stop/send button
             cleanupVoiceUI(true);
@@ -578,24 +571,23 @@ function stopListening(sendAfter = true) {
 function cleanupVoiceUI(sendAfter = true) {
     stopVoiceVisualizer();
 
-    if (sendAfter) {
-        const input = document.getElementById("user-input");
-        if (input && input.value.trim().length > 0) {
-            // Change text to show processing
-            const liveTranscript = document.getElementById("live-transcript");
-            if(liveTranscript) liveTranscript.innerText = "Analyzing audio...";
-            
-            // Wait 600ms so the user can read "Analyzing...", then close and send
-            setTimeout(() => {
-                toggleVoiceMode(false);
-                sendMessage();
-            }, 600);
-            return; // Exit here so we don't close instantly
-        }
+    const input = document.getElementById("user-input");
+    const hasText = input && input.value.trim().length > 0;
+
+    if (sendAfter && hasText) {
+        // 🚀 OPTIMIZATION: Show the user we are processing before closing
+        const liveTranscript = document.getElementById("live-transcript");
+        if (liveTranscript) liveTranscript.innerText = "Analyzing audio...";
+        
+        // Wait 800ms so the user can see the text, then close and send
+        setTimeout(() => {
+            toggleVoiceMode(false);
+            sendMessage();
+        }, 800); 
+    } else {
+        // If no text was captured, close instantly
+        toggleVoiceMode(false);
     }
-    
-    // If we reach here, there was no text to send, close instantly
-    toggleVoiceMode(false);
 }
 
 let breathInterval; let breathTimeouts = [];
