@@ -1,7 +1,27 @@
 let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
+// 📱 NEW: Mobile Sidebar Drawer Logic
+function toggleMobileSidebar() {
+    const sidebar = document.getElementById('mobile-sidebar');
+    const overlay = document.getElementById('mobile-overlay');
+    if (!sidebar || !overlay) return;
+    
+    if (sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+    } else {
+        sidebar.classList.add('open');
+        overlay.classList.add('active');
+    }
+}
 
+// 🎨 Force initialization of Wildflower on mobile without breaking Desktop
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.innerWidth <= 768) {
+        document.body.setAttribute('data-mood', 'wildflower');
+    }
+});
 function toggleThemeMenu() {
     const menu = document.getElementById('theme-menu');
     menu.classList.toggle('active');

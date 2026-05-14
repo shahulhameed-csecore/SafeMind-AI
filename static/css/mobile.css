@@ -1,213 +1,147 @@
 /* =========================================================
-   📱 SAFEMIND AI - PREMIUM MOBILE UI (NATIVE APP FEEL)
+   📱 SAFEMIND AI - PREMIUM MOBILE UI (WILDFLOWER THEME)
 ========================================================= */
 
+/* Desktop label hiding */
+.sidebar-label, .mobile-sidebar-header, .mobile-only-flex, .mobile-hamburger { display: none; }
+
 @media screen and (max-width: 768px) {
-    /* 1. Global Viewport & Safe Area Locks */
+    /* 1. Global Premium Theme Injection (Forces Light Wildflower) */
     body {
-        height: 100dvh !important; /* Prevents keyboard crush */
+        --bg-base: #F7F4FF !important;
+        --primary: #7C5CFC !important;
+        --secondary: #B39DFF !important;
+        --text-main: #2D1F55 !important;
+        --text-muted: #7E70A5 !important;
+        --surface-panel: rgba(255, 255, 255, 0.9) !important;
+        --surface-input: #FFFFFF !important;
+        --border-soft: rgba(124, 92, 252, 0.12) !important;
+        --glass-highlight: rgba(255, 255, 255, 1) !important;
+        --glow-1: rgba(124, 92, 252, 0.15) !important;
+        
+        height: 100dvh !important; 
         width: 100vw !important;
         overflow: hidden !important;
         background: var(--bg-base) !important;
         -webkit-font-smoothing: antialiased;
     }
     
-    .app-layout { 
-        padding: 0 !important; 
-        height: 100dvh !important;
-    }
-    
-    .workspace { 
-        padding: 0 !important; 
-        gap: 0 !important; 
-        flex-direction: column !important; 
-        height: 100% !important; 
-    }
+    .app-layout { padding: 0 !important; height: 100dvh !important; }
+    .workspace { padding: 0 !important; gap: 0 !important; flex-direction: column !important; height: 100% !important; }
 
-    /* 2. Hide Desktop Elements Completely */
-    .side-nav-icons, .desktop-avatar, .header-nav, .desktop-only-icon, .right-col { 
-        display: none !important; 
-    }
-    .theme-option:nth-child(n+3) { 
-        display: none !important; 
-    }
+    /* 2. Hide Desktop Clutter */
+    .desktop-avatar, .header-nav, .desktop-only-icon, .right-col, .mobile-hide, .desktop-only { display: none !important; }
+    .bg-aurora-container { opacity: 0.3 !important; } /* Softens background animations */
 
-    /* 3. Premium Sticky Header (Glassmorphism) */
+    /* 3. Sticky Premium Navbar */
     .top-header {
         position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
+        top: 0 !important; left: 0 !important; width: 100% !important;
         z-index: 1000 !important;
         border-radius: 0 0 24px 24px !important;
         padding: env(safe-area-inset-top, 15px) 20px 15px 20px !important;
-        background: rgba(10, 10, 15, 0.65) !important;
-        backdrop-filter: blur(25px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        background: rgba(255, 255, 255, 0.85) !important;
+        backdrop-filter: blur(30px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
         border: none !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        border-bottom: 1px solid rgba(124, 92, 252, 0.1) !important;
+        box-shadow: 0 10px 30px rgba(124, 92, 252, 0.05) !important;
         margin: 0 !important;
     }
-    .logo-icon { width: 30px !important; height: 30px !important; border-radius: 8px !important; }
-    .logo { font-size: 1.15rem !important; }
-    .theme-toggle-btn { padding: 8px !important; border-radius: 50% !important; width: 38px !important; height: 38px !important; justify-content: center !important; background: rgba(255,255,255,0.05) !important;}
-    .theme-toggle-btn svg { display: none !important; }
-    #current-theme-name { display: none !important; }
+    .mobile-hamburger { display: flex !important; background: transparent; border: none; color: var(--primary); padding: 5px; cursor: pointer; }
+    .logo-container { width: 100%; justify-content: space-between; flex-direction: row-reverse; }
+    .logo-icon { width: 32px !important; height: 32px !important; border-radius: 10px !important; background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; color: white !important; }
+    .logo { display: none !important; } /* Center minimal look */
+
+    /* 4. Slide-Out Sidebar Drawer */
+    .mobile-sidebar-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(45, 31, 85, 0.4);
+        backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        z-index: 2000; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+    }
+    .mobile-sidebar-overlay.active { opacity: 1; pointer-events: all; }
     
-    /* Compact Breathe Button */
-    .breathe-sos-btn span { display: none !important; }
-    .breathe-sos-btn { width: 38px !important; height: 38px !important; padding: 0 !important; justify-content: center !important; border-radius: 50% !important; background: rgba(255,255,255,0.05) !important; box-shadow: none !important;}
-    .breathe-sos-btn svg { margin: 0 !important; width: 18px !important; height: 18px !important; }
-
-    /* 4. Chat Area Layout */
-    .view-container { border-radius: 0 !important; height: 100% !important; }
-    .view-panel { border-radius: 0 !important; height: 100% !important; padding-top: 80px !important; }
+    .side-nav-icons {
+        position: fixed !important; top: 0 !important; left: 0 !important;
+        width: 280px !important; height: 100dvh !important;
+        background: #FFFFFF !important;
+        border-radius: 0 32px 32px 0 !important;
+        padding: env(safe-area-inset-top, 30px) 20px 30px 20px !important;
+        z-index: 2001 !important;
+        transform: translateX(-100%) !important;
+        box-shadow: 20px 0 50px rgba(0,0,0,0.1) !important;
+        display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 10px !important;
+    }
+    .side-nav-icons.open { transform: translateX(0) !important; }
     
-    #view-chat { 
-        display: flex !important; 
-        flex-direction: column !important; 
-        height: 100dvh !important; 
-        background: transparent !important;
-        padding-bottom: 0 !important;
+    .mobile-sidebar-header { display: flex !important; width: 100%; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-left: 10px; color: var(--text-main); }
+    .mobile-sidebar-header h3 { font-size: 1.2rem; font-weight: 700; }
+    .close-sidebar-btn { background: rgba(124, 92, 252, 0.1); border: none; width: 36px; height: 36px; border-radius: 50%; color: var(--primary); font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    
+    .sidebar-label { display: block !important; font-size: 1rem; font-weight: 600; margin-left: 15px; }
+    .mobile-only-flex { display: flex !important; }
+    .icon-pill {
+        width: 100% !important; height: 55px !important; border-radius: 16px !important;
+        justify-content: flex-start !important; padding: 0 20px !important;
+        background: transparent !important; color: var(--text-muted) !important;
     }
+    .icon-pill.active { background: rgba(124, 92, 252, 0.08) !important; color: var(--primary) !important; box-shadow: none !important; transform: none !important; }
 
-    /* 5. Modern Native App Chat Bubbles */
-    .chat-box { 
-        flex-grow: 1 !important; 
-        padding: 10px 15px !important; 
-        overflow-y: auto !important; 
-        scroll-behavior: smooth !important;
-        padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important; /* Prevents text hiding behind input */
-    }
-    .msg { 
-        max-width: 88% !important; 
-        padding: 14px 18px !important; 
-        line-height: 1.5 !important; 
-        font-size: 0.95rem !important; 
-        margin-bottom: 15px !important; 
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
-    }
-    .msg.bot { 
-        border-radius: 20px 20px 20px 4px !important; 
-        background: rgba(30, 30, 40, 0.6) !important; 
-        backdrop-filter: blur(15px) !important;
-        -webkit-backdrop-filter: blur(15px) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important; 
-    }
-    .msg.user { 
-        border-radius: 20px 20px 4px 20px !important; 
-        background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; 
-    }
+    /* 5. Chat Interface Redesign */
+    .view-container { border-radius: 0 !important; height: 100% !important; background: var(--bg-base) !important; }
+    .view-panel { border-radius: 0 !important; height: 100% !important; padding-top: 75px !important; background: transparent !important; box-shadow: none !important; border: none !important;}
+    
+    #view-chat { display: flex !important; flex-direction: column !important; padding-bottom: 0 !important; }
+    
+    .chat-box { flex-grow: 1 !important; padding: 15px 20px !important; overflow-y: auto !important; padding-bottom: calc(180px + env(safe-area-inset-bottom)) !important; }
+    
+    /* Native App Chat Bubbles */
+    .msg { max-width: 88% !important; padding: 14px 18px !important; font-size: 0.95rem !important; margin-bottom: 12px !important; box-shadow: 0 4px 15px rgba(124, 92, 252, 0.05) !important; line-height: 1.5 !important; }
+    .msg.bot { border-radius: 20px 20px 20px 4px !important; background: #FFFFFF !important; color: var(--text-main) !important; border: 1px solid var(--border-soft) !important; }
+    .msg.user { border-radius: 20px 20px 4px 20px !important; background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; color: #FFFFFF !important; box-shadow: 0 8px 20px rgba(124, 92, 252, 0.25) !important; }
 
-    /* 6. Horizontal Scroll Snap Icebreakers */
+    /* 6. Snap-Scroll Icebreakers */
     .chat-icebreakers {
-        display: flex !important;
-        width: 100vw !important;
-        overflow-x: auto !important;
-        scroll-snap-type: x mandatory !important;
-        -webkit-overflow-scrolling: touch !important;
-        padding: 0 15px 10px 15px !important;
-        gap: 12px !important;
-        margin-bottom: 0 !important;
+        display: flex !important; width: 100vw !important; overflow-x: auto !important; scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important; padding: 0 15px 15px 15px !important; gap: 10px !important; margin-bottom: 0 !important;
     }
     .chat-icebreakers::-webkit-scrollbar { display: none !important; }
     .icebreaker-chip {
-        scroll-snap-align: start !important;
-        flex-shrink: 0 !important;
-        background: rgba(30, 30, 40, 0.7) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-radius: 100px !important;
-        padding: 10px 18px !important;
-        font-size: 0.85rem !important;
-        backdrop-filter: blur(10px) !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
-        color: rgba(255,255,255,0.9) !important;
+        scroll-snap-align: start !important; flex-shrink: 0 !important;
+        background: #FFFFFF !important; border: 1px solid var(--border-soft) !important;
+        border-radius: 100px !important; padding: 12px 20px !important; font-size: 0.85rem !important;
+        box-shadow: 0 4px 15px rgba(124, 92, 252, 0.08) !important; color: var(--primary) !important;
     }
 
-    /* 7. Floating Pill Input Area */
+    /* 7. Floating Modern Input */
     .input-area {
-        position: fixed !important;
-        bottom: calc(85px + env(safe-area-inset-bottom)) !important;
-        left: 0 !important;
-        width: 100% !important;
-        padding: 0 !important;
-        background: transparent !important;
-        z-index: 999 !important;
-        display: flex !important; 
-        flex-direction: column !important; 
-        align-items: center !important;
+        position: fixed !important; bottom: calc(15px + env(safe-area-inset-bottom)) !important; left: 0 !important; width: 100% !important;
+        padding: 0 !important; background: transparent !important; z-index: 999 !important; display: flex !important; flex-direction: column !important; align-items: center !important;
     }
     .input-wrapper {
-        width: 92% !important;
-        background: rgba(20, 20, 25, 0.85) !important;
-        backdrop-filter: blur(25px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-radius: 100px !important;
-        padding: 6px 8px 6px 20px !important;
-        gap: 8px !important;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+        width: 92% !important; background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important; -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid var(--border-soft) !important; border-radius: 100px !important;
+        padding: 8px 10px 8px 20px !important; gap: 8px !important;
+        box-shadow: 0 15px 35px rgba(124, 92, 252, 0.15) !important;
     }
-    
-    /* 🚀 Fix iOS Auto-Zoom */
-    .input-wrapper input, .clinical-input, .clinical-select, #journal-input, .burn-textarea { 
-        font-size: 16px !important; 
-    }
-    
-    .input-wrapper input { min-width: 0 !important; height: 42px !important; padding: 0 !important; }
-    .send-btn, .icon-btn { width: 42px !important; height: 42px !important; flex-shrink: 0 !important; border-radius: 50% !important; }
-    .lang-toggle-btn { padding: 8px 12px !important; font-size: 0.8rem !important; border-radius: 100px !important; }
+    .input-wrapper input { font-size: 16px !important; color: var(--text-main) !important; height: 42px !important; padding: 0 !important;}
+    .input-wrapper input::placeholder { color: rgba(45, 31, 85, 0.4) !important; }
+    .send-btn, .icon-btn { width: 44px !important; height: 44px !important; flex-shrink: 0 !important; border-radius: 50% !important; }
 
-    /* 8. Floating Dock Bottom Navigation */
-    .mobile-bottom-nav {
-        display: flex !important;
-        position: fixed !important;
-        bottom: calc(15px + env(safe-area-inset-bottom)) !important;
-        left: 5% !important;
-        width: 90% !important;
-        height: 65px !important;
-        background: rgba(15, 15, 20, 0.75) !important;
-        backdrop-filter: blur(30px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
-        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 100px !important;
-        justify-content: space-evenly !important;
-        align-items: center !important;
-        z-index: 1000 !important;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
-        padding: 0 5px !important;
-    }
-    .mobile-nav-item {
-        flex: 1 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 4px !important;
-        color: rgba(255, 255, 255, 0.4) !important;
-        height: 100% !important;
-        background: transparent !important;
-        border: none !important;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-    }
-    .mobile-nav-item svg { width: 22px !important; height: 22px !important; transition: 0.3s ease !important; }
-    .mobile-nav-item span { font-size: 0.65rem !important; font-weight: 600 !important; }
-    
-    .mobile-nav-item.active {
-        color: var(--primary) !important;
-        transform: translateY(-4px) !important;
-    }
-    .mobile-nav-item.active svg { filter: drop-shadow(0 0 8px var(--primary)) !important; }
+    /* 8. Dashboard & Clinical Tools Tweaks */
+    #view-dashboard, #view-journal { padding: 20px !important; padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important; }
+    .dash-card { background: #FFFFFF !important; border-radius: 28px !important; padding: 25px !important; box-shadow: 0 15px 35px rgba(124, 92, 252, 0.05) !important; border: 1px solid var(--border-soft) !important; }
+    .tool-item { background: rgba(247, 244, 255, 0.5) !important; border: 1px solid var(--border-soft) !important; border-radius: 20px !important; padding: 20px !important; }
+    .tool-icon { background: rgba(124, 92, 252, 0.1) !important; color: var(--primary) !important; border: none !important; }
+    .tool-info p { color: var(--text-muted) !important; }
 
-    /* 9. Dashboard & Journal Tweaks */
-    #view-dashboard, #view-journal { padding: 15px !important; padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important; }
-    .dash-card, .metric-card { padding: 20px !important; border-radius: 24px !important; }
-    .dash-grid-4 { grid-template-columns: 1fr 1fr !important; gap: 15px !important; } /* 2x2 grid on mobile */
+    .journal-composer { background: #FFFFFF !important; color: var(--text-main) !important; }
+    #journal-input { background: #F7F4FF !important; color: var(--text-main) !important; }
+    .journal-card { background: #FFFFFF !important; }
+    .journal-text { color: var(--text-main) !important; }
 
-    /* 10. Tap & Touch Animations */
-    .send-btn:active, .mic-btn:active, .icebreaker-chip:active, .mobile-nav-item:active {
-        transform: scale(0.92) !important;
-    }
+    /* Fix side panels over mobile */
+    .side-panel { background: #FFFFFF !important; width: 100vw !important; left: 0 !important; border-radius: 32px 32px 0 0 !important; top: 60px !important; height: calc(100vh - 60px) !important; box-shadow: 0 -20px 50px rgba(0,0,0,0.1) !important; }
 }
