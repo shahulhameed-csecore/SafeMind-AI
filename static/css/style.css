@@ -32,7 +32,7 @@ body {
     font-family: 'Plus Jakarta Sans', sans-serif; 
     background-color: var(--bg-base); 
     color: var(--text-main);
-    height: 100vh; 
+    height: 100dvh; /* 🚀 OPTIMIZATION: Dynamic Viewport prevents keyboard crush */
     overflow: hidden;
     position: relative;
     transition: background-color 1.5s ease, color 1.5s ease; 
@@ -297,6 +297,10 @@ input::placeholder { color: rgba(255,255,255,0.4); }
 
 @media (max-width: 768px) {
     .right-col, .side-nav-icons, .desktop-avatar, .header-nav, .breathe-sos-btn span { display: none !important; }
+    /* 🚀 OPTIMIZATION: Forces iOS to respect your layout and not auto-zoom */
+    .input-wrapper input, .clinical-input, .clinical-select, #journal-input, .burn-textarea { 
+        font-size: 16px !important; 
+    }
     .app-layout { padding: 12px; padding-bottom: 90px; } 
     .workspace { padding: 0; gap: 0; flex-direction: column; }
     

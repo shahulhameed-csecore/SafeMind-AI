@@ -1,6 +1,7 @@
 import os
 import base64
 import time
+import html
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -352,7 +353,8 @@ def get_dashboard_stats():
 @login_required
 def save_journal():
     data = request.json
-    entry_text = data.get('entry')
+    # 🚀 OPTIMIZATION: html.escape() neutralizes malicious Javascript (XSS protection)
+    entry_text = html.escape(data.get('entry', '')) 
     user_id = session.get('user_id')
     
     system_prompt = "You are an empathetic journal assistant."

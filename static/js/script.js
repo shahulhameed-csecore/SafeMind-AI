@@ -306,6 +306,10 @@ async function sendMessage() {
     const icebreakers = document.getElementById("chat-icebreakers");
     if (icebreakers) icebreakers.style.display = "none";
 
+    // 🚀 OPTIMIZATION: Debounce the send button so they can't spam it
+    const sendBtn = document.getElementById("send-btn");
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = "0.5"; }
+
     addMessage(message, "user");
     sessionMemory.push({ role: "User", text: message });
     input.value = "";
@@ -317,7 +321,6 @@ async function sendMessage() {
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
 
-        // 🧠 Pass up to the last 12 messages so the backend can summarize them intelligently
         const response = await fetch("/analyze", { 
             method: "POST", headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify({ message: message, history: sessionMemory.slice(-12), session_id: currentSessionId, language: selectedLang }) 
@@ -325,7 +328,6 @@ async function sendMessage() {
         const data = await response.json();
         loadingBubble.remove();
         
-        // 🚀 TYPEWRITER & AGENTIC TOOL PASSING
         addMessage(data.response, "bot", false, data.tool);
         sessionMemory.push({ role: "SafeMind AI", text: data.response });
         
@@ -345,6 +347,9 @@ async function sendMessage() {
     } catch (error) { 
         loadingBubble.remove();
         addMessage("Connection lost.", "bot", true); 
+    } finally {
+        // 🚀 OPTIMIZATION: Re-enable the send button after the API is done
+        if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = "1"; }
     }
 }
 
