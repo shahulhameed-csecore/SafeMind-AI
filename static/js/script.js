@@ -519,15 +519,23 @@ function createRecognition() {
         stopListening(false);
     };
 
-    recog.onend = () => {
-        isListening = false;
+recog.onstart = () => {
+        isListening = true;
+        manuallyStopped = false;
+        finalTranscript = '';
+
+        const input = document.getElementById("user-input");
+        if (input) input.value = '';
+
+        const liveTranscript = document.getElementById("live-transcript");
+        if (liveTranscript) liveTranscript.innerText = "Listening...";
+
+        toggleVoiceMode(true);
         
-        if (!manuallyStopped) {
-            // 🚀 OPTIMIZATION: Android stopped it automatically. SEND whatever was captured!
-            cleanupVoiceUI(true); 
-        } else {
-            // User manually clicked the stop/send button
-            cleanupVoiceUI(true);
+        // 🚀 MOBILE FIX: Only run the visualizer on Desktop. 
+        // If we run it on a phone, it steals the microphone from the AI!
+        if (window.innerWidth > 768) {
+            startVoiceVisualizer(); 
         }
     };
     return recog;
