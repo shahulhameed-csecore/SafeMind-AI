@@ -1,7 +1,7 @@
 import os
 import base64
 import time
-import html
+import html  # 🚀 Added for XSS Security
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -363,7 +363,6 @@ def save_journal():
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today."
     
-    # 🚀 Connecting to Google AI Studio directly with Exponential Backoff
     if gemini_client:
         max_retries = 3
         base_wait_time = 2
@@ -372,7 +371,7 @@ def save_journal():
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
-                    model="gemma-4-26b-a4b-it", # 👈 The correct, stable Hackathon model
+                    model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
@@ -390,7 +389,7 @@ def save_journal():
                         ai_insight = line.split(':', 1)[1].strip()
                 
                 print("✅ Journal tagged successfully.")
-                break # Success! Exit the retry loop
+                break 
                         
             except Exception as e:
                 error_str = str(e)
