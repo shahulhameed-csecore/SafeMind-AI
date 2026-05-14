@@ -520,13 +520,20 @@ function createRecognition() {
 
     recog.onend = () => {
         isListening = false;
+        
         if (!manuallyStopped) {
-            setTimeout(() => {
-                if (!isListening && recognition) {
-                    try { recognition.start(); } catch (e) { cleanupVoiceUI(false); }
-                } else if (!recognition) { cleanupVoiceUI(false); }
-            }, 500);
+            // The browser stopped listening automatically (user paused).
+            // Let's check if they actually said something.
+            const input = document.getElementById("user-input");
+            if (input && input.value.trim().length > 0) {
+                // If they spoke, SEND the message to the AI
+                cleanupVoiceUI(true); 
+            } else {
+                // If it stopped and they said nothing, just close gracefully
+                cleanupVoiceUI(false);
+            }
         } else {
+            // User manually clicked the stop/send button
             cleanupVoiceUI(true);
         }
     };
@@ -569,15 +576,26 @@ function stopListening(sendAfter = true) {
 }
 
 function cleanupVoiceUI(sendAfter = true) {
-    toggleVoiceMode(false);
     stopVoiceVisualizer();
 
     if (sendAfter) {
         const input = document.getElementById("user-input");
         if (input && input.value.trim().length > 0) {
-            sendMessage();
+            // Change text to show processing
+            const liveTranscript = document.getElementById("live-transcript");
+            if(liveTranscript) liveTranscript.innerText = "Analyzing audio...";
+            
+            // Wait 600ms so the user can read "Analyzing...", then close and send
+            setTimeout(() => {
+                toggleVoiceMode(false);
+                sendMessage();
+            }, 600);
+            return; // Exit here so we don't close instantly
         }
     }
+    
+    // If we reach here, there was no text to send, close instantly
+    toggleVoiceMode(false);
 }
 
 let breathInterval; let breathTimeouts = [];
