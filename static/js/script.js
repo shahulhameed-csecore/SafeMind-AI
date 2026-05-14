@@ -1,7 +1,8 @@
 let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
-// 📱 NEW: Mobile Sidebar Drawer Logic
+
+// 📱 Mobile Sidebar Drawer Logic
 function toggleMobileSidebar() {
     const sidebar = document.getElementById('mobile-sidebar');
     const overlay = document.getElementById('mobile-overlay');
@@ -16,12 +17,6 @@ function toggleMobileSidebar() {
     }
 }
 
-// 🎨 Force initialization of Wildflower on mobile without breaking Desktop
-document.addEventListener("DOMContentLoaded", () => {
-    if (window.innerWidth <= 768) {
-        document.body.setAttribute('data-mood', 'wildflower');
-    }
-});
 function toggleThemeMenu() {
     const menu = document.getElementById('theme-menu');
     menu.classList.toggle('active');
@@ -501,12 +496,9 @@ function createRecognition() {
         for (let i = 0; i < event.results.length; i++) {
             let chunk = event.results[i][0].transcript;
             
-            // If the new chunk already contains everything we have so far, 
-            // Android is accumulating the string for us. Replace it.
             if (fullText.trim().length > 0 && chunk.toLowerCase().includes(fullText.toLowerCase().trim())) {
                 fullText = chunk;
             } else {
-                // Otherwise (like on Desktop), it's a new distinct chunk. Append it.
                 fullText += chunk;
             }
         }
@@ -527,10 +519,8 @@ function createRecognition() {
         isListening = false;
         
         if (!manuallyStopped) {
-            // Android stopped it automatically. SEND whatever was captured!
             cleanupVoiceUI(true); 
         } else {
-            // User manually clicked the stop/send button
             cleanupVoiceUI(true);
         }
     };
