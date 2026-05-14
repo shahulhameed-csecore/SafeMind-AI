@@ -124,9 +124,8 @@ body {
    NAVIGATION & UI ELEMENTS
 ========================================== */
 .logo-container { display: flex; align-items: center; gap: 12px; }
-.logo-icon { width: 38px; height: 38px; background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.2)); border: 1px solid var(--primary); box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 0 15px var(--glow-1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: 1s; }
-.logo { font-size: 1.25rem; font-weight: 700; color: var(--text-main); letter-spacing: -0.5px;}
-.logo span { color: var(--primary); text-shadow: 0 0 15px var(--glow-1); }
+.custom-app-logo { height: 45px; width: auto; object-fit: contain; cursor: pointer; transition: transform 0.3s ease; }
+.custom-app-logo:hover { transform: scale(1.05); }
 
 .header-nav { display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 100px; border: 1px solid var(--border-soft); box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
 .header-nav-btn { padding: 8px 24px; border-radius: 100px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; background: transparent; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }

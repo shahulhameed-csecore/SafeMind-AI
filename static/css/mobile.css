@@ -52,8 +52,7 @@
     }
     .mobile-hamburger { display: flex !important; background: transparent; border: none; color: var(--primary); padding: 5px; cursor: pointer; }
     .logo-container { width: 100%; justify-content: space-between; flex-direction: row-reverse; align-items: center; }
-    .logo-icon { width: 32px !important; height: 32px !important; border-radius: 10px !important; background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; color: white !important; }
-    .logo { display: none !important; } 
+    .custom-app-logo { height: 32px !important; width: auto !important; object-fit: contain !important; }
 
     /* 4. Slide-Out Sidebar Drawer (60FPS Hardware Accelerated) */
     .mobile-sidebar-overlay {
