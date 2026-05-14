@@ -47,7 +47,6 @@ function applyTheme(moodId, moodName, primaryHex, secondaryHex) {
     
     setTimeout(() => {
         if(typeof moodChartInstance !== 'undefined' && moodChartInstance) loadMoodChart(); 
-        if(typeof radarChartInstance !== 'undefined' && radarChartInstance && typeof lastEmotionData !== 'undefined' && lastEmotionData) updateEmotionRadar(lastEmotionData);
     }, 300);
 }
 
@@ -100,6 +99,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dot = document.getElementById('current-theme-dot');
     if(dot) dot.style.background = `linear-gradient(135deg, ${currMap.p}, ${currMap.s})`;
 
+    // 🚀 NEW: Load Clinical Safety Plan from local storage
+    const triggers = localStorage.getItem('safeminds_safety_triggers');
+    const coping = localStorage.getItem('safeminds_safety_coping');
+    const contacts = localStorage.getItem('safeminds_safety_contacts');
+    if(triggers && document.getElementById('safety-triggers')) document.getElementById('safety-triggers').value = triggers;
+    if(coping && document.getElementById('safety-coping')) document.getElementById('safety-coping').value = coping;
+    if(contacts && document.getElementById('safety-contacts')) document.getElementById('safety-contacts').value = contacts;
+
     if (document.getElementById("history-list")) {
         await loadSidebarSessions();
         await loadMoodChart();
@@ -107,6 +114,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadMainDashboardChart();
     }
 });
+
+// 🚀 NEW: Save Safety Plan function
+function saveSafetyPlan() {
+    localStorage.setItem('safeminds_safety_triggers', document.getElementById('safety-triggers').value);
+    localStorage.setItem('safeminds_safety_coping', document.getElementById('safety-coping').value);
+    localStorage.setItem('safeminds_safety_contacts', document.getElementById('safety-contacts').value);
+    
+    const msg = document.getElementById('safety-save-msg');
+    msg.style.display = "block";
+    setTimeout(() => { msg.style.display = "none"; }, 3000);
+}
 
 function acceptSafety() {
     localStorage.setItem('safeminds_ftue_accepted', 'true');
@@ -204,41 +222,6 @@ function saveMood(mood) {
     addMessage(`Mood logged: ${mood}.`, "bot");
 }
 
-let radarChartInstance = null;
-let lastEmotionData = null; 
-
-function updateEmotionRadar(emotionData) {
-    if (!emotionData || emotionData.length === 0) return;
-    lastEmotionData = emotionData; 
-    
-    const canvas = document.getElementById('emotionRadarChart');
-    if (!canvas) return;
-    
-    let dominantEmotion = emotionData.reduce((max, obj) => (obj.score > max.score) ? obj : max);
-    document.getElementById('radar-insight-box').style.display = "flex";
-    const emotionName = dominantEmotion.label.charAt(0).toUpperCase() + dominantEmotion.label.slice(1);
-    document.getElementById('radar-insight-text').innerHTML = `My analysis detects <strong>${emotionName}</strong> as your primary emotion.`;
-
-    const labels = ['Joy', 'Surprise', 'Neutral', 'Sadness', 'Fear', 'Disgust', 'Anger'];
-    const dataPoints = labels.map(label => {
-        const found = emotionData.find(e => e.label.toLowerCase() === label.toLowerCase());
-        return found ? (found.score * 100).toFixed(1) : 0;
-    });
-
-    const ctx = canvas.getContext('2d');
-    const theme = getThemeColors(); 
-
-    if (radarChartInstance) radarChartInstance.destroy(); 
-    radarChartInstance = new Chart(ctx, {
-        type: 'radar',
-        data: { labels: labels, datasets: [{ data: dataPoints, backgroundColor: theme.bg, borderColor: theme.line, pointBackgroundColor: theme.point, borderWidth: 2 }] },
-        options: { 
-            responsive: true, maintainAspectRatio: false, 
-            scales: { r: { angleLines: { color: theme.grid }, grid: { color: theme.grid }, pointLabels: { color: theme.text, font: { size: 10, family: 'Plus Jakarta Sans', weight: '600' } }, ticks: { display: false, min: 0, max: 100 } } }, 
-            plugins: { legend: { display: false } } 
-        }
-    });
-}
 
 async function loadSidebarSessions() {
     const historyList = document.getElementById("history-list");
@@ -330,8 +313,6 @@ async function sendMessage() {
         
         addMessage(data.response, "bot", false, data.tool);
         sessionMemory.push({ role: "SafeMind AI", text: data.response });
-        
-        if (data.emotions) updateEmotionRadar(data.emotions);
         
        if (data.audio) {
             let audio = new Audio("data:audio/mp3;base64," + data.audio);
@@ -645,7 +626,6 @@ function togglePanel(panelId, iconElement) {
     if (!isActive) {
         targetPanel.classList.add('active'); iconElement.classList.add('active');
         if (panelId === 'panel-analytics') setTimeout(() => { if (moodChartInstance) moodChartInstance.resize(); }, 300);
-        if (panelId === 'panel-radar') setTimeout(() => { if (radarChartInstance) radarChartInstance.resize(); }, 300); 
     } else {
         document.querySelector('.side-nav-icons .icon-pill').classList.add('active');
     }

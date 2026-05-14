@@ -1,7 +1,7 @@
 import os
 import base64
 import time
-import html  # 🚀 Added for XSS Security
+import html
 from io import BytesIO
 from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -17,7 +17,7 @@ from google.genai import types
 from datetime import datetime, timedelta
 
 load_dotenv()
-from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, analyze_deep_emotion, strip_pii
+from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, strip_pii
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "super_secret_safeminds_key")
@@ -170,7 +170,6 @@ def analyze():
 
     is_crisis = detect_crisis(user_input)
     sentiment = analyze_sentiment(user_input)
-    deep_emotions = analyze_deep_emotion(user_input)
     
     past_memory = retrieve_past_context(user_input)
     augmented_input = f"[Recall from past: {past_memory}]\nUser says: {user_input}" if past_memory else user_input
@@ -213,9 +212,9 @@ def analyze():
         "sentiment": sentiment, 
         "crisis": is_crisis,
         "chat_id": chat_id, 
-        "emotions": deep_emotions,
+        "emotions": [], # 🚀 Radar removed!
         "audio": audio_base64,
-        "tool": agentic_tool # 🧠 Pass the tool decision to the frontend
+        "tool": agentic_tool 
     })
 
 @app.route('/get_sessions', methods=['GET'])
