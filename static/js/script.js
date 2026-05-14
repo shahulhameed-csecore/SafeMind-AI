@@ -306,7 +306,7 @@ async function sendMessage() {
     const icebreakers = document.getElementById("chat-icebreakers");
     if (icebreakers) icebreakers.style.display = "none";
 
-    // 🚀 OPTIMIZATION: Debounce the send button so they can't spam it
+    // Debounce the send button so they can't spam it
     const sendBtn = document.getElementById("send-btn");
     if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = "0.5"; }
 
@@ -348,7 +348,7 @@ async function sendMessage() {
         loadingBubble.remove();
         addMessage("Connection lost.", "bot", true); 
     } finally {
-        // 🚀 OPTIMIZATION: Re-enable the send button after the API is done
+        // Re-enable the send button after the API is done
         if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = "1"; }
     }
 }
@@ -481,7 +481,6 @@ function createRecognition() {
     const langSelector = document.getElementById("mic-lang");
     recog.lang = langSelector ? langSelector.value : "en-US";
 
-    // 🚀 CORRECTED ONSTART: Mobile Hardware Bug Fix
     recog.onstart = () => {
         isListening = true;
         manuallyStopped = false;
@@ -501,11 +500,20 @@ function createRecognition() {
         }
     };
 
-    // 🚀 CORRECTED ONRESULT: Stops the repeating text stutter bug
+    // 🚀 THE ULTIMATE ANDROID DEDUPLICATION ALGORITHM 
     recog.onresult = (event) => {
         let fullText = '';
         for (let i = 0; i < event.results.length; i++) {
-            fullText += event.results[i][0].transcript;
+            let chunk = event.results[i][0].transcript;
+            
+            // If the new chunk already contains everything we have so far, 
+            // Android is accumulating the string for us. Replace it.
+            if (fullText.trim().length > 0 && chunk.toLowerCase().includes(fullText.toLowerCase().trim())) {
+                fullText = chunk;
+            } else {
+                // Otherwise (like on Desktop), it's a new distinct chunk. Append it.
+                fullText += chunk;
+            }
         }
 
         const input = document.getElementById("user-input");
@@ -577,7 +585,7 @@ function cleanupVoiceUI(sendAfter = true) {
     const hasText = input && input.value.trim().length > 0;
 
     if (sendAfter && hasText) {
-        // 🚀 OPTIMIZATION: Show the user we are processing before closing
+        // Show the user we are processing before closing
         const liveTranscript = document.getElementById("live-transcript");
         if (liveTranscript) liveTranscript.innerText = "Analyzing audio...";
         
@@ -814,7 +822,7 @@ const journalFeed = document.getElementById('journal-feed');
 
 let journalRecog = null;
 let isJournalMicActive = false;
-let originalJournalText = ''; // 🚀 Stores text so it isn't deleted
+let originalJournalText = ''; // Stores text so it isn't deleted
 
 function toggleJournalMic() {
     const btn = document.getElementById('journal-mic-btn');
@@ -837,18 +845,24 @@ function toggleJournalMic() {
         isJournalMicActive = true;
         btn.classList.add('recording');
         btn.innerHTML = '🛑';
-        // 🚀 Save what the user already typed before speaking
         originalJournalText = input.value; 
     };
 
+    // 🚀 THE ULTIMATE ANDROID DEDUPLICATION ALGORITHM (Journal)
     journalRecog.onresult = (event) => {
-        // 🚀 Rebuild the spoken string to prevent Android duplication
         let spokenText = '';
         for (let i = 0; i < event.results.length; i++) {
-            spokenText += event.results[i][0].transcript;
+            let chunk = event.results[i][0].transcript;
+            
+            // If chunk already contains our previous accumulated string, replace it
+            if (spokenText.trim().length > 0 && chunk.toLowerCase().includes(spokenText.toLowerCase().trim())) {
+                spokenText = chunk; 
+            } else {
+                spokenText += chunk; 
+            }
         }
         
-        // Combine the old typed text with the new spoken text cleanly
+        // Combine the old typed text with the new deduplicated spoken text cleanly
         input.value = originalJournalText + (originalJournalText.endsWith(' ') || originalJournalText === '' ? '' : ' ') + spokenText;
     };
 
