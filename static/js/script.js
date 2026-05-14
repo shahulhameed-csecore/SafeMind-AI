@@ -462,6 +462,7 @@ function toggleVoiceMode(show) {
     }
 }
 
+
 function createRecognition() {
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -480,6 +481,7 @@ function createRecognition() {
     const langSelector = document.getElementById("mic-lang");
     recog.lang = langSelector ? langSelector.value : "en-US";
 
+    // 🚀 CORRECTED ONSTART: Mobile Hardware Bug Fix
     recog.onstart = () => {
         isListening = true;
         manuallyStopped = false;
@@ -492,21 +494,20 @@ function createRecognition() {
         if (liveTranscript) liveTranscript.innerText = "Listening...";
 
         toggleVoiceMode(true);
-        startVoiceVisualizer(); 
+        
+        // Only run the visualizer on Desktop to prevent Android Mic Stealing
+        if (window.innerWidth > 768) {
+            startVoiceVisualizer(); 
+        }
     };
 
+    // 🚀 CORRECTED ONRESULT: Stops the repeating text stutter bug
     recog.onresult = (event) => {
-        let interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            const transcript = event.results[i][0].transcript;
-            if (event.results[i].isFinal) {
-                finalTranscript += transcript + ' ';
-            } else {
-                interimTranscript += transcript;
-            }
+        let fullText = '';
+        for (let i = 0; i < event.results.length; i++) {
+            fullText += event.results[i][0].transcript;
         }
 
-        const fullText = finalTranscript + interimTranscript;
         const input = document.getElementById("user-input");
         if (input) input.value = fullText;
 
@@ -519,25 +520,18 @@ function createRecognition() {
         stopListening(false);
     };
 
-recog.onstart = () => {
-        isListening = true;
-        manuallyStopped = false;
-        finalTranscript = '';
-
-        const input = document.getElementById("user-input");
-        if (input) input.value = '';
-
-        const liveTranscript = document.getElementById("live-transcript");
-        if (liveTranscript) liveTranscript.innerText = "Listening...";
-
-        toggleVoiceMode(true);
+    recog.onend = () => {
+        isListening = false;
         
-        // 🚀 MOBILE FIX: Only run the visualizer on Desktop. 
-        // If we run it on a phone, it steals the microphone from the AI!
-        if (window.innerWidth > 768) {
-            startVoiceVisualizer(); 
+        if (!manuallyStopped) {
+            // Android stopped it automatically. SEND whatever was captured!
+            cleanupVoiceUI(true); 
+        } else {
+            // User manually clicked the stop/send button
+            cleanupVoiceUI(true);
         }
     };
+    
     return recog;
 }
 
@@ -820,6 +814,7 @@ const journalFeed = document.getElementById('journal-feed');
 
 let journalRecog = null;
 let isJournalMicActive = false;
+let originalJournalText = ''; // 🚀 Stores text so it isn't deleted
 
 function toggleJournalMic() {
     const btn = document.getElementById('journal-mic-btn');
@@ -842,14 +837,19 @@ function toggleJournalMic() {
         isJournalMicActive = true;
         btn.classList.add('recording');
         btn.innerHTML = '🛑';
+        // 🚀 Save what the user already typed before speaking
+        originalJournalText = input.value; 
     };
 
     journalRecog.onresult = (event) => {
-        let final = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) final += event.results[i][0].transcript + ' ';
+        // 🚀 Rebuild the spoken string to prevent Android duplication
+        let spokenText = '';
+        for (let i = 0; i < event.results.length; i++) {
+            spokenText += event.results[i][0].transcript;
         }
-        if(final) input.value += final;
+        
+        // Combine the old typed text with the new spoken text cleanly
+        input.value = originalJournalText + (originalJournalText.endsWith(' ') || originalJournalText === '' ? '' : ' ') + spokenText;
     };
 
     journalRecog.onend = () => {
