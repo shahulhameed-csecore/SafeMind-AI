@@ -1,0 +1,213 @@
+/* =========================================================
+   📱 SAFEMIND AI - PREMIUM MOBILE UI (NATIVE APP FEEL)
+========================================================= */
+
+@media screen and (max-width: 768px) {
+    /* 1. Global Viewport & Safe Area Locks */
+    body {
+        height: 100dvh !important; /* Prevents keyboard crush */
+        width: 100vw !important;
+        overflow: hidden !important;
+        background: var(--bg-base) !important;
+        -webkit-font-smoothing: antialiased;
+    }
+    
+    .app-layout { 
+        padding: 0 !important; 
+        height: 100dvh !important;
+    }
+    
+    .workspace { 
+        padding: 0 !important; 
+        gap: 0 !important; 
+        flex-direction: column !important; 
+        height: 100% !important; 
+    }
+
+    /* 2. Hide Desktop Elements Completely */
+    .side-nav-icons, .desktop-avatar, .header-nav, .desktop-only-icon, .right-col { 
+        display: none !important; 
+    }
+    .theme-option:nth-child(n+3) { 
+        display: none !important; 
+    }
+
+    /* 3. Premium Sticky Header (Glassmorphism) */
+    .top-header {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 1000 !important;
+        border-radius: 0 0 24px 24px !important;
+        padding: env(safe-area-inset-top, 15px) 20px 15px 20px !important;
+        background: rgba(10, 10, 15, 0.65) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        margin: 0 !important;
+    }
+    .logo-icon { width: 30px !important; height: 30px !important; border-radius: 8px !important; }
+    .logo { font-size: 1.15rem !important; }
+    .theme-toggle-btn { padding: 8px !important; border-radius: 50% !important; width: 38px !important; height: 38px !important; justify-content: center !important; background: rgba(255,255,255,0.05) !important;}
+    .theme-toggle-btn svg { display: none !important; }
+    #current-theme-name { display: none !important; }
+    
+    /* Compact Breathe Button */
+    .breathe-sos-btn span { display: none !important; }
+    .breathe-sos-btn { width: 38px !important; height: 38px !important; padding: 0 !important; justify-content: center !important; border-radius: 50% !important; background: rgba(255,255,255,0.05) !important; box-shadow: none !important;}
+    .breathe-sos-btn svg { margin: 0 !important; width: 18px !important; height: 18px !important; }
+
+    /* 4. Chat Area Layout */
+    .view-container { border-radius: 0 !important; height: 100% !important; }
+    .view-panel { border-radius: 0 !important; height: 100% !important; padding-top: 80px !important; }
+    
+    #view-chat { 
+        display: flex !important; 
+        flex-direction: column !important; 
+        height: 100dvh !important; 
+        background: transparent !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* 5. Modern Native App Chat Bubbles */
+    .chat-box { 
+        flex-grow: 1 !important; 
+        padding: 10px 15px !important; 
+        overflow-y: auto !important; 
+        scroll-behavior: smooth !important;
+        padding-bottom: calc(160px + env(safe-area-inset-bottom)) !important; /* Prevents text hiding behind input */
+    }
+    .msg { 
+        max-width: 88% !important; 
+        padding: 14px 18px !important; 
+        line-height: 1.5 !important; 
+        font-size: 0.95rem !important; 
+        margin-bottom: 15px !important; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+    }
+    .msg.bot { 
+        border-radius: 20px 20px 20px 4px !important; 
+        background: rgba(30, 30, 40, 0.6) !important; 
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important; 
+    }
+    .msg.user { 
+        border-radius: 20px 20px 4px 20px !important; 
+        background: linear-gradient(135deg, var(--primary), var(--secondary)) !important; 
+    }
+
+    /* 6. Horizontal Scroll Snap Icebreakers */
+    .chat-icebreakers {
+        display: flex !important;
+        width: 100vw !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 0 15px 10px 15px !important;
+        gap: 12px !important;
+        margin-bottom: 0 !important;
+    }
+    .chat-icebreakers::-webkit-scrollbar { display: none !important; }
+    .icebreaker-chip {
+        scroll-snap-align: start !important;
+        flex-shrink: 0 !important;
+        background: rgba(30, 30, 40, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 100px !important;
+        padding: 10px 18px !important;
+        font-size: 0.85rem !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+        color: rgba(255,255,255,0.9) !important;
+    }
+
+    /* 7. Floating Pill Input Area */
+    .input-area {
+        position: fixed !important;
+        bottom: calc(85px + env(safe-area-inset-bottom)) !important;
+        left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+        background: transparent !important;
+        z-index: 999 !important;
+        display: flex !important; 
+        flex-direction: column !important; 
+        align-items: center !important;
+    }
+    .input-wrapper {
+        width: 92% !important;
+        background: rgba(20, 20, 25, 0.85) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 100px !important;
+        padding: 6px 8px 6px 20px !important;
+        gap: 8px !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5) !important;
+    }
+    
+    /* 🚀 Fix iOS Auto-Zoom */
+    .input-wrapper input, .clinical-input, .clinical-select, #journal-input, .burn-textarea { 
+        font-size: 16px !important; 
+    }
+    
+    .input-wrapper input { min-width: 0 !important; height: 42px !important; padding: 0 !important; }
+    .send-btn, .icon-btn { width: 42px !important; height: 42px !important; flex-shrink: 0 !important; border-radius: 50% !important; }
+    .lang-toggle-btn { padding: 8px 12px !important; font-size: 0.8rem !important; border-radius: 100px !important; }
+
+    /* 8. Floating Dock Bottom Navigation */
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: calc(15px + env(safe-area-inset-bottom)) !important;
+        left: 5% !important;
+        width: 90% !important;
+        height: 65px !important;
+        background: rgba(15, 15, 20, 0.75) !important;
+        backdrop-filter: blur(30px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 100px !important;
+        justify-content: space-evenly !important;
+        align-items: center !important;
+        z-index: 1000 !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6) !important;
+        padding: 0 5px !important;
+    }
+    .mobile-nav-item {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        color: rgba(255, 255, 255, 0.4) !important;
+        height: 100% !important;
+        background: transparent !important;
+        border: none !important;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+    .mobile-nav-item svg { width: 22px !important; height: 22px !important; transition: 0.3s ease !important; }
+    .mobile-nav-item span { font-size: 0.65rem !important; font-weight: 600 !important; }
+    
+    .mobile-nav-item.active {
+        color: var(--primary) !important;
+        transform: translateY(-4px) !important;
+    }
+    .mobile-nav-item.active svg { filter: drop-shadow(0 0 8px var(--primary)) !important; }
+
+    /* 9. Dashboard & Journal Tweaks */
+    #view-dashboard, #view-journal { padding: 15px !important; padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important; }
+    .dash-card, .metric-card { padding: 20px !important; border-radius: 24px !important; }
+    .dash-grid-4 { grid-template-columns: 1fr 1fr !important; gap: 15px !important; } /* 2x2 grid on mobile */
+
+    /* 10. Tap & Touch Animations */
+    .send-btn:active, .mic-btn:active, .icebreaker-chip:active, .mobile-nav-item:active {
+        transform: scale(0.92) !important;
+    }
+}

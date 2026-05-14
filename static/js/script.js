@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const dot = document.getElementById('current-theme-dot');
     if(dot) dot.style.background = `linear-gradient(135deg, ${currMap.p}, ${currMap.s})`;
 
-    // 🚀 NEW: Load Clinical Safety Plan from local storage
+    // Load Clinical Safety Plan from local storage
     const triggers = localStorage.getItem('safeminds_safety_triggers');
     const coping = localStorage.getItem('safeminds_safety_coping');
     const contacts = localStorage.getItem('safeminds_safety_contacts');
@@ -115,7 +115,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// 🚀 NEW: Save Safety Plan function
 function saveSafetyPlan() {
     localStorage.setItem('safeminds_safety_triggers', document.getElementById('safety-triggers').value);
     localStorage.setItem('safeminds_safety_coping', document.getElementById('safety-coping').value);
@@ -289,7 +288,6 @@ async function sendMessage() {
     const icebreakers = document.getElementById("chat-icebreakers");
     if (icebreakers) icebreakers.style.display = "none";
 
-    // Debounce the send button so they can't spam it
     const sendBtn = document.getElementById("send-btn");
     if (sendBtn) { sendBtn.disabled = true; sendBtn.style.opacity = "0.5"; }
 
@@ -329,7 +327,6 @@ async function sendMessage() {
         loadingBubble.remove();
         addMessage("Connection lost.", "bot", true); 
     } finally {
-        // Re-enable the send button after the API is done
         if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = "1"; }
     }
 }
@@ -413,7 +410,6 @@ function clearChat() {
 
 document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
 
-
 let recognition = null;
 let isListening = false;
 let finalTranscript = '';
@@ -442,7 +438,6 @@ function toggleVoiceMode(show) {
         }
     }
 }
-
 
 function createRecognition() {
 
@@ -481,7 +476,6 @@ function createRecognition() {
         }
     };
 
-    // 🚀 THE ULTIMATE ANDROID DEDUPLICATION ALGORITHM 
     recog.onresult = (event) => {
         let fullText = '';
         for (let i = 0; i < event.results.length; i++) {
@@ -566,17 +560,14 @@ function cleanupVoiceUI(sendAfter = true) {
     const hasText = input && input.value.trim().length > 0;
 
     if (sendAfter && hasText) {
-        // Show the user we are processing before closing
         const liveTranscript = document.getElementById("live-transcript");
         if (liveTranscript) liveTranscript.innerText = "Analyzing audio...";
         
-        // Wait 800ms so the user can see the text, then close and send
         setTimeout(() => {
             toggleVoiceMode(false);
             sendMessage();
         }, 800); 
     } else {
-        // If no text was captured, close instantly
         toggleVoiceMode(false);
     }
 }
@@ -802,7 +793,7 @@ const journalFeed = document.getElementById('journal-feed');
 
 let journalRecog = null;
 let isJournalMicActive = false;
-let originalJournalText = ''; // Stores text so it isn't deleted
+let originalJournalText = '';
 
 function toggleJournalMic() {
     const btn = document.getElementById('journal-mic-btn');
@@ -828,21 +819,16 @@ function toggleJournalMic() {
         originalJournalText = input.value; 
     };
 
-    // 🚀 THE ULTIMATE ANDROID DEDUPLICATION ALGORITHM (Journal)
     journalRecog.onresult = (event) => {
         let spokenText = '';
         for (let i = 0; i < event.results.length; i++) {
             let chunk = event.results[i][0].transcript;
-            
-            // If chunk already contains our previous accumulated string, replace it
             if (spokenText.trim().length > 0 && chunk.toLowerCase().includes(spokenText.toLowerCase().trim())) {
                 spokenText = chunk; 
             } else {
                 spokenText += chunk; 
             }
         }
-        
-        // Combine the old typed text with the new deduplicated spoken text cleanly
         input.value = originalJournalText + (originalJournalText.endsWith(' ') || originalJournalText === '' ? '' : ' ') + spokenText;
     };
 
