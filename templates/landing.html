@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SafeMind AI | Emotional Sanctuary</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* Variables & Reset */
         :root {
             --bg-dark: #03050a;
             --neon-blue: #4A90E2;
-            --neon-purple: #8b5cf6;
             --text-light: #f8fafc;
             --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-highlight: rgba(255, 255, 255, 0.15);
             --glow-primary: rgba(74, 144, 226, 0.3);
-            --glow-secondary: rgba(139, 92, 246, 0.3);
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-dark);
@@ -36,7 +32,6 @@
                 radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08), transparent 25%);
             animation: pulseGlow 15s ease-in-out infinite alternate;
         }
-
         .noise {
             position: fixed; inset: 0; z-index: -1; opacity: 0.03; pointer-events: none;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -46,57 +41,25 @@
         nav {
             position: fixed; top: 0; left: 0; width: 100%;
             padding: 20px 5%; display: flex; justify-content: space-between; align-items: center;
-            background: rgba(3, 5, 10, 0.7); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border);
+            background: rgba(3, 5, 10, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--glass-border);
             z-index: 1000;
         }
-
-        /* 🚀 PREMIUM LOGO TEXT & GLOW (FIXED FOR VISIBILITY) */
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 1.6rem; /* Slightly larger text */
-            font-weight: 800; /* Bolder text */
-            text-transform: uppercase; /* More premium look */
-            letter-spacing: 0.5px;
-            color: #ffffff; /* Brighter, forced white text */
-            
-            /* Powerful glow effect on the main text */
-            text-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px var(--neon-blue), 0 0 45px var(--glow-primary); 
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
         
-        .logo:hover {
-            color: var(--neon-blue) !important;
-            text-shadow: 0 0 20px rgba(255,255,255,1), 0 0 40px var(--neon-blue), 0 0 60px var(--glow-primary); 
-            transform: scale(1.03);
+        .logo {
+            display: flex; align-items: center; gap: 12px;
+            font-size: 1.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;
+            color: #ffffff; text-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px var(--neon-blue); 
+            transition: all 0.3s ease; cursor: pointer; text-decoration: none;
         }
-
-        .logo-icon-container {
-            width: 40px; height: 40px; 
-            border-radius: 12px; 
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(0,0,0,0.3));
-            border: 1px solid var(--neon-blue);
-            display: flex; justify-content: center; align-items: center;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 0 15px var(--glow-primary);
-        }
-
+        .logo:hover { transform: scale(1.02); }
+        .logo-ai { color: var(--neon-blue); font-weight: 900; }
+        
         .premium-circle-logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            object-position: center;
-            background: #0a0a0a;
-            border: 2px solid var(--neon-blue); /* Updated glowing ring color to blue */
-            box-shadow: 0 0 10px rgba(74, 144, 226, 0.4); /* Blue glow */
-            padding: 2px;
-        }
-
-        .logo-ai {
-            color: var(--neon-blue) !important; /* Specific color for AI */
-            font-weight: 900;
+            width: 36px; height: 36px; border-radius: 50%;
+            object-fit: cover; object-position: center;
+            background: #0a0a0a; border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 12px rgba(74, 144, 226, 0.5); padding: 2px;
         }
 
         .nav-links { display: flex; gap: 30px; list-style: none; }
@@ -104,56 +67,56 @@
         .nav-links a:hover { color: #fff; }
 
         .nav-btn {
-            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-highlight);
+            background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--glass-border); 
             padding: 10px 24px; border-radius: 100px; text-decoration: none; font-weight: 600; font-size: 0.9rem;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            backdrop-filter: blur(10px);
+            transition: all 0.3s ease; backdrop-filter: blur(10px);
         }
         .nav-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--neon-blue); box-shadow: 0 10px 30px rgba(74, 144, 226, 0.2); transform: translateY(-2px); }
 
-        /* Giant Text */
+        /* Giant Text Background */
         .giant-bg-text {
-            position: absolute; top: 15vh; left: 50%; transform: translateX(-50%);
-            font-family: 'Space Grotesk', sans-serif; font-size: 20vw; font-weight: 900;
-            color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.03);
-            white-space: nowrap; z-index: -1; pointer-events: none; user-select: none;
-            letter-spacing: -0.05em;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Space Grotesk', sans-serif; font-size: 15vw; font-weight: 900;
+            color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,0.03);
+            white-space: nowrap; z-index: 0; pointer-events: none; user-select: none;
         }
 
-        /* Hero Image Layout */
-        .hero-image-container {
-            width: 100%; height: 60vh;
-            display: flex; justify(center; align-items: flex-end;
-            margin-top: 80px; position: relative;
+        /* 🚀 PERFECT 2-COLUMN HERO SECTION */
+        .hero-section {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 140px 8% 60px 8%; min-height: 100vh;
+            position: relative; z-index: 10; max-width: 1600px; margin: 0 auto;
         }
-        
+        .hero-content {
+            flex: 1; max-width: 650px;
+        }
+        .hero-image-container {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+        }
         .hero-image-container img {
-            height: 100%; width: auto; object-fit: contain;
-            filter: drop-shadow(0 0 40px rgba(74, 144, 226, 0.15));
+            width: 100%; max-width: 500px; height: auto; object-fit: contain;
+            filter: drop-shadow(0 0 40px rgba(74, 144, 226, 0.2));
             animation: float 6s ease-in-out infinite;
         }
 
-        /* Bottom Hero Content */
-        .hero-bottom {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            padding: 0 10%; margin-top: -50px; position: relative; z-index: 10;
-        }
-
+        /* Hero Text */
         .tagline {
-            font-size: 3.5rem; font-weight: 700; line-height: 1.1; letter-spacing: -1px;
-            color: #fff; text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-size: 4.2rem; font-weight: 800; line-height: 1.1; letter-spacing: -1.5px;
+            color: #fff; margin-bottom: 40px; text-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .tagline span {
             background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
+        /* Buttons & Trust Badges */
         .cta-btn {
             display: inline-flex; align-items: center; gap: 12px;
             background: #D4FF00; color: #000; text-decoration: none;
             padding: 18px 36px; border-radius: 100px; font-weight: 700; font-size: 1.1rem;
             transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 15px 35px rgba(212, 255, 0, 0.2), inset 0 -3px 5px rgba(0,0,0,0.1);
+            margin-bottom: 50px;
         }
         .cta-btn:hover {
             transform: translateY(-5px); box-shadow: 0 20px 45px rgba(212, 255, 0, 0.4);
@@ -162,78 +125,72 @@
         .cta-btn svg { transition: transform 0.3s; }
         .cta-btn:hover svg { transform: translateX(5px); }
 
-        /* Trusted By */
-        .trusted-by {
-            margin-top: 80px; padding: 0 10%; text-align: left;
-        }
-        .trusted-by p { color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;}
-        .brand-logos { display: flex; gap: 40px; opacity: 0.5; filter: grayscale(100%) contrast(200%); }
-        .brand-logos img { height: 30px; width: auto; }
+        .trusted-by p { color: #64748b; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px;}
+        .brand-logos { display: flex; gap: 30px; opacity: 0.6; filter: grayscale(100%); transition: 0.3s; }
+        .brand-logos:hover { opacity: 1; filter: grayscale(0%); }
+        .brand-item { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.1rem; color: #fff;}
 
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-20px); } 100% { transform: translateY(0px); } }
 
+        /* Responsive Mobile Design */
         @media (max-width: 1024px) {
-            .hero-bottom { flex-direction: column; align-items: center; text-align: center; gap: 40px; margin-top: 20px;}
-            .tagline { font-size: 2.8rem; }
-            .trusted-by { text-align: center; }
-            .brand-logos { justify-content: center; flex-wrap: wrap; }
+            .tagline { font-size: 3.2rem; }
         }
-
         @media (max-width: 768px) {
             .nav-links { display: none; }
-            .giant-bg-text { display: none; }
-            .tagline { font-size: 2.2rem; }
-            .hero-image-container { height: 45vh; margin-top: 100px; }
-            .cta-btn { width: 100%; justify-content: center; }
+            .giant-bg-text { font-size: 22vw; }
+            .hero-section { flex-direction: column-reverse; text-align: center; padding-top: 120px; }
+            .hero-content { display: flex; flex-direction: column; align-items: center; }
+            .hero-image-container { margin-bottom: 40px; }
+            .hero-image-container img { max-width: 300px; }
+            .tagline { font-size: 2.5rem; }
+            .brand-logos { justify-content: center; flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
-
     <div class="bg-gradient"></div>
     <div class="noise"></div>
 
-    <div class="container">
-        <nav>
-            <div class="logo">
-                <div class="logo-icon-container">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" class="premium-circle-logo" alt="SafeMind Logo">
-                </div>
-                <span>SafeMind</span> <span class="logo-ai">AI</span>
-            </div>
-            <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#privacy">Privacy & Security</a></li>
-                <li><a href="#" style="color: #ef4444; font-weight: 600; text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);">Emergency Help</a></li>
-            </ul>
-            <a href="{{ url_for('login') }}" class="nav-btn">Launch App</a>
-        </nav>
+    <nav>
+        <a href="#" class="logo">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" class="premium-circle-logo" alt="SafeMind Logo">
+            SafeMind <span class="logo-ai">AI</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#privacy">Privacy & Security</a></li>
+            <li><a href="#" style="color: #ef4444; font-weight: 600;">Emergency Help</a></li>
+        </ul>
+        <a href="{{ url_for('login') }}" class="nav-btn">Launch App</a>
+    </nav>
 
-        <div class="giant-bg-text">SAFEMINDS</div>
+    <div class="giant-bg-text">SAFEMINDS</div>
 
-        <div class="hero-image-container">
-            <img src="{{ url_for('static', filename='images/robot-hand1.png') }}" alt="SafeMinds AI">
-        </div>
-
-        <div class="hero-bottom">
+    <div class="hero-section">
+        <div class="hero-content">
             <h1 class="tagline">Your intelligent <span>shield</span><br>for a safer digital mind.</h1>
             <a href="{{ url_for('register') }}" class="cta-btn">
                 Try SafeMind for free 
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </a>
+            
+            <div class="trusted-by">
+                <p>Built with enterprise security</p>
+                <div class="brand-logos">
+                    <div class="brand-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> SOC2 Certified
+                    </div>
+                    <div class="brand-item">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> HIPAA Compliant
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="trusted-by">
-            <p>Built with enterprise security</p>
-            <div class="brand-logos">
-                <span style="font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> SOC2 Certified
-                </span>
-                <span style="font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg> HIPAA Compliant
-                </span>
-            </div>
+        <div class="hero-image-container">
+            <img src="{{ url_for('static', filename='images/robot-hand1.png') }}" alt="SafeMinds AI">
         </div>
     </div>
 
