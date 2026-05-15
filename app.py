@@ -163,7 +163,11 @@ def analyze():
 
     data = request.json
     user_input = data.get('message')
-    chat_history = data.get('history', [])
+    
+    # 🚀 FIX 1: Force payload to be small on the backend (drastically increases speed)
+    raw_history = data.get('history', [])
+    chat_history = raw_history[-4:] if len(raw_history) > 4 else raw_history
+    
     session_id = data.get('session_id')
     user_id = session.get('user_id')
     user_lang = data.get('language', 'en-US')[:2] 

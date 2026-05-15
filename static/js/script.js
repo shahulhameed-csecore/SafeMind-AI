@@ -319,7 +319,7 @@ async function sendMessage() {
 
         const response = await fetch("/analyze", { 
             method: "POST", headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ message: message, history: sessionMemory.slice(-12), session_id: currentSessionId, language: selectedLang }) 
+            body: JSON.stringify({ message: message, history: sessionMemory.slice(-4), session_id: currentSessionId, language: selectedLang })
         });
         const data = await response.json();
         loadingBubble.remove();
