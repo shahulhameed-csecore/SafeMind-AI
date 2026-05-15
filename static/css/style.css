@@ -124,9 +124,37 @@ body {
    NAVIGATION & UI ELEMENTS
 ========================================== */
 .logo-container { display: flex; align-items: center; gap: 12px; }
-.custom-app-logo { height: 45px; width: auto; object-fit: contain; cursor: pointer; transition: transform 0.3s ease; }
-.custom-app-logo:hover { transform: scale(1.05); }
+/* 🚀 PREMIUM CIRCULAR LOGO UI */
+.premium-circle-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover; /* Crops the rectangle perfectly into a circle */
+    object-position: center;
+    background: #0a0a0a; /* Dark background to match your logo */
+    border: 2px solid var(--primary, #D4FF00); /* Glowing ring */
+    box-shadow: 0 0 15px var(--glow-1, rgba(212, 255, 0, 0.4));
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    padding: 3px; /* Creates a nice inner gap */
+}
 
+/* Hover Effect: Rotates slightly, grows, and glows brighter */
+.premium-circle-logo:hover {
+    transform: scale(1.15) rotate(8deg);
+    box-shadow: 0 0 25px var(--primary, #D4FF00);
+    border-color: #ffffff;
+}
+
+/* Larger size specifically for the Login/Register Page */
+.auth-logo-custom {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 20px auto;
+    display: block;
+    border-width: 3px;
+    box-shadow: 0 0 25px rgba(212, 255, 0, 0.5);
+}
 .header-nav { display: flex; gap: 8px; background: rgba(0,0,0,0.2); padding: 6px; border-radius: 100px; border: 1px solid var(--border-soft); box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
 .header-nav-btn { padding: 8px 24px; border-radius: 100px; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; background: transparent; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .header-nav-btn:hover { color: var(--text-main); }
