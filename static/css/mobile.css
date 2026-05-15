@@ -52,6 +52,8 @@
     }
     .mobile-hamburger { display: flex !important; background: transparent; border: none; color: var(--primary); padding: 5px; cursor: pointer; }
     .logo-container { width: 100%; justify-content: space-between; flex-direction: row-reverse; align-items: center; }
+    
+    /* 🚀 FIX: Ensure the circular logo looks perfect on the mobile header */
     .premium-circle-logo {
         width: 38px !important;
         height: 38px !important;
@@ -64,7 +66,6 @@
     /* 4. Slide-Out Sidebar Drawer (60FPS Hardware Accelerated) */
     .mobile-sidebar-overlay {
         position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
-        /* 🚀 Removed the blur filter here to instantly stop mobile processor lag */
         background: rgba(20, 15, 40, 0.5) !important; 
         z-index: 2000 !important; opacity: 0; pointer-events: none !important; 
         transition: opacity 0.25s ease !important;
@@ -80,13 +81,11 @@
         padding: env(safe-area-inset-top, 30px) 20px 30px 20px !important;
         z-index: 2001 !important;
         
-        /* 🚀 Forces the phone's GPU to handle the slide instead of the CPU */
         transform: translateX(-100%) translateZ(0) !important;
         will-change: transform !important;
         -webkit-backface-visibility: hidden !important;
         backface-visibility: hidden !important;
         
-        /* Optimized shadow paints faster on scrolling */
         box-shadow: 10px 0 25px rgba(0,0,0,0.08) !important; 
         display: flex !important; flex-direction: column !important; align-items: flex-start !important; gap: 10px !important;
         transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -105,6 +104,7 @@
         background: transparent !important; color: var(--text-muted) !important;
     }
     .icon-pill.active { background: rgba(124, 92, 252, 0.08) !important; color: var(--primary) !important; box-shadow: none !important; transform: none !important; }
+    
     /* 5. Chat Interface Redesign */
     .view-container { border-radius: 0 !important; height: 100% !important; background: var(--bg-base) !important; }
     .view-panel { 
@@ -114,7 +114,6 @@
         background: transparent !important; 
         box-shadow: none !important; 
         border: none !important;
-        /* 🚀 Add these three lines to make tab-switching flawless */
         will-change: transform, opacity !important;
         -webkit-backface-visibility: hidden !important;
         backface-visibility: hidden !important;
@@ -162,7 +161,7 @@
         align-items: center !important;
         justify-content: space-between !important;
         background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(15px) !important; /* Speed optimized */
+        backdrop-filter: blur(15px) !important;
         -webkit-backdrop-filter: blur(15px) !important;
         border: 1px solid var(--border-soft) !important; 
         border-radius: 100px !important;
@@ -177,7 +176,7 @@
         color: var(--text-main) !important; 
         height: 42px !important; 
         padding: 0 !important;
-        flex: 1 1 auto !important; /* Allows shrinking */
+        flex: 1 1 auto !important;
         min-width: 50px !important;
         background: transparent !important;
         border: none !important;
@@ -185,7 +184,6 @@
     }
     .input-wrapper input::placeholder { color: rgba(45, 31, 85, 0.4) !important; }
     
-    /* Strict sizing for buttons to prevent squeezing */
     .send-btn, .icon-btn, .lang-toggle-btn { flex: 0 0 auto !important; }
     .send-btn, .icon-btn { width: 40px !important; height: 40px !important; border-radius: 50% !important; display: flex !important; align-items: center !important; justify-content: center !important;}
     .lang-toggle-btn { padding: 6px 10px !important; font-size: 0.8rem !important; border-radius: 100px !important; }
@@ -202,7 +200,7 @@
     .clinical-modal-content h2 { font-size: 1.5rem !important; color: var(--text-main) !important; }
     .clinical-modal-content p { color: var(--text-muted) !important; font-size: 0.9rem !important; }
     .clinical-label {
-        white-space: normal !important; /* Forces text to wrap instead of cutting off */
+        white-space: normal !important;
         font-size: 0.95rem !important;
         line-height: 1.4 !important;
         display: block !important;
@@ -224,6 +222,5 @@
     .journal-card { background: #FFFFFF !important; }
     .journal-text { color: var(--text-main) !important; }
 
-    /* Fix side panels over mobile */
     .side-panel { background: #FFFFFF !important; width: 100vw !important; left: 0 !important; border-radius: 32px 32px 0 0 !important; top: 60px !important; height: calc(100vh - 60px) !important; box-shadow: 0 -20px 50px rgba(0,0,0,0.1) !important; }
 }
