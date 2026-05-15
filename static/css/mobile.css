@@ -51,7 +51,35 @@
         transform: translateZ(0); /* Hardware acceleration */
     }
     .mobile-hamburger { display: flex !important; background: transparent; border: none; color: var(--primary); padding: 5px; cursor: pointer; }
-    .logo-container { width: 100%; justify-content: space-between; flex-direction: row-reverse; align-items: center; }
+    /* 🚀 FIX: Proper layout for the header (Left Logo, Right Menu) */
+    .logo-container { 
+        width: 100%; 
+        display: flex !important;
+        justify-content: space-between !important; 
+        align-items: center !important;
+        flex-direction: row !important; 
+        position: relative !important;
+    }
+
+    /* 🚀 FIX: Perfectly centers the title with a premium bold font */
+    .logo {
+        display: block !important;
+        position: absolute !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        font-size: 1.35rem !important;
+        font-weight: 800 !important;
+        color: var(--text-main) !important;
+        letter-spacing: -0.5px !important;
+        white-space: nowrap !important;
+        margin: 0 !important;
+        text-shadow: 0 4px 10px rgba(124, 92, 252, 0.1) !important;
+    }
+    
+    .logo span {
+        color: var(--primary) !important;
+    }
     
     /* 🚀 FIX: Ensure the circular logo looks perfect on the mobile header */
     .premium-circle-logo {

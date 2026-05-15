@@ -87,12 +87,15 @@
 
     <div class="app-layout">
         <header class="glass-panel top-header">
+            
             <div class="logo-container">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SafeMind AI" class="premium-circle-logo">
+                
+                <div class="logo">SafeMind <span>AI</span></div>
+
                 <button class="mobile-hamburger" onclick="toggleMobileSidebar()" aria-label="Open Menu">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
-                
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="SafeMind AI" class="premium-circle-logo">
             </div>
 
             <div class="header-nav">
