@@ -579,20 +579,12 @@ function stopListening(sendAfter = true) {
 function cleanupVoiceUI(sendAfter = true) {
     stopVoiceVisualizer();
 
-    const input = document.getElementById("user-input");
-    const hasText = input && input.value.trim().length > 0;
+    // 1. Close the microphone overlay UI
+    toggleVoiceMode(false);
 
-    if (sendAfter && hasText) {
-        const liveTranscript = document.getElementById("live-transcript");
-        if (liveTranscript) liveTranscript.innerText = "Analyzing audio...";
-        
-        setTimeout(() => {
-            toggleVoiceMode(false);
-            sendMessage();
-        }, 800); 
-    } else {
-        toggleVoiceMode(false);
-    }
+    // 2. We completely REMOVED the setTimeout and sendMessage() trigger here!
+    // Now, the microphone turns off, the overlay closes, and your spoken text
+    // is waiting perfectly in the standard chat box for you to review, edit, and send manually.
 }
 
 let breathInterval; let breathTimeouts = [];
