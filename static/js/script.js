@@ -231,8 +231,21 @@ async function loadMoodChart() {
     } catch (error) { console.error("Chart error:", error); }
 }
 
-function saveMood(mood) {
-    fetch("/save_mood", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ mood: mood }) }).then(() => loadMoodChart());
+// 🚀 FIX: Automatically updates the entire Dashboard when a mood is clicked
+async function saveMood(mood) {
+    // 1. Save to database
+    await fetch("/save_mood", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" }, 
+        body: JSON.stringify({ mood: mood }) 
+    });
+    
+    // 2. Refresh ALL charts and stats instantly without refreshing the page
+    await loadMoodChart();
+    await loadDashboardStats();
+    await loadMainDashboardChart();
+    
+    // 3. Show message in chat
     addMessage(`Mood logged: ${mood}.`, "bot");
 }
 
