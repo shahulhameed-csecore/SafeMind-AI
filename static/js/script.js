@@ -183,9 +183,17 @@ function playCloudAudio(base64Audio) {
 }
 
 function stopSpeech() {
+    // 🚀 NEW: If the AI is still "Thinking", kill the network request instantly!
+    if (abortController) {
+        abortController.abort();
+        abortController = null;
+    }
+
+    // Existing logic to stop audio if it is already talking
     window.speechSynthesis.cancel(); 
     if (window.currentAudio) { window.currentAudio.pause(); window.currentAudio.currentTime = 0; }
     isSpeaking = false; 
+    
     const stopBtn = document.getElementById('stop-audio-btn');
     if(stopBtn) stopBtn.style.display = 'none';
 }
@@ -307,6 +315,8 @@ function sendIcebreaker(text) {
     }
 }
 
+let abortController = null; // 🚀 ADD THIS LINE AT THE TOP OF THE FUNCTION
+
 async function sendMessage() {
     const input = document.getElementById("user-input");
     const message = input.value.trim();
@@ -327,13 +337,26 @@ async function sendMessage() {
     if(liveTranscript) liveTranscript.innerText = "Analyzing...";
 
     const loadingBubble = addMessage("Thinking...", "bot", true);
+    
+    // 🚀 NEW: Show the Stop button immediately so the user can cancel the thought
+    const stopBtn = document.getElementById('stop-audio-btn');
+    if(stopBtn) stopBtn.style.display = 'flex';
+
+    // 🚀 NEW: Create the kill-switch for the network request
+    abortController = new AbortController();
+
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
 
         const response = await fetch("/analyze", { 
-            method: "POST", headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ message: message, history: sessionMemory.slice(-4), session_id: currentSessionId, language: selectedLang })
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ message: message, history: sessionMemory.slice(-4), session_id: currentSessionId, language: selectedLang }),
+            signal: abortController.signal // 🚀 NEW: Attach the kill-switch to the request
         });
+        
+        abortController = null; // Reset it if the request finishes successfully
+
         const data = await response.json();
         loadingBubble.remove();
         
@@ -342,7 +365,6 @@ async function sendMessage() {
         
        if (data.audio) {
             let audio = new Audio("data:audio/mp3;base64," + data.audio);
-            const stopBtn = document.getElementById('stop-audio-btn');
             audio.play();
             if (stopBtn) stopBtn.style.display = 'flex'; 
             audio.onended = function() { if (stopBtn) stopBtn.style.display = 'none'; };
@@ -353,9 +375,18 @@ async function sendMessage() {
         if (isFirstMessage) loadSidebarSessions();
     } catch (error) { 
         loadingBubble.remove();
-        addMessage("Connection lost.", "bot", true); 
+        // 🚀 NEW: Catch the kill-switch event and show a graceful cancel message
+        if (error.name === 'AbortError') {
+            addMessage("Message cancelled.", "bot", true);
+            // Remove the cancelled message from memory so the AI forgets it
+            sessionMemory.pop(); 
+        } else {
+            addMessage("Connection lost.", "bot", true); 
+        }
     } finally {
         if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = "1"; }
+        // Hide the stop button if we cancelled before audio started
+        if (!isSpeaking && !window.currentAudio && stopBtn) stopBtn.style.display = 'none';
     }
 }
 
