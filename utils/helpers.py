@@ -157,6 +157,7 @@ It sounds like you're carrying a heavy weight right now. Failing an exam hurts, 
             break 
 
         except Exception as e:
+            print(f"🚨 CRITICAL AI ERROR: {e}")
             if "429" in str(e) or "500" in str(e) or "503" in str(e):
                 wait_time = base_wait_time * (2 ** attempt)
                 time.sleep(wait_time)
