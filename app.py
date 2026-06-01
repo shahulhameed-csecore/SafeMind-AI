@@ -52,16 +52,27 @@ except Exception as e:
     gemini_client = None
 
 def get_embedding(text):
-    if not gemini_client: return None
+    if not gemini_client: 
+        return None
     try:
+        
         response = gemini_client.models.embed_content(
-            model="text-embedding-001",  # Updated for better compatibility
+            model="gemini-embedding-2",   # Newest model
             contents=text
         )
         return response.embeddings[0].values
     except Exception as e:
-        print(f"Embedding error: {e}")
-        return None
+        print(f"Embedding error with gemini-embedding-2: {e}")
+        try:
+            # Fallback to 001
+            response = gemini_client.models.embed_content(
+                model="gemini-embedding-001",
+                contents=text
+            )
+            return response.embeddings[0].values
+        except Exception as e2:
+            print(f"Embedding error with fallback: {e2}")
+            return None
 
 def retrieve_past_context(user_text):
     if not pinecone_index: return ""
