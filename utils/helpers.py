@@ -71,30 +71,17 @@ def compress_session(chat_history):
     try:
         summary_prompt = f"Summarize this wellness support session concisely in one brief paragraph, capturing the user's emotional state and core issues:\n{older_history}"
         
-        # ✅ MAINTAINED: gemma-4-26b-a4b-it
         response = gemini_client.models.generate_content(
             model='gemma-4-26b-a4b-it',
             contents=summary_prompt,
             config=types.GenerateContentConfig(
                 temperature=0.2, 
-                max_output_tokens=100,
+                max_output_tokens=300, # ✅ FIX 2: Increased tokens
                 safety_settings=[
-                    types.SafetySetting(
-                        category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, 
-                        threshold=types.HarmBlockThreshold.BLOCK_NONE
-                    ),
-                    types.SafetySetting(
-                        category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, 
-                        threshold=types.HarmBlockThreshold.BLOCK_NONE
-                    ),
-                    types.SafetySetting(
-                        category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, 
-                        threshold=types.HarmBlockThreshold.BLOCK_NONE
-                    ),
-                    types.SafetySetting(
-                        category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, 
-                        threshold=types.HarmBlockThreshold.BLOCK_NONE
-                    )
+                    types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                    types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                    types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                    types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE)
                 ]
             )
         )
@@ -103,7 +90,6 @@ def compress_session(chat_history):
         else:
             return older_history + "\n" + recent_history
     except:
-        # Fallback if summarization fails
         return older_history + "\n" + recent_history
 
 def generate_ai_response(user_input, chat_history, user_lang='en'):
@@ -116,15 +102,10 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
     # Translate history to English for the model safely
     english_history = []
     for msg in chat_history:
-        # Gracefully handle both formats ('role'/'text' or 'user'/'bot')
         role = msg.get('role') or ('user' if 'user' in msg else 'model')
         raw_text = msg.get('text') or msg.get('user') or msg.get('bot') or ""
-        
-        try: 
-            en_text = GoogleTranslator(source='auto', target='en').translate(raw_text)
-        except: 
-            en_text = raw_text
-            
+        try: en_text = GoogleTranslator(source='auto', target='en').translate(raw_text)
+        except: en_text = raw_text
         english_history.append({"role": role, "text": en_text})
         
     history_text = compress_session(english_history)
@@ -157,14 +138,13 @@ Focus on being a kind friend who listens and supports, not a doctor."""
         try:
             if not gemini_client: raise ValueError("Client offline.")
             
-            # ✅ MAINTAINED: gemma-4-26b-a4b-it
             response = gemini_client.models.generate_content(
                 model='gemma-4-26b-a4b-it', 
                 contents=enforced_input,
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
                     temperature=0.75,           
-                    max_output_tokens=280,
+                    max_output_tokens=800, # ✅ FIX 2: Re-enabled proper limit to prevent sentence cutoff
                     safety_settings=[
                         types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                         types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
@@ -194,17 +174,36 @@ Focus on being a kind friend who listens and supports, not a doctor."""
     else:
         full_output = "<response>The servers are taking a moment to process. Please take a deep breath and try sending that again.</response>"
 
-    # 🧠 PARSE THE MODEL'S REASONING AND TOOL CALLS
+    # ✅ FIX 3: Bulletproof Parser - Prevents tags leaking even if the model gets cut off!
     reasoning = "Standard empathy applied."
     clean_reply = full_output
     
-    if "<reasoning>" in full_output and "</reasoning>" in full_output:
-        reasoning = full_output.split("<reasoning>")[1].split("</reasoning>")[0].strip()
+    # Safely Extract Reasoning
+    if "<reasoning>" in full_output:
+        parts = full_output.split("<reasoning>")
+        if len(parts) > 1:
+            reasoning_part = parts[1]
+            if "</reasoning>" in reasoning_part:
+                reasoning = reasoning_part.split("</reasoning>")[0].strip()
+            else:
+                reasoning = reasoning_part.strip()
     
-    if "<response>" in full_output and "</response>" in full_output:
-        clean_reply = full_output.split("<response>")[1].split("</response>")[0].strip()
+    # Safely Extract Response
+    if "<response>" in full_output:
+        parts = full_output.split("<response>")
+        if len(parts) > 1:
+            response_part = parts[1]
+            if "</response>" in response_part:
+                clean_reply = response_part.split("</response>")[0].strip()
+            else:
+                clean_reply = response_part.strip()
     elif "</reasoning>" in full_output:
-        clean_reply = full_output.split("</reasoning>")[1].strip()
+        parts = full_output.split("</reasoning>")
+        if len(parts) > 1:
+            clean_reply = parts[1].strip()
+            
+    # Ultimate fail-safe to wipe raw tags if they sneak in
+    clean_reply = clean_reply.replace("<response>", "").replace("</response>", "").strip()
 
     # Extract Tool
     tool = None

@@ -1,4 +1,4 @@
-import os
+]import os
 import base64
 import time
 import html
@@ -55,9 +55,9 @@ def get_embedding(text):
     if not gemini_client: 
         return None
     try:
-        # ✅ FIX: Updated to official correct embedding string
+        # ✅ FIX 1: Stable, universally supported embedding model to fix the 404 crash
         response = gemini_client.models.embed_content(
-            model="text-embedding-004",   
+            model="gemini-embedding-001",
             contents=text
         )
         return response.embeddings[0].values
@@ -184,7 +184,6 @@ def analyze():
         try:
             vector = get_embedding(clean_memory_text)
             if vector:
-                # ✅ FIX: Used len(raw_history) to stop overwriting previous memories in Pinecone
                 pinecone_index.upsert(vectors=[{"id": f"{session_id}_{len(raw_history)}", "values": vector, "metadata": {"text": clean_memory_text}}])
         except Exception: pass
 
@@ -238,14 +237,13 @@ def save_journal():
         
         for attempt in range(max_retries):
             try:
-                # ✅ MAINTAINED: gemma-4-26b-a4b-it as requested
                 response = gemini_client.models.generate_content(
                     model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
                         temperature=0.3,
-                        max_output_tokens=80,
+                        max_output_tokens=300, # ✅ FIX 2: Increased token limit
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
