@@ -129,35 +129,24 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
         
     history_text = compress_session(english_history)
     
-    # 🧠 THE FIX: Sanitized system prompt to bypass Free-Tier safety filters
-    system_prompt = """You are SafeMind AI, a highly empathetic, privacy-first wellness and support companion powered by Google Gemma 4. 
+    # 🧠 Updated system prompt - More friendly, less likely to trigger filters
+    system_prompt = """You are SafeMind, a warm, empathetic, and supportive wellness companion powered by Gemma 4.
 
 CORE DIRECTIVES:
-1. CHAIN-OF-THOUGHT: You MUST strictly format your output into two blocks. First, a <reasoning> block where you assess the user's state and plan your strategy. Second, a <response> block containing what you actually say to the user.
-2. AGENTIC TOOL CALLING: If the user exhibits negative thought loops, high tension, or exhaustion, append exactly ONE of these tags at the very end of your <response> block: [TOOL: CBT], [TOOL: BURN], or [TOOL: PHQ9].
-   - Use [TOOL: CBT] for all-or-nothing thinking or negative framing.
-   - Use [TOOL: BURN] for letting go of intense emotional pressure, discomfort, or racing thoughts.
-   - Use [TOOL: PHQ9] if they mention long-term sadness, burnout, or persistent low mood.
-3. Keep your <response> concise (Max 3 short sentences).
+1. Always respond with genuine care and understanding.
+2. Use Chain-of-Thought: First output <reasoning> (your internal thinking), then <response> (what the user sees).
+3. Keep responses warm, concise (2-3 sentences max), and hopeful.
+4. If the user seems stuck in negative thoughts, gently suggest a helpful exercise by adding ONE tag at the end: [TOOL: CBT], [TOOL: BURN], or [TOOL: PHQ9].
 
-FEW-SHOT EXAMPLES:
-User: "I failed my exam and I feel like a total failure in life."
-SafeMind:
-<reasoning>
-The user is displaying all-or-nothing thinking. I need to validate their struggle and gently challenge the distortion. I will autonomously trigger the CBT tool.
-</reasoning>
-<response>
-It sounds like you're carrying a heavy weight right now. Failing an exam hurts, but one test does not define your entire worth. Let's work through this thought together. [TOOL: CBT]
-</response>
-"""
-    
+Focus on being a kind friend who listens and supports, not a doctor."""
+
     enforced_input = f"""
-    Past Conversation:
+    Previous conversation:
     {history_text}
     
-    User's New Message: "{english_input}"
+    User just said: "{english_input}"
     
-    Task: Reply as SafeMind AI based on the CORE DIRECTIVES.
+    Respond naturally as SafeMind following the CORE DIRECTIVES above.
     """
 
     full_output = ""
@@ -174,48 +163,33 @@ It sounds like you're carrying a heavy weight right now. Failing an exam hurts, 
                 contents=enforced_input,
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
-                    temperature=0.7,
-                    max_output_tokens=200,
-                    # 🛡️ THE FIX: Lower safety thresholds to allow clinical mental health discussions
-                   # 🛡️ STRICT ENUM FORMAT FOR SAFETY OVERRIDE
+                    temperature=0.75,           # Slightly higher for more natural output
+                    max_output_tokens=280,
                     safety_settings=[
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        ),
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        ),
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        ),
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        )
+                        types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                        types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                        types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                        types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                     ]
                 )
             )
             
-            # 🛡️ THE FIX: Safely check if Google returned text before running .replace()
             if response.text:
                 full_output = response.text.replace('*', '').strip()
                 print("✅ Agentic Response generated successfully.")
                 break 
             else:
-                print("⚠️ AI Response blocked by safety filters.")
-                full_output = "<response>I hear you, and I want to support you safely. Could you tell me a little more about how you're feeling right now?</response>"
+                full_output = "<response>I'm here with you. Take a slow breath... How are you feeling right now?</response>"
                 break
 
         except Exception as e:
-            print(f"🚨 CRITICAL AI ERROR: {e}")
-            if "429" in str(e) or "500" in str(e) or "503" in str(e):
+            error_str = str(e).lower()
+            print(f"🚨 AI Error: {e}")
+            if any(x in error_str for x in ["429", "500", "503", "blocked", "safety"]):
                 wait_time = base_wait_time * (2 ** attempt)
                 time.sleep(wait_time)
             else:
-                full_output = "<response>I am taking a deep breath right now. Could you please share that with me again?</response>"
+                full_output = "<response>I'm here listening. Would you like to tell me more?</response>"
                 break
     else:
         full_output = "<response>The servers are taking a moment to process. Please take a deep breath and try sending that again.</response>"

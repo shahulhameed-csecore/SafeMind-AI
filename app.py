@@ -360,8 +360,8 @@ def save_journal():
     entry_text = html.escape(data.get('entry', '')) 
     user_id = session.get('user_id')
     
-    system_prompt = "You are an empathetic journal assistant."
-    insight_prompt = f"The user wrote this private journal entry: '{entry_text}'.\n\nTASK:\n1. Identify the core emotion in ONE word (e.g. Joy, Anxiety, Hope, Grief, Frustration, Calm, Overwhelmed).\n2. Write a single, comforting, 1-sentence insight or 'silver lining'.\n\nFORMAT YOUR RESPONSE EXACTLY LIKE THIS:\nEmotion: [Word]\nInsight: [Sentence]"
+    system_prompt = "You are a kind and supportive journal companion. Always respond warmly."
+        insight_prompt = f"The user wrote: '{entry_text}'.\n\nTask: Identify the main emotion in ONE word. Then give one short comforting insight.\n\nReply exactly in this format:\nEmotion: [Word]\nInsight: [Short sentence]"
     
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today."
