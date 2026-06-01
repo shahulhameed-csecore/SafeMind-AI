@@ -73,9 +73,21 @@ def compress_session(chat_history):
         response = gemini_client.models.generate_content(
             model='gemma-4-26b-a4b-it',
             contents=summary_prompt,
-            config=types.GenerateContentConfig(temperature=0.2, max_output_tokens=100)
+            config=types.GenerateContentConfig(
+                temperature=0.2, 
+                max_output_tokens=100,
+                safety_settings=[
+                    types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_ONLY_HIGH"),
+                    types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_ONLY_HIGH"),
+                    types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_ONLY_HIGH"),
+                    types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_ONLY_HIGH")
+                ]
+            )
         )
-        return f"[Clinical Session Summary: {response.text.strip()}]\n\n--- Recent Messages ---\n{recent_history}"
+        if response.text:
+            return f"[Clinical Session Summary: {response.text.strip()}]\n\n--- Recent Messages ---\n{recent_history}"
+        else:
+            return older_history + "\n" + recent_history
     except:
         # Fallback if summarization fails
         return older_history + "\n" + recent_history
@@ -149,12 +161,26 @@ It sounds like you're carrying a heavy weight right now. Failing an exam hurts, 
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
                     temperature=0.7,
-                    max_output_tokens=200
+                    max_output_tokens=200,
+                    # 🛡️ THE FIX: Lower safety thresholds to allow clinical mental health discussions
+                    safety_settings=[
+                        types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_ONLY_HIGH"),
+                        types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_ONLY_HIGH"),
+                        types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_ONLY_HIGH"),
+                        types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_ONLY_HIGH")
+                    ]
                 )
             )
-            full_output = response.text.replace('*', '').strip()
-            print("✅ Agentic Response generated successfully.")
-            break 
+            
+            # 🛡️ THE FIX: Safely check if Google returned text before running .replace()
+            if response.text:
+                full_output = response.text.replace('*', '').strip()
+                print("✅ Agentic Response generated successfully.")
+                break 
+            else:
+                print("⚠️ AI Response blocked by safety filters.")
+                full_output = "<response>I hear you, and I want to support you safely. Could you tell me a little more about how you're feeling right now?</response>"
+                break
 
         except Exception as e:
             print(f"🚨 CRITICAL AI ERROR: {e}")
