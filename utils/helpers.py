@@ -62,7 +62,7 @@ def analyze_sentiment(text):
 # 🧠 FEATURE 3: BACKGROUND CONTEXT COMPRESSION
 def compress_session(chat_history):
     if len(chat_history) <= 4:
-        return "\n".join([f"{msg['role']}: {msg['text']}" for msg in chat_history])
+        return "\n".join([f"{msg.get('role', 'user')}: {msg.get('text', '')}" for msg in chat_history])
     
     # Extract older messages to summarize
     older_history = "\n".join([f"{msg['role']}: {msg['text']}" for msg in chat_history[:-2]])
@@ -87,12 +87,19 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
     else:
         english_input = user_input
 
-    # Translate history to English for the model
+    # Translate history to English for the model safely
     english_history = []
     for msg in chat_history:
-        try: en_text = GoogleTranslator(source='auto', target='en').translate(msg['text'])
-        except: en_text = msg['text']
-        english_history.append({"role": msg['role'], "text": en_text})
+        # Gracefully handle both formats ('role'/'text' or 'user'/'bot')
+        role = msg.get('role') or ('user' if 'user' in msg else 'model')
+        raw_text = msg.get('text') or msg.get('user') or msg.get('bot') or ""
+        
+        try: 
+            en_text = GoogleTranslator(source='auto', target='en').translate(raw_text)
+        except: 
+            en_text = raw_text
+            
+        english_history.append({"role": role, "text": en_text})
         
     history_text = compress_session(english_history)
     
@@ -142,7 +149,7 @@ It sounds like you're carrying a heavy weight right now. Failing an exam hurts, 
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
                     temperature=0.7,
-                    max_output_tokens=200 # Increased to allow room for the <reasoning> block
+                    max_output_tokens=200
                 )
             )
             full_output = response.text.replace('*', '').strip()
@@ -168,7 +175,7 @@ It sounds like you're carrying a heavy weight right now. Failing an exam hurts, 
     
     if "<response>" in full_output and "</response>" in full_output:
         clean_reply = full_output.split("<response>")[1].split("</response>")[0].strip()
-    elif "</reasoning>" in full_output: # Fallback if model forgets opening tag
+    elif "</reasoning>" in full_output:
         clean_reply = full_output.split("</reasoning>")[1].strip()
 
     # Extract Tool
@@ -176,7 +183,6 @@ It sounds like you're carrying a heavy weight right now. Failing an exam hurts, 
     tool_match = re.search(r'\[TOOL:\s*(CBT|BURN|PHQ9)\]', clean_reply, re.IGNORECASE)
     if tool_match:
         tool = tool_match.group(1).upper()
-        # Remove the tag from the text the user sees
         clean_reply = re.sub(r'\[TOOL:\s*(CBT|BURN|PHQ9)\]', '', clean_reply, flags=re.IGNORECASE).strip()
          
     if user_lang != 'en' and "deep breath" not in clean_reply:
