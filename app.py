@@ -379,20 +379,33 @@ def save_journal():
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
                         temperature=0.2,
-                        max_output_tokens=60
+                        max_output_tokens=60,
+                        safety_settings=[
+                            types.SafetySetting(category="HARM_CATEGORY_DANGEROUS_CONTENT", threshold="BLOCK_ONLY_HIGH"),
+                            types.SafetySetting(category="HARM_CATEGORY_HARASSMENT", threshold="BLOCK_ONLY_HIGH"),
+                            types.SafetySetting(category="HARM_CATEGORY_HATE_SPEECH", threshold="BLOCK_ONLY_HIGH"),
+                            types.SafetySetting(category="HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold="BLOCK_ONLY_HIGH")
+                        ]
                     )
                 )
                 
-                content = response.text.replace('*', '').strip() 
-                
-                for line in content.split('\n'):
-                    if line.lower().startswith('emotion:'):
-                        emotion_tag = line.split(':', 1)[1].strip()
-                    elif line.lower().startswith('insight:'):
-                        ai_insight = line.split(':', 1)[1].strip()
-                
-                print("✅ Journal tagged successfully.")
-                break 
+                # 🛡️ THE FIX: Safely check if Google returned text before manipulating it
+                if response.text:
+                    content = response.text.replace('*', '').strip() 
+                    
+                    for line in content.split('\n'):
+                        if line.lower().startswith('emotion:'):
+                            emotion_tag = line.split(':', 1)[1].strip()
+                        elif line.lower().startswith('insight:'):
+                            ai_insight = line.split(':', 1)[1].strip()
+                    
+                    print("✅ Journal tagged successfully.")
+                    break 
+                else:
+                    print("⚠️ Journal AI Response blocked by safety filters.")
+                    emotion_tag = "Reflection"
+                    ai_insight = "Thank you for sharing your thoughts today."
+                    break
                         
             except Exception as e:
                 error_str = str(e)
