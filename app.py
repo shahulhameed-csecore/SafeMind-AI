@@ -55,24 +55,15 @@ def get_embedding(text):
     if not gemini_client: 
         return None
     try:
-        
+        # ✅ FIX: Updated to official correct embedding string
         response = gemini_client.models.embed_content(
-            model="gemini-embedding-2",   # Newest model
+            model="text-embedding-004",   
             contents=text
         )
         return response.embeddings[0].values
     except Exception as e:
-        print(f"Embedding error with gemini-embedding-2: {e}")
-        try:
-            # Fallback to 001
-            response = gemini_client.models.embed_content(
-                model="gemini-embedding-001",
-                contents=text
-            )
-            return response.embeddings[0].values
-        except Exception as e2:
-            print(f"Embedding error with fallback: {e2}")
-            return None
+        print(f"Embedding error: {e}")
+        return None
 
 def retrieve_past_context(user_text):
     if not pinecone_index: return ""
@@ -193,7 +184,8 @@ def analyze():
         try:
             vector = get_embedding(clean_memory_text)
             if vector:
-                pinecone_index.upsert(vectors=[{"id": f"{session_id}_{len(chat_history)}", "values": vector, "metadata": {"text": clean_memory_text}}])
+                # ✅ FIX: Used len(raw_history) to stop overwriting previous memories in Pinecone
+                pinecone_index.upsert(vectors=[{"id": f"{session_id}_{len(raw_history)}", "values": vector, "metadata": {"text": clean_memory_text}}])
         except Exception: pass
 
     audio_base64 = None
@@ -246,6 +238,7 @@ def save_journal():
         
         for attempt in range(max_retries):
             try:
+                # ✅ MAINTAINED: gemma-4-26b-a4b-it as requested
                 response = gemini_client.models.generate_content(
                     model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
@@ -295,8 +288,6 @@ def save_journal():
     
     return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
 
-# ... [All other routes remain the same - get_sessions, get_chat, etc.] ...
-
 @app.route('/get_sessions', methods=['GET'])
 @login_required
 def get_sessions():
@@ -320,7 +311,113 @@ def get_sessions():
     session_list = [{"session_id": row["session_id"], "title": row["user_message"][:25] + "..."} for row in sessions]
     return jsonify(session_list)
 
-# (Keeping other routes as they were - get_chat, delete_session, save_mood, etc.)
+@app.route('/get_chat/<session_id>', methods=['GET'])
+@login_required
+def get_chat(session_id):
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(
+        "SELECT id, user_message, bot_response FROM chat_logs WHERE session_id = %s AND user_id = %s ORDER BY timestamp ASC",
+        (session_id, user_id)
+    )
+    chats = cursor.fetchall()
+    conn.close()
+    return jsonify([{"id": row["id"], "user": row["user_message"], "bot": row["bot_response"]} for row in chats])
+
+@app.route('/delete_session', methods=['POST'])
+@login_required
+def delete_session():
+    session_id = request.json.get('session_id')
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM chat_logs WHERE session_id = %s AND user_id = %s", (session_id, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success"})
+
+@app.route('/save_mood', methods=['POST'])
+@login_required
+def save_mood():
+    mood = request.json.get('mood')
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO mood_logs (user_id, mood) VALUES (%s, %s)", (user_id, mood))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success"})
+
+@app.route('/get_moods', methods=['GET'])
+@login_required
+def get_moods():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute(
+        "SELECT mood, timestamp FROM mood_logs WHERE user_id = %s ORDER BY timestamp DESC LIMIT 15",
+        (user_id,)
+    )
+    moods = cursor.fetchall()
+    conn.close()
+    
+    moods_list = [{"mood": row["mood"], "time": row["timestamp"]} for row in moods]
+    moods_list.reverse()
+    return jsonify(moods_list)
+
+@app.route('/get_dashboard_stats', methods=['GET'])
+@login_required
+def get_dashboard_stats():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+    cursor.execute("SELECT COUNT(DISTINCT session_id) as total FROM chat_logs WHERE user_id = %s", (user_id,))
+    total_sessions = cursor.fetchone()['total']
+
+    crisis_keywords = ["die", "suicide", "kill", "end my life", "hopeless", "end it", "worthless", "give up", "dead"]
+    query_conditions = " OR ".join(["user_message ILIKE %s" for _ in crisis_keywords])
+    params = [f"%{kw}%" for kw in crisis_keywords]
+    cursor.execute(f"SELECT COUNT(*) as alerts FROM chat_logs WHERE user_id = %s AND ({query_conditions})", [user_id] + params)
+    crisis_alerts = cursor.fetchone()['alerts']
+
+    cursor.execute("SELECT mood, timestamp FROM mood_logs WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    moods = cursor.fetchall()
+
+    streak = 0
+    avg_sentiment = "Analyzing"
+
+    if moods:
+        unique_dates = sorted(list(set([m['timestamp'].date() for m in moods])), reverse=True)
+        today = datetime.now().date()
+        
+        if unique_dates and (unique_dates[0] == today or unique_dates[0] == today - timedelta(days=1)):
+            streak = 1
+            for i in range(1, len(unique_dates)):
+                if unique_dates[i-1] - unique_dates[i] == timedelta(days=1):
+                    streak += 1
+                else:
+                    break
+                    
+        mood_scores = {'Happy': 4, 'Calm': 3, 'Sad': 2, 'Stressed': 1}
+        recent_moods = moods[:5]
+        score_sum = sum([mood_scores.get(m['mood'], 2.5) for m in recent_moods])
+        avg_score = score_sum / len(recent_moods)
+        
+        if avg_score >= 3.5: avg_sentiment = "Joyful"
+        elif avg_score >= 2.5: avg_sentiment = "Calm"
+        elif avg_score >= 1.5: avg_sentiment = "Down"
+        else: avg_sentiment = "Stressed"
+
+    conn.close()
+
+    return jsonify({
+        "total_sessions": total_sessions,
+        "streak": streak,
+        "avg_sentiment": avg_sentiment,
+        "crisis_alerts": crisis_alerts
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)

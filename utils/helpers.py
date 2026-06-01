@@ -69,33 +69,33 @@ def compress_session(chat_history):
     recent_history = "\n".join([f"{msg['role']}: {msg['text']}" for msg in chat_history[-2:]])
     
     try:
-        # THE FIX: Removed the word "clinical therapy" to bypass medical filters
         summary_prompt = f"Summarize this wellness support session concisely in one brief paragraph, capturing the user's emotional state and core issues:\n{older_history}"
+        
+        # ✅ MAINTAINED: gemma-4-26b-a4b-it
         response = gemini_client.models.generate_content(
             model='gemma-4-26b-a4b-it',
             contents=summary_prompt,
             config=types.GenerateContentConfig(
                 temperature=0.2, 
                 max_output_tokens=100,
-                # 🛡️ STRICT ENUM FORMAT FOR SAFETY OVERRIDE
-                    safety_settings=[
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        ),
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        ),
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        ),
-                        types.SafetySetting(
-                            category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, 
-                            threshold=types.HarmBlockThreshold.BLOCK_NONE
-                        )
-                    ]
+                safety_settings=[
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, 
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, 
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, 
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE
+                    ),
+                    types.SafetySetting(
+                        category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, 
+                        threshold=types.HarmBlockThreshold.BLOCK_NONE
+                    )
+                ]
             )
         )
         if response.text:
@@ -129,7 +129,6 @@ def generate_ai_response(user_input, chat_history, user_lang='en'):
         
     history_text = compress_session(english_history)
     
-    # 🧠 Updated system prompt - More friendly, less likely to trigger filters
     system_prompt = """You are SafeMind, a warm, empathetic, and supportive wellness companion powered by Gemma 4.
 
 CORE DIRECTIVES:
@@ -158,12 +157,13 @@ Focus on being a kind friend who listens and supports, not a doctor."""
         try:
             if not gemini_client: raise ValueError("Client offline.")
             
+            # ✅ MAINTAINED: gemma-4-26b-a4b-it
             response = gemini_client.models.generate_content(
                 model='gemma-4-26b-a4b-it', 
                 contents=enforced_input,
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
-                    temperature=0.75,           # Slightly higher for more natural output
+                    temperature=0.75,           
                     max_output_tokens=280,
                     safety_settings=[
                         types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
