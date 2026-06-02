@@ -8,7 +8,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from dotenv import load_dotenv
 from gtts import gTTS
-from langdetect import detect
 import psycopg2
 import psycopg2.extras
 from pinecone import Pinecone
@@ -39,6 +38,7 @@ def init_db():
     cursor.execute('''CREATE INDEX IF NOT EXISTS idx_chat_user ON chat_logs(user_id);''')
     conn.commit()
     conn.close()
+
 init_db()
 
 try:
@@ -51,38 +51,43 @@ except Exception as e:
     pinecone_index = None
     gemini_client = None
 
+# ====================== FIXED EMBEDDING ======================
 def get_embedding(text):
-    if not gemini_client: 
+    if not gemini_client:
         return None
-        
-    # ✅ FIX: Infallible fallback loop. It will test the official Google strings
-    # until it finds the exact one supported by your specific API tier.
-    models_to_try = [
-        "text-embedding-004", 
-        "models/text-embedding-004",
-        "embedding-001",
-        "models/embedding-001"
-    ]
     
+    # Best models for India + Gemma API (2026)
+    models_to_try = [
+        "gemini-embedding-001",           # Most stable
+        "embedding-001",
+        "models/embedding-001",
+        "text-embedding-004"
+    ]
+   
     for model_name in models_to_try:
         try:
             response = gemini_client.models.embed_content(
                 model=model_name,
                 contents=text
             )
-            if response and response.embeddings:
+            if response and hasattr(response, 'embeddings') and response.embeddings:
+                print(f"✅ Embedding successful with model: {model_name}")
                 return response.embeddings[0].values
         except Exception as e:
+            print(f"Embedding failed with {model_name}: {str(e)[:100]}")
             continue
-            
-    print("❌ All embedding models failed. Check Google API status.")
+           
+    print("⚠️ All embedding models failed")
     return None
+# ============================================================
 
 def retrieve_past_context(user_text):
-    if not pinecone_index: return ""
+    if not pinecone_index: 
+        return ""
     try:
         vector = get_embedding(user_text)
-        if not vector: return ""
+        if not vector: 
+            return ""
         
         results = pinecone_index.query(vector=vector, top_k=2, include_metadata=True)
         
@@ -92,9 +97,10 @@ def retrieve_past_context(user_text):
                 if match.get('score', 0) > 0.75 and 'text' in match['metadata']:
                     past_messages.append(match['metadata']['text'])
             return "\n".join(past_messages)
-    except Exception as e:
+    except Exception:
         pass
     return ""
+
 
 def login_required(f):
     @wraps(f)
@@ -246,6 +252,7 @@ def save_journal():
     if gemini_client:
         max_retries = 3
         base_wait_time = 2
+        import time
         
         for attempt in range(max_retries):
             try:
@@ -279,12 +286,11 @@ def save_journal():
                     break
                         
             except Exception as e:
-                error_str = str(e)
+                error_str = str(e).lower()
                 if "429" in error_str or "500" in error_str or "503" in error_str:
                     wait_time = base_wait_time * (2 ** attempt)
                     time.sleep(wait_time)
                 else:
-                    print(f"❌ Journal AI Error: {e}")
                     break
 
     conn = get_db_connection()
