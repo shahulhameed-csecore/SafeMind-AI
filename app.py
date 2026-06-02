@@ -240,14 +240,26 @@ def analyze():
 @login_required
 def save_journal():
     data = request.json
-    entry_text = html.escape(data.get('entry', '')) 
+    entry_text = html.escape(data.get('entry', ''))
     user_id = session.get('user_id')
     
-    system_prompt = "You are a kind and supportive journal companion. Always respond warmly."
-    insight_prompt = f"The user wrote: '{entry_text}'.\n\nTask: Identify the main emotion in ONE word. Then give one short comforting insight.\n\nReply exactly in this format:\nEmotion: [Word]\nInsight: [Short sentence]"
+    # More neutral and safe prompt
+    system_prompt = "You are a friendly, positive journaling assistant. Always respond warmly and supportively."
     
+    insight_prompt = f"""
+    User journal entry: "{entry_text}"
+    
+    Task:
+    1. Identify the main feeling in ONE simple word (example: Calm, Happy, Worried, Tired, Grateful).
+    2. Give one short, kind, and uplifting sentence.
+    
+    Reply exactly like this:
+    Emotion: [Word]
+    Insight: [Short positive sentence]
+    """
+
     emotion_tag = "Reflection"
-    ai_insight = "Thank you for sharing your thoughts today."
+    ai_insight = "Thank you for sharing your thoughts today. I'm here with you."
     
     if gemini_client:
         max_retries = 3
@@ -257,42 +269,46 @@ def save_journal():
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
-                    model="gemma-4-26b-a4b-it", 
+                    model="gemma-4-26b-a4b-it",
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
-                        temperature=0.3,
-                        max_output_tokens=300,
+                        temperature=0.4,
+                        max_output_tokens=150,
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold=types.HarmBlockThreshold.BLOCK_NONE),
-                            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE)
+                            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                         ]
                     )
                 )
                 
-                if response.text:
-                    content = response.text.replace('*', '').strip() 
+                if response and response.text:
+                    content = response.text.replace('*', '').strip()
+                    
                     for line in content.split('\n'):
                         if line.lower().startswith('emotion:'):
                             emotion_tag = line.split(':', 1)[1].strip()
                         elif line.lower().startswith('insight:'):
                             ai_insight = line.split(':', 1)[1].strip()
+                    
                     print("✅ Journal tagged successfully.")
-                    break 
+                    break
                 else:
-                    print("⚠️ Journal AI Response blocked.")
+                    print("⚠️ Journal response was empty.")
                     break
                         
             except Exception as e:
                 error_str = str(e).lower()
+                print(f"Journal attempt {attempt+1} failed: {e}")
                 if "429" in error_str or "500" in error_str or "503" in error_str:
                     wait_time = base_wait_time * (2 ** attempt)
                     time.sleep(wait_time)
                 else:
                     break
 
+    # Save to database
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
