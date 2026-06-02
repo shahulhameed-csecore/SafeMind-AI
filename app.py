@@ -51,14 +51,12 @@ except Exception as e:
     pinecone_index = None
     gemini_client = None
 
-# ====================== FIXED EMBEDDING ======================
 def get_embedding(text):
     if not gemini_client:
         return None
     
-    # Best models for India + Gemma API (2026)
     models_to_try = [
-        "gemini-embedding-001",           # Most stable
+        "gemini-embedding-001",
         "embedding-001",
         "models/embedding-001",
         "text-embedding-004"
@@ -74,12 +72,10 @@ def get_embedding(text):
                 print(f"✅ Embedding successful with model: {model_name}")
                 return response.embeddings[0].values
         except Exception as e:
-            print(f"Embedding failed with {model_name}: {str(e)[:100]}")
             continue
            
     print("⚠️ All embedding models failed")
     return None
-# ============================================================
 
 def retrieve_past_context(user_text):
     if not pinecone_index: 
@@ -247,7 +243,6 @@ def save_journal():
     ai_insight = "Thank you for sharing your thoughts today. I'm here with you."
     
     if not entry_text:
-        # Save empty entry without AI call
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -258,30 +253,23 @@ def save_journal():
         conn.close()
         return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
 
-    # ✅ Stronger, simpler prompt
-    insight_prompt = f"""
-    Journal entry: {entry_text}
-
-    You are a kind friend. 
-    Reply in exactly this format (nothing else):
-
-    Emotion: [One word]
-    Insight: [One short positive or supportive sentence]
-    """
+    # ✅ FIXED: Replicated the exact structure of your successful chat endpoint
+    system_prompt = "You are a kind and supportive journal companion. Your task is to identify the main emotion in ONE word, and provide ONE short comforting sentence."
+    enforced_input = f'Journal entry: "{entry_text}"\n\nReply EXACTLY in this format:\nEmotion: [Word]\nInsight: [Sentence]'
 
     if gemini_client:
         max_retries = 3
         base_wait_time = 2
-        import time
         
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
-                    model="gemma-4-26b-a4b-it", 
-                    contents=insight_prompt,
+                    model="gemma-4-26b-a4b-it", # ✅ MAINTAINED EXACTLY
+                    contents=enforced_input,
                     config=types.GenerateContentConfig(
-                        temperature=0.5,
-                        max_output_tokens=120,
+                        system_instruction=system_prompt,
+                        temperature=0.7, # ✅ Increased temperature to match your working chat config
+                        max_output_tokens=150,
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
@@ -291,16 +279,30 @@ def save_journal():
                     )
                 )
                 
-                if response and response.text and response.text.strip():
-                    content = response.text.replace('*', '').strip()
+                # Safely extract text (prevents SDK crashes if blocked)
+                response_text = ""
+                try:
+                    response_text = response.text
+                except Exception:
+                    pass
+                
+                if response_text and response_text.strip():
+                    content = response_text.replace('*', '').strip()
                     
-                    for line in content.split('\n'):
-                        line = line.strip()
+                    # ✅ Smart fallback parser in case the model forgets formatting
+                    lines = [line.strip() for line in content.split('\n') if line.strip()]
+                    
+                    for line in lines:
                         if line.lower().startswith('emotion:'):
                             emotion_tag = line.split(':', 1)[1].strip()
                         elif line.lower().startswith('insight:'):
                             ai_insight = line.split(':', 1)[1].strip()
                     
+                    # If it forgot the labels entirely but still gave two lines
+                    if emotion_tag == "Reflection" and len(lines) >= 2:
+                        emotion_tag = lines[0].strip()
+                        ai_insight = lines[1].strip()
+                        
                     print("✅ Journal tagged successfully.")
                     break 
                 else:
@@ -316,7 +318,7 @@ def save_journal():
                 else:
                     break
 
-    # Always save to database even if AI fails
+    # Save to database
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
