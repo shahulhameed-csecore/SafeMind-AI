@@ -246,8 +246,8 @@ def save_journal():
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today. I'm here with you."
     
-    # Do not waste an API call if the user submitted an empty journal
     if not entry_text:
+        # Save empty entry without AI call
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
@@ -258,17 +258,17 @@ def save_journal():
         conn.close()
         return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
 
-    # ✅ THE FIX: Combined the system prompt directly into the main prompt!
-    insight_prompt = f"""You are a kind and supportive journal companion. Always respond warmly.
-    
-    The user wrote this journal entry: '{entry_text}'
+    # ✅ Stronger, simpler prompt
+    insight_prompt = f"""
+    Journal entry: {entry_text}
 
-    Task: Identify the main emotion in ONE word. Then give one short comforting insight.
+    You are a kind friend. 
+    Reply in exactly this format (nothing else):
 
-    Reply EXACTLY in this format:
-    Emotion: [Word]
-    Insight: [Short positive sentence]"""
-    
+    Emotion: [One word]
+    Insight: [One short positive or supportive sentence]
+    """
+
     if gemini_client:
         max_retries = 3
         base_wait_time = 2
@@ -280,9 +280,8 @@ def save_journal():
                     model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
-                        # ✅ THE FIX: Removed system_instruction= parameter to prevent the silent model crash
-                        temperature=0.4,
-                        max_output_tokens=150,
+                        temperature=0.5,
+                        max_output_tokens=120,
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
@@ -292,34 +291,32 @@ def save_journal():
                     )
                 )
                 
-                # ✅ Simplified the text check to match your chat code perfectly
-                if response.text:
-                    content = response.text.replace('*', '').strip() 
+                if response and response.text and response.text.strip():
+                    content = response.text.replace('*', '').strip()
+                    
                     for line in content.split('\n'):
+                        line = line.strip()
                         if line.lower().startswith('emotion:'):
                             emotion_tag = line.split(':', 1)[1].strip()
                         elif line.lower().startswith('insight:'):
                             ai_insight = line.split(':', 1)[1].strip()
+                    
                     print("✅ Journal tagged successfully.")
                     break 
                 else:
-                    print(f"⚠️ Journal response was empty on attempt {attempt + 1}.")
+                    print(f"⚠️ Journal response empty on attempt {attempt + 1}")
                     if attempt < max_retries - 1:
                         time.sleep(base_wait_time)
                         continue
-                    else:
-                        break
-                        
+                    
             except Exception as e:
-                error_str = str(e).lower()
                 print(f"❌ Journal attempt {attempt + 1} failed: {e}")
-                if "429" in error_str or "500" in error_str or "503" in error_str:
-                    wait_time = base_wait_time * (2 ** attempt)
-                    time.sleep(wait_time)
+                if "429" in str(e) or "500" in str(e) or "503" in str(e):
+                    time.sleep(base_wait_time * (2 ** attempt))
                 else:
                     break
 
-    # Save to database
+    # Always save to database even if AI fails
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
