@@ -127,6 +127,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         await loadMoodChart();
         await loadDashboardStats();     
         await loadMainDashboardChart();
+        await loadJournals();
     }
 });
 

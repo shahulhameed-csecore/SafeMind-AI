@@ -231,7 +231,6 @@ def analyze():
         "audio": audio_base64,
         "tool": agentic_tool 
     })
-
 @app.route('/save_journal', methods=['POST'])
 @login_required
 def save_journal():
@@ -253,22 +252,28 @@ def save_journal():
         conn.close()
         return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
 
-    # ✅ FIXED: Replicated the exact structure of your successful chat endpoint
-    system_prompt = "You are a kind and supportive journal companion. Your task is to identify the main emotion in ONE word, and provide ONE short comforting sentence."
-    enforced_input = f'Journal entry: "{entry_text}"\n\nReply EXACTLY in this format:\nEmotion: [Word]\nInsight: [Sentence]'
+    # ✅ FIXED: "Smushed" prompt. Everything is in one string so the hackathon model understands it.
+    insight_prompt = f"""You are a kind and supportive journal companion. Your task is to identify the main emotion in ONE word, and provide ONE short comforting sentence.
+    
+Journal entry: "{entry_text}"
+
+Reply EXACTLY in this format:
+Emotion: [Word]
+Insight: [Sentence]"""
 
     if gemini_client:
         max_retries = 3
         base_wait_time = 2
+        import time
         
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
                     model="gemma-4-26b-a4b-it", # ✅ MAINTAINED EXACTLY
-                    contents=enforced_input,
+                    contents=insight_prompt,    # ✅ Passed the combined prompt here
                     config=types.GenerateContentConfig(
-                        system_instruction=system_prompt,
-                        temperature=0.7, # ✅ Increased temperature to match your working chat config
+                        # ❌ system_instruction is REMOVED so the model doesn't crash!
+                        temperature=0.7, 
                         max_output_tokens=150,
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
@@ -329,6 +334,29 @@ def save_journal():
     conn.close()
     
     return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
+
+@app.route('/get_journals', methods=['GET'])
+@login_required
+def get_journals():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    cursor.execute("SELECT id, entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    journals = cursor.fetchall()
+    conn.close()
+    return jsonify(journals)
+
+@app.route('/delete_journal', methods=['POST'])
+@login_required
+def delete_journal():
+    journal_id = request.json.get('id')
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM journals WHERE id = %s AND user_id = %s", (journal_id, user_id))
+    conn.commit()
+    conn.close()
+    return jsonify({"status": "success"})
 
 @app.route('/get_sessions', methods=['GET'])
 @login_required
