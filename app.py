@@ -240,26 +240,36 @@ def analyze():
 @login_required
 def save_journal():
     data = request.json
-    entry_text = html.escape(data.get('entry', ''))
+    entry_text = html.escape(data.get('entry', '')).strip()
     user_id = session.get('user_id')
     
-    # More neutral and safe prompt
-    system_prompt = "You are a friendly, positive journaling assistant. Always respond warmly and supportively."
-    
-    insight_prompt = f"""
-    User journal entry: "{entry_text}"
-    
-    Task:
-    1. Identify the main feeling in ONE simple word (example: Calm, Happy, Worried, Tired, Grateful).
-    2. Give one short, kind, and uplifting sentence.
-    
-    Reply exactly like this:
-    Emotion: [Word]
-    Insight: [Short positive sentence]
-    """
-
     emotion_tag = "Reflection"
     ai_insight = "Thank you for sharing your thoughts today. I'm here with you."
+    
+    # Do not waste an API call if the user submitted an empty journal
+    if not entry_text:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "INSERT INTO journals (user_id, entry_text, ai_insight, emotion_tag) VALUES (%s, %s, %s, %s)",
+            (user_id, entry_text, ai_insight, emotion_tag)
+        )
+        conn.commit()
+        conn.close()
+        return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
+
+    # Combined prompt (Gemma processes this much better)
+    insight_prompt = f"""You are a friendly, positive journaling assistant. Always respond warmly.
+
+User's journal entry: "{entry_text}"
+
+Task:
+1. Identify the main emotion in ONE simple word (e.g., Calm, Happy, Worried, Tired, Grateful).
+2. Give one short, kind, and uplifting sentence.
+
+Reply EXACTLY in this format:
+Emotion: [Word]
+Insight: [Short positive sentence]"""
     
     if gemini_client:
         max_retries = 3
@@ -269,39 +279,42 @@ def save_journal():
         for attempt in range(max_retries):
             try:
                 response = gemini_client.models.generate_content(
-                    model="gemma-4-26b-a4b-it",
+                    model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
-                        system_instruction=system_prompt,
                         temperature=0.4,
                         max_output_tokens=150,
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold=types.HarmBlockThreshold.BLOCK_NONE),
-                            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
+                            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE)
                         ]
                     )
                 )
                 
-                if response and response.text:
-                    content = response.text.replace('*', '').strip()
-                    
+                # Check safely if response has text
+                if response and getattr(response, 'text', None):
+                    content = response.text.replace('*', '').strip() 
                     for line in content.split('\n'):
                         if line.lower().startswith('emotion:'):
                             emotion_tag = line.split(':', 1)[1].strip()
                         elif line.lower().startswith('insight:'):
                             ai_insight = line.split(':', 1)[1].strip()
-                    
                     print("✅ Journal tagged successfully.")
-                    break
+                    break 
                 else:
-                    print("⚠️ Journal response was empty.")
-                    break
+                    print(f"⚠️ Journal response was empty on attempt {attempt + 1}.")
+                    # ✅ THE FIX: Wait and try again instead of breaking!
+                    if attempt < max_retries - 1:
+                        time.sleep(base_wait_time)
+                        continue
+                    else:
+                        break
                         
             except Exception as e:
                 error_str = str(e).lower()
-                print(f"Journal attempt {attempt+1} failed: {e}")
+                print(f"❌ Journal attempt {attempt + 1} failed: {e}")
                 if "429" in error_str or "500" in error_str or "503" in error_str:
                     wait_time = base_wait_time * (2 ** attempt)
                     time.sleep(wait_time)
