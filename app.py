@@ -1,4 +1,4 @@
-]import os
+import os
 import base64
 import time
 import html
@@ -54,16 +54,29 @@ except Exception as e:
 def get_embedding(text):
     if not gemini_client: 
         return None
-    try:
-        # ✅ FIX 1: Stable, universally supported embedding model to fix the 404 crash
-        response = gemini_client.models.embed_content(
-            model="gemini-embedding-001",
-            contents=text
-        )
-        return response.embeddings[0].values
-    except Exception as e:
-        print(f"Embedding error: {e}")
-        return None
+        
+    # ✅ FIX: Infallible fallback loop. It will test the official Google strings
+    # until it finds the exact one supported by your specific API tier.
+    models_to_try = [
+        "text-embedding-004", 
+        "models/text-embedding-004",
+        "embedding-001",
+        "models/embedding-001"
+    ]
+    
+    for model_name in models_to_try:
+        try:
+            response = gemini_client.models.embed_content(
+                model=model_name,
+                contents=text
+            )
+            if response and response.embeddings:
+                return response.embeddings[0].values
+        except Exception as e:
+            continue
+            
+    print("❌ All embedding models failed. Check Google API status.")
+    return None
 
 def retrieve_past_context(user_text):
     if not pinecone_index: return ""
@@ -233,7 +246,6 @@ def save_journal():
     if gemini_client:
         max_retries = 3
         base_wait_time = 2
-        import time
         
         for attempt in range(max_retries):
             try:
@@ -243,7 +255,7 @@ def save_journal():
                     config=types.GenerateContentConfig(
                         system_instruction=system_prompt,
                         temperature=0.3,
-                        max_output_tokens=300, # ✅ FIX 2: Increased token limit
+                        max_output_tokens=300,
                         safety_settings=[
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                             types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
