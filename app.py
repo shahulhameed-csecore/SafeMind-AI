@@ -258,18 +258,16 @@ def save_journal():
         conn.close()
         return jsonify({"status": "success", "insight": ai_insight, "emotion": emotion_tag})
 
-    # Combined prompt (Gemma processes this much better)
-    insight_prompt = f"""You are a friendly, positive journaling assistant. Always respond warmly.
+    # ✅ THE FIX: Combined the system prompt directly into the main prompt!
+    insight_prompt = f"""You are a kind and supportive journal companion. Always respond warmly.
+    
+    The user wrote this journal entry: '{entry_text}'
 
-User's journal entry: "{entry_text}"
+    Task: Identify the main emotion in ONE word. Then give one short comforting insight.
 
-Task:
-1. Identify the main emotion in ONE simple word (e.g., Calm, Happy, Worried, Tired, Grateful).
-2. Give one short, kind, and uplifting sentence.
-
-Reply EXACTLY in this format:
-Emotion: [Word]
-Insight: [Short positive sentence]"""
+    Reply EXACTLY in this format:
+    Emotion: [Word]
+    Insight: [Short positive sentence]"""
     
     if gemini_client:
         max_retries = 3
@@ -282,6 +280,7 @@ Insight: [Short positive sentence]"""
                     model="gemma-4-26b-a4b-it", 
                     contents=insight_prompt,
                     config=types.GenerateContentConfig(
+                        # ✅ THE FIX: Removed system_instruction= parameter to prevent the silent model crash
                         temperature=0.4,
                         max_output_tokens=150,
                         safety_settings=[
@@ -293,8 +292,8 @@ Insight: [Short positive sentence]"""
                     )
                 )
                 
-                # Check safely if response has text
-                if response and getattr(response, 'text', None):
+                # ✅ Simplified the text check to match your chat code perfectly
+                if response.text:
                     content = response.text.replace('*', '').strip() 
                     for line in content.split('\n'):
                         if line.lower().startswith('emotion:'):
@@ -305,7 +304,6 @@ Insight: [Short positive sentence]"""
                     break 
                 else:
                     print(f"⚠️ Journal response was empty on attempt {attempt + 1}.")
-                    # ✅ THE FIX: Wait and try again instead of breaking!
                     if attempt < max_retries - 1:
                         time.sleep(base_wait_time)
                         continue
