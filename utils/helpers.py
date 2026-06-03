@@ -134,6 +134,7 @@ Focus on being a kind friend who listens and supports, not a doctor."""
     base_wait_time = 2
 
     # 🚀 GOOGLE-APPROVED EXPONENTIAL BACKOFF
+
     for attempt in range(max_retries):
         try:
             if not gemini_client: raise ValueError("Client offline.")
@@ -144,7 +145,7 @@ Focus on being a kind friend who listens and supports, not a doctor."""
                 config=types.GenerateContentConfig(
                     system_instruction=system_prompt,
                     temperature=0.75,           
-                    max_output_tokens=800, # ✅ FIX 2: Re-enabled proper limit to prevent sentence cutoff
+                    max_output_tokens=800, # ✅ FIX 1: Increased from 280 to 800 so it never gets cut off!
                     safety_settings=[
                         types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
                         types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
@@ -174,7 +175,8 @@ Focus on being a kind friend who listens and supports, not a doctor."""
     else:
         full_output = "<response>The servers are taking a moment to process. Please take a deep breath and try sending that again.</response>"
 
-    # ✅ FIX 3: Bulletproof Parser - Prevents tags leaking even if the model gets cut off!
+    # ✅ FIX 2: BULLETPROOF PARSER
+    # This will safely hide tags even if the AI crashes or gets cut off mid-sentence.
     reasoning = "Standard empathy applied."
     clean_reply = full_output
     
@@ -203,7 +205,10 @@ Focus on being a kind friend who listens and supports, not a doctor."""
             clean_reply = parts[1].strip()
             
     # Ultimate fail-safe to wipe raw tags if they sneak in
-    clean_reply = clean_reply.replace("<response>", "").replace("</response>", "").strip()
+    clean_reply = clean_reply.replace("<response>", "").replace("</response>", "").replace("<reasoning>", "").replace("</reasoning>", "").strip()
+
+    if not clean_reply:
+        clean_reply = "I'm listening. Please go on."
 
     # Extract Tool
     tool = None
