@@ -7,6 +7,9 @@ from flask import Flask, render_template, request, jsonify, session, redirect, u
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from dotenv import load_dotenv
+from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 from gtts import gTTS
 import psycopg2
 import psycopg2.extras
@@ -18,12 +21,79 @@ from datetime import datetime, timedelta
 load_dotenv()
 from utils.helpers import detect_crisis, analyze_sentiment, generate_ai_response, strip_pii
 
+# Validate required environment variables
+REQUIRED_VARS = ["SECRET_KEY", "DATABASE_URL", "PINECONE_API_KEY", "GEMINI_API_KEY"]
+for var in REQUIRED_VARS:
+    if not os.getenv(var):
+        raise RuntimeError(f"Startup failed: Missing required environment variable '{var}'. Please add it to your .env file.")
+
 app = Flask(__name__)
-app.secret_key = os.getenv("SECRET_KEY", "super_secret_safeminds_key")
+app.secret_key = os.environ["SECRET_KEY"]
+
+# Production settings for Render
+frontend_url = os.environ.get("FRONTEND_URL", "*")
+CORS(app, supports_credentials=True, origins=[frontend_url])
+
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='None'
+)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+def rate_limit_key():
+    return str(session.get('user_id', get_remote_address()))
+
+limiter = Limiter(
+    key_func=rate_limit_key,
+    app=app,
+    storage_uri="memory://"
+)
+
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    if request.path == '/analyze':
+        return jsonify({
+            "response": "Please wait a moment. I am still here.",
+            "sentiment": "neutral", 
+            "crisis": False, 
+            "emotions": [], 
+            "audio": None, 
+            "tool": None
+        }), 429
+    flash("Please wait a moment. I am still here.", "error")
+    return redirect(request.url)
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"})
+
+from sqlalchemy import create_engine
+
+# Initialize SQLAlchemy connection pool
+db_url = os.environ["DATABASE_URL"]
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+if "?" not in db_url:
+    db_url += "?sslmode=require"
+elif "sslmode=" not in db_url:
+    db_url += "&sslmode=require"
+
+db_engine = create_engine(
+    db_url,
+    pool_size=5,
+    max_overflow=10,
+    pool_timeout=30,
+    pool_recycle=1800,
+    echo_pool=False  # Logs pool checkout/checkin to the console
+)
 
 def get_db_connection():
-    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-    return conn
+    return db_engine.raw_connection()
 
 def init_db():
     conn = get_db_connection()
@@ -42,9 +112,9 @@ def init_db():
 init_db()
 
 try:
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=os.environ["PINECONE_API_KEY"])
     pinecone_index = pc.Index("safemind")
-    gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    gemini_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
     print("✅ Pinecone & Gemini Vector Memory Initialized")
 except Exception as e:
     print(f"⚠️ Pinecone/Gemini Memory Offline: {e}")
@@ -106,7 +176,13 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+@app.route('/consent', methods=['POST'])
+def consent():
+    session['consent'] = True
+    return jsonify({"status": "success"})
+
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -127,6 +203,7 @@ def login():
     return render_template('index.html', show_auth=True, auth_type='login')
 
 @app.route('/register', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def register():
     if request.method == 'POST':
         username = request.form['username']
@@ -147,6 +224,58 @@ def register():
             conn.close()
     return render_template('index.html', show_auth=True, auth_type='register')
 
+@app.route('/export_data', methods=['GET'])
+@login_required
+def export_data():
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    
+    cursor.execute("SELECT id, username FROM users WHERE id = %s", (user_id,))
+    user_info = cursor.fetchone()
+    
+    cursor.execute("SELECT entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+    journals = cursor.fetchall()
+    conn.close()
+    
+    for j in journals:
+        j['timestamp'] = j['timestamp'].isoformat() if j['timestamp'] else None
+
+    data = {
+        "profile": user_info,
+        "journals": journals
+    }
+    
+    return jsonify(data), 200, {'Content-Disposition': 'attachment; filename=my_safemind_data.json'}
+
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    data = request.json
+    phrase = data.get('confirm_phrase', '').lower().strip()
+    
+    if phrase != 'delete my account':
+        return jsonify({"error": "Invalid confirmation phrase."}), 400
+        
+    user_id = session.get('user_id')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("DELETE FROM journals WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM chat_logs WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM mood_logs WHERE user_id = %s", (user_id,))
+        cursor.execute("DELETE FROM users WHERE id = %s", (user_id,))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": "Failed to delete account"}), 500
+    finally:
+        conn.close()
+        
+    session.clear()
+    return jsonify({"status": "success"})
+
 @app.route('/logout')
 def logout():
     session.clear()
@@ -164,8 +293,12 @@ def app_dashboard():
     return render_template('index.html', show_auth=False)
 
 @app.route('/analyze', methods=['POST'])
+@limiter.limit("20 per minute")
 @login_required
 def analyze():
+    if not session.get('consent'):
+        return jsonify({"error": "Consent required to use chat."}), 403
+
     last_req = session.get('last_msg_time', 0)
     current_time = time.time()
     if current_time - last_req < 1.5:
@@ -188,10 +321,14 @@ def analyze():
     is_crisis = detect_crisis(user_input)
     sentiment = analyze_sentiment(user_input)
     
-    past_memory = retrieve_past_context(user_input)
-    augmented_input = f"[Recall from past: {past_memory}]\nUser says: {user_input}" if past_memory else user_input
-
-    ai_response, reasoning, agentic_tool = generate_ai_response(augmented_input, chat_history, user_lang)
+    if is_crisis:
+        ai_response = "I am concerned about your safety. Please look at the emergency information on your screen."
+        reasoning = "Crisis detected via keyword analysis. Support chat halted."
+        agentic_tool = None
+    else:
+        past_memory = retrieve_past_context(user_input)
+        augmented_input = f"[Recall from past: {past_memory}]\nUser says: {user_input}" if past_memory else user_input
+        ai_response, reasoning, agentic_tool = generate_ai_response(augmented_input, chat_history, user_lang)
 
     clean_memory_text = strip_pii(user_input)
 
@@ -490,4 +627,5 @@ def get_dashboard_stats():
     })
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

@@ -1,3 +1,4 @@
+const API_BASE = window.API_BASE || "";
 let sessionMemory = [];
 let currentSessionId = Date.now().toString(36) + Math.random().toString(36).substring(2);
 let isSpeaking = false;
@@ -141,7 +142,8 @@ function saveSafetyPlan() {
     setTimeout(() => { msg.style.display = "none"; }, 3000);
 }
 
-function acceptSafety() {
+async function acceptSafety() {
+    await fetch(API_BASE + '/consent', { method: 'POST', credentials: 'include' });
     localStorage.setItem('safeminds_ftue_accepted', 'true');
     closeModal('safety-modal');
 }
@@ -209,8 +211,15 @@ async function loadMoodChart() {
     const canvas = document.getElementById('moodChart');
     if (!canvas) return;
     try {
-        const response = await fetch('/get_moods');
+        const response = await fetch(API_BASE + '/get_moods', { credentials: 'include' });
         const data = await response.json();
+
+        if (data.crisis) {
+            stopSpeech();
+            document.getElementById('panel-crisis').classList.add('active');
+            return;
+        }
+
         const labels = data.map(log => {
             const date = new Date(log.time);
             return `${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
@@ -243,7 +252,7 @@ async function loadMoodChart() {
 // 🚀 FIX: Automatically updates the entire Dashboard when a mood is clicked
 async function saveMood(mood) {
     // 1. Save to database
-    await fetch("/save_mood", { 
+    await fetch(API_BASE + '/save_mood', { credentials: 'include', 
         method: "POST", 
         headers: { "Content-Type": "application/json" }, 
         body: JSON.stringify({ mood: mood }) 
@@ -263,7 +272,7 @@ async function loadSidebarSessions() {
     const historyList = document.getElementById("history-list");
     if (!historyList) return;
     try {
-        const response = await fetch("/get_sessions");
+        const response = await fetch(API_BASE + '/get_sessions', { credentials: 'include' });
         const sessions = await response.json();
         historyList.innerHTML = "";
         if (sessions.length === 0) { historyList.innerHTML = '<div class="empty" style="font-size:0.85rem; opacity:0.5;">No recent chats</div>'; return; }
@@ -286,7 +295,7 @@ async function loadChatThread(sessionId) {
     addMessage("Loading previous session...", "bot", true);
     
     try {
-        const response = await fetch(`/get_chat/${sessionId}`);
+        const response = await fetch(API_BASE + `/get_chat/${sessionId}`, { credentials: 'include' });
         const chats = await response.json();
         chatBox.innerHTML = "";
         
@@ -349,7 +358,7 @@ async function sendMessage() {
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
 
-        const response = await fetch("/analyze", { 
+        const response = await fetch(API_BASE + '/analyze', { credentials: 'include', 
             method: "POST", 
             headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify({ message: message, history: sessionMemory.slice(-4), session_id: currentSessionId, language: selectedLang }),
@@ -359,7 +368,19 @@ async function sendMessage() {
         abortController = null; // Reset it if the request finishes successfully
 
         const data = await response.json();
+
+        if (data.crisis) {
+            stopSpeech();
+            document.getElementById('panel-crisis').classList.add('active');
+            return;
+        }
+
         loadingBubble.remove();
+        
+        if (data.crisis === true) {
+            showCrisisModal();
+            return; 
+        }
         
         addMessage(data.response, "bot", false, data.tool);
         sessionMemory.push({ role: "SafeMind AI", text: data.response });
@@ -427,7 +448,7 @@ function addMessage(text, sender, skipTyping = false, tool = null) {
         let i = 0;
         function typeWriter() {
             if (i < text.length) {
-                textSpan.innerHTML += text.charAt(i);
+                textSpan.textContent += text.charAt(i);
                 i++;
                 chatBox.scrollTop = chatBox.scrollHeight;
                 setTimeout(typeWriter, 12);
@@ -448,7 +469,7 @@ function addMessage(text, sender, skipTyping = false, tool = null) {
 
 async function deleteEntireSession(sessionId) {
     if(!confirm("Delete this conversation permanently?")) return;
-    await fetch("/delete_session", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId }) });
+    await fetch(API_BASE + '/delete_session', { credentials: 'include', method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ session_id: sessionId }) });
     if (currentSessionId === sessionId) clearChat();
     loadSidebarSessions();
 }
@@ -897,12 +918,19 @@ if (saveJournalBtn) {
         saveJournalBtn.disabled = true;
 
         try {
-            const response = await fetch('/save_journal', {
+            const response = await fetch(API_BASE + '/save_journal', { credentials: 'include',
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ entry: text })
             });
             const data = await response.json();
+
+        if (data.crisis) {
+            stopSpeech();
+            document.getElementById('panel-crisis').classList.add('active');
+            return;
+        }
+
             if (data.status === 'success') {
                 journalInput.value = ''; 
                 loadJournals(); 
@@ -926,7 +954,7 @@ function getEmotionColor(emotion) {
 async function deleteJournal(id) {
     if (!confirm("Are you sure you want to delete this reflection?")) return;
     try {
-        await fetch('/delete_journal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
+        await fetch(API_BASE + '/delete_journal', { credentials: 'include', method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: id }) });
         loadJournals();
     } catch (e) { console.error(e); }
 }
@@ -934,7 +962,7 @@ async function deleteJournal(id) {
 async function loadJournals() {
     if (!journalFeed) return;
     try {
-        const response = await fetch('/get_journals');
+        const response = await fetch(API_BASE + '/get_journals', { credentials: 'include' });
         const journals = await response.json();
         journalFeed.innerHTML = ''; 
         
@@ -951,19 +979,46 @@ async function loadJournals() {
 
             const card = document.createElement('div');
             card.className = 'journal-card';
-           card.innerHTML = `
-                <div class="journal-card-header">
-                    <div class="emotion-pill" style="background: ${colors.bg}; color: ${colors.text}; border-color: ${colors.text}50;">${j.emotion_tag}</div>
-                    <button class="journal-delete-btn" title="Delete Entry" onclick="deleteJournal(${j.id})">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                    </button>
-                </div>
-                <div class="journal-date">${dateString} at ${timeString}</div>
-                <div class="journal-text">${j.entry_text}</div>
-                <div class="journal-insight">
-                    ✨ <b>SafeMind Insight:</b> ${j.ai_insight}
-                </div>
-            `;
+            
+            const header = document.createElement('div');
+            header.className = 'journal-card-header';
+            
+            const pill = document.createElement('div');
+            pill.className = 'emotion-pill';
+            pill.style.background = colors.bg;
+            pill.style.color = colors.text;
+            pill.style.borderColor = colors.text + '50';
+            pill.textContent = j.emotion_tag;
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = 'journal-delete-btn';
+            delBtn.title = 'Delete Entry';
+            delBtn.onclick = () => deleteJournal(j.id);
+            delBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+            
+            header.appendChild(pill);
+            header.appendChild(delBtn);
+            
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'journal-date';
+            dateDiv.textContent = dateString + ' at ' + timeString;
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'journal-text';
+            const doc = new DOMParser().parseFromString(j.entry_text, "text/html");
+            textDiv.textContent = doc.documentElement.textContent;
+            
+            const insightDiv = document.createElement('div');
+            insightDiv.className = 'journal-insight';
+            insightDiv.innerHTML = '✨ <b>SafeMind Insight:</b> ';
+            const insightText = document.createTextNode(j.ai_insight);
+            insightDiv.appendChild(insightText);
+            
+            card.appendChild(header);
+            card.appendChild(dateDiv);
+            card.appendChild(textDiv);
+            card.appendChild(insightDiv);
+            
             journalFeed.appendChild(card);
         });
     } catch (error) { console.error("Error loading journals:", error); }
@@ -971,8 +1026,15 @@ async function loadJournals() {
 
 async function loadDashboardStats() {
     try {
-        const response = await fetch('/get_dashboard_stats');
+        const response = await fetch(API_BASE + '/get_dashboard_stats', { credentials: 'include' });
         const data = await response.json();
+
+        if (data.crisis) {
+            stopSpeech();
+            document.getElementById('panel-crisis').classList.add('active');
+            return;
+        }
+
         
         document.getElementById('stat-sessions').innerText = data.total_sessions;
         document.getElementById('stat-streak').innerText = `${data.streak} Days`;
@@ -1012,8 +1074,15 @@ async function loadMainDashboardChart() {
     const canvas = document.getElementById('mainDashboardChart');
     if (!canvas) return;
     try {
-        const response = await fetch('/get_moods');
+        const response = await fetch(API_BASE + '/get_moods', { credentials: 'include' });
         const data = await response.json();
+
+        if (data.crisis) {
+            stopSpeech();
+            document.getElementById('panel-crisis').classList.add('active');
+            return;
+        }
+
         if(data.length === 0) return;
 
         const labels = data.map(log => {
@@ -1070,3 +1139,49 @@ document.addEventListener('click', function(event) {
         jLangMenu.classList.remove('active');
     }
 });
+
+function showCrisisModal() {
+    const modal = document.getElementById('crisis-modal');
+    if (modal) modal.style.display = 'flex';
+    
+    const composer = document.querySelector('.input-area');
+    if (composer) {
+        composer.style.pointerEvents = 'none';
+        composer.style.opacity = '0.3';
+    }
+}
+
+function dismissCrisisModal() {
+    const modal = document.getElementById('crisis-modal');
+    if (modal) modal.style.display = 'none';
+    
+    const composer = document.querySelector('.input-area');
+    if (composer) {
+        composer.style.pointerEvents = 'auto';
+        composer.style.opacity = '1';
+    }
+}
+
+async function confirmDeleteAccount() {
+    const phrase = prompt("To permanently delete your account and all data, type 'delete my account':");
+    if (phrase && phrase.toLowerCase().trim() === 'delete my account') {
+        try {
+            const res = await fetch(API_BASE + '/delete_account', { credentials: 'include',
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ confirm_phrase: phrase })
+            });
+            const data = await res.json();
+            if (res.ok && data.status === 'success') {
+                alert("Account deleted. Taking you to the home page.");
+                window.location.href = '/';
+            } else {
+                alert(data.error || "Failed to delete account.");
+            }
+        } catch (e) {
+            alert("Error communicating with server.");
+        }
+    } else if (phrase) {
+        alert("Incorrect confirmation phrase. Account was not deleted.");
+    }
+}
