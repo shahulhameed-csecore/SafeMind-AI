@@ -39,7 +39,7 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='None'
 )
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -326,34 +326,38 @@ def analyze():
         reasoning = "Crisis detected via keyword analysis. Support chat halted."
         agentic_tool = None
     else:
-        past_memory = retrieve_past_context(user_input)
-        augmented_input = f"[Recall from past: {past_memory}]\nUser says: {user_input}" if past_memory else user_input
-        ai_response, reasoning, agentic_tool = generate_ai_response(augmented_input, chat_history, user_lang)
+        try:
+            clean_user_input = strip_pii(user_input)
+        except Exception:
+            clean_user_input = None
+            
+        if user_input and clean_user_input is None:
+            ai_response = "I'm having trouble processing that safely right now. Could you rephrase it?"
+            reasoning = "PII stripping failed."
+            agentic_tool = None
+        else:
+            past_memory = retrieve_past_context(clean_user_input)
+            augmented_input = f"[Recall from past: {past_memory}]\nUser says: {clean_user_input}" if past_memory else clean_user_input
+            ai_response, reasoning, agentic_tool = generate_ai_response(augmented_input, chat_history, user_lang)
 
-    clean_memory_text = strip_pii(user_input)
+    try:
+        clean_memory_text = strip_pii(user_input)
+    except Exception:
+        clean_memory_text = None
 
-    if pinecone_index:
+    if pinecone_index and clean_memory_text:
         try:
             vector = get_embedding(clean_memory_text)
             if vector:
                 pinecone_index.upsert(vectors=[{"id": f"{session_id}_{len(raw_history)}", "values": vector, "metadata": {"text": clean_memory_text}}])
         except Exception: pass
 
-    audio_base64 = None
-    try:
-        lang_code = 'en' if user_lang not in ['ta', 'hi', 'en'] else user_lang
-        tts = gTTS(text=ai_response, lang=lang_code, slow=False)
-        fp = BytesIO()
-        tts.write_to_fp(fp)
-        fp.seek(0)
-        audio_base64 = base64.b64encode(fp.read()).decode('utf-8')
-    except Exception: pass
-
     conn = get_db_connection()
     cursor = conn.cursor()
+    safe_log_msg = clean_memory_text if clean_memory_text else ""
     cursor.execute(
         "INSERT INTO chat_logs (session_id, user_id, user_message, bot_response, reasoning) VALUES (%s, %s, %s, %s, %s) RETURNING id",
-        (session_id, user_id, user_input, ai_response, reasoning)
+        (session_id, user_id, safe_log_msg, ai_response, reasoning)
     )
     chat_id = cursor.fetchone()[0]
     conn.commit()
@@ -365,7 +369,6 @@ def analyze():
         "crisis": is_crisis,
         "chat_id": chat_id, 
         "emotions": [],
-        "audio": audio_base64,
         "tool": agentic_tool 
     })
 @app.route('/save_journal', methods=['POST'])
