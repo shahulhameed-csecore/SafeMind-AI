@@ -231,20 +231,45 @@ def export_data():
     conn = get_db_connection()
     cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     
-    cursor.execute("SELECT id, username FROM users WHERE id = %s", (user_id,))
-    user_info = cursor.fetchone()
+    data = {}
     
-    cursor.execute("SELECT entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
-    journals = cursor.fetchall()
-    conn.close()
-    
-    for j in journals:
-        j['timestamp'] = j['timestamp'].isoformat() if j['timestamp'] else None
+    try:
+        cursor.execute("SELECT id, username FROM users WHERE id = %s", (user_id,))
+        data['profile'] = cursor.fetchone()
+    except Exception:
+        conn.rollback()
 
-    data = {
-        "profile": user_info,
-        "journals": journals
-    }
+    try:
+        cursor.execute("SELECT entry_text, ai_insight, emotion_tag, timestamp FROM journals WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+        journals = cursor.fetchall()
+        for j in journals:
+            if j.get('timestamp'):
+                j['timestamp'] = j['timestamp'].isoformat()
+        data['journals'] = journals
+    except Exception:
+        conn.rollback()
+        
+    try:
+        cursor.execute("SELECT session_id, user_message, bot_response, reasoning, timestamp FROM chat_logs WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+        chat_logs = cursor.fetchall()
+        for c in chat_logs:
+            if c.get('timestamp'):
+                c['timestamp'] = c['timestamp'].isoformat()
+        data['chat_logs'] = chat_logs
+    except Exception:
+        conn.rollback()
+
+    try:
+        cursor.execute("SELECT mood, timestamp FROM mood_logs WHERE user_id = %s ORDER BY timestamp DESC", (user_id,))
+        mood_logs = cursor.fetchall()
+        for m in mood_logs:
+            if m.get('timestamp'):
+                m['timestamp'] = m['timestamp'].isoformat()
+        data['mood_logs'] = mood_logs
+    except Exception:
+        conn.rollback()
+
+    conn.close()
     
     return jsonify(data), 200, {'Content-Disposition': 'attachment; filename=my_safemind_data.json'}
 

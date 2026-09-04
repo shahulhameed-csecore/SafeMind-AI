@@ -1,0 +1,13 @@
+Flask
+gunicorn
+openai
+gTTS
+textblob
+deep-translator
+langdetect
+psycopg2-binary
+python-dotenv
+pinecone
+google-genai
+Flask-Limiter
+SQLAlchemy

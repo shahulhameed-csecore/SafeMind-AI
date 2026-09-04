@@ -302,7 +302,7 @@ async function loadChatThread(sessionId) {
         const icebreakers = document.getElementById("chat-icebreakers");
 
         if (!chats || chats.length === 0) { 
-            addMessage("This conversation is empty.", "bot", true);
+            addMessage("I'm here. Say it the way it is.", "bot", true);
             if (icebreakers) icebreakers.style.display = "flex";
             return; 
         }
@@ -346,7 +346,7 @@ async function sendMessage() {
     const liveTranscript = document.getElementById("live-transcript");
     if(liveTranscript) liveTranscript.innerText = "Analyzing...";
 
-    const loadingBubble = addMessage("Thinking...", "bot", true);
+    const loadingBubble = addMessage("still with you", "bot", true);
     
     // 🚀 NEW: Show the Stop button immediately so the user can cancel the thought
     const stopBtn = document.getElementById('stop-audio-btn');
@@ -444,7 +444,7 @@ function addMessage(text, sender, skipTyping = false, tool = null) {
         }
     }
 
-    if (sender === "bot" && !skipTyping && text !== "Thinking..." && text !== "Connection lost." && text !== "Loading previous session..." && text !== "This conversation is empty.") {
+    if (sender === "bot" && !skipTyping && text !== "still with you" && text !== "Connection lost." && text !== "Loading previous session..." && text !== "I'm here. Say it the way it is.") {
         let i = 0;
         function typeWriter() {
             if (i < text.length) {
@@ -489,7 +489,7 @@ function clearChat() {
     }
 }
 
-document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter") sendMessage(); });
+document.getElementById("user-input")?.addEventListener("keypress", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); } });
 
 let recognition = null;
 let isListening = false;
