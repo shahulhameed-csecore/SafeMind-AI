@@ -786,14 +786,7 @@ function switchMainView(viewName) {
         }
     });
 
-    const sidebar = document.getElementById('mobile-sidebar');
-    if (sidebar) {
-        if (viewName === 'chat') {
-            sidebar.style.display = 'none';
-        } else {
-            sidebar.style.display = '';
-        }
-    }
+
 
     if (viewName === 'journal') loadJournals();
     if (viewName === 'chat') { 
