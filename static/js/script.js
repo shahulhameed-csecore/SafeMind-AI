@@ -148,7 +148,7 @@ async function acceptSafety() {
     closeModal('safety-modal');
 }
 
-function getBestTherapistVoice(text = "") {
+function getBestVoice(text = "") {
     const voices = window.speechSynthesis.getVoices();
     if (/[\u0B80-\u0BFF]/.test(text)) return voices.find(v => v.name.includes('Google') && v.lang.includes('ta')) || voices.find(v => v.lang.includes('ta'));
     if (/[\u0900-\u097F]/.test(text)) return voices.find(v => v.name.includes('Google') && v.lang.includes('hi')) || voices.find(v => v.lang.includes('hi'));
@@ -163,7 +163,7 @@ function speakText(text) {
     window.speechSynthesis.cancel();
     let smoothedText = text.replace(/ \. /g, '... ').replace(/,/g, ', ');
     const utterance = new SpeechSynthesisUtterance(smoothedText);
-    utterance.voice = getBestTherapistVoice(text);
+    utterance.voice = getBestVoice(text);
     utterance.rate = (/[\u0B80-\u0BFF]/.test(text) || /[\u0900-\u097F]/.test(text)) ? 0.85 : 1.05;
     utterance.pitch = 1.05; utterance.volume = 1.0;
     
@@ -201,7 +201,7 @@ function stopSpeech() {
     if(stopBtn) stopBtn.style.display = 'none';
 }
 
-window.speechSynthesis.onvoiceschanged = getBestTherapistVoice;
+window.speechSynthesis.onvoiceschanged = getBestVoice;
 function speakResponse(text) { speakText(text); }
 
 let moodChartInstance = null;
@@ -357,15 +357,49 @@ async function sendMessage() {
 
     try {
         const selectedLang = document.getElementById("mic-lang") ? document.getElementById("mic-lang").value : 'en-US';
+        const reqBody = JSON.stringify({ message: message, history: sessionMemory.slice(-4), session_id: currentSessionId, language: selectedLang });
 
-        const response = await fetch(API_BASE + '/analyze', { credentials: 'include', 
-            method: "POST", 
-            headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ message: message, history: sessionMemory.slice(-4), session_id: currentSessionId, language: selectedLang }),
-            signal: abortController.signal // 🚀 NEW: Attach the kill-switch to the request
-        });
+        let response;
+        let attempt = 0;
+        let success = false;
+
+        while (attempt < 2 && !success) {
+            try {
+                response = await fetch(API_BASE + '/analyze', { 
+                    credentials: 'include', 
+                    method: "POST", 
+                    headers: { "Content-Type": "application/json" }, 
+                    body: reqBody,
+                    signal: abortController.signal
+                });
+                success = true;
+            } catch (err) {
+                if (err.name === 'AbortError') throw err;
+                attempt++;
+                if (attempt === 1) {
+                    console.warn("Network error, possible Render cold start. Retrying in 3s...");
+                    await new Promise(r => setTimeout(r, 3000));
+                } else {
+                    throw err;
+                }
+            }
+        }
         
         abortController = null; // Reset it if the request finishes successfully
+
+        console.log("Chat response status:", response.status);
+
+        if (!response.ok) {
+            loadingBubble.remove();
+            if (response.status === 401) {
+                addMessage("Session expired, sign in again", "bot", true);
+            } else if (response.status === 429) {
+                addMessage("Please wait a moment", "bot", true);
+            } else {
+                addMessage("Couldn't reach the server. Wait 20 seconds if the host is waking, then Retry. (Tele-MANAS 14416)", "bot", true);
+            }
+            return;
+        }
 
         const data = await response.json();
 
@@ -403,7 +437,8 @@ async function sendMessage() {
             // Remove the cancelled message from memory so the AI forgets it
             sessionMemory.pop(); 
         } else {
-            addMessage("Connection lost.", "bot", true); 
+            console.error("Chat network error:", error);
+            addMessage("Couldn't reach the server. Wait 20 seconds if the host is waking, then Retry. (Tele-MANAS 14416)", "bot", true); 
         }
     } finally {
         if (sendBtn) { sendBtn.disabled = false; sendBtn.style.opacity = "1"; }
@@ -750,6 +785,15 @@ function switchMainView(viewName) {
             if (panel) panel.classList.add('slide-right');
         }
     });
+
+    const sidebar = document.getElementById('mobile-sidebar');
+    if (sidebar) {
+        if (viewName === 'chat') {
+            sidebar.style.display = 'none';
+        } else {
+            sidebar.style.display = '';
+        }
+    }
 
     if (viewName === 'journal') loadJournals();
     if (viewName === 'chat') { 
