@@ -161,12 +161,12 @@
             <li><a href="#">Home</a></li>
             <li><a href="#features">Features</a></li>
             <li><a href="#privacy">Privacy & Security</a></li>
-            <li><a href="#" style="color: #ef4444; font-weight: 600;">Emergency Help</a></li>
+            <li><a href="#emergency" style="color: #ef4444; font-weight: 600;">Emergency Help</a></li>
         </ul>
         <a href="{{ url_for('login') }}" class="nav-btn">Launch App</a>
     </nav>
 
-    <div class="giant-bg-text">SAFEMINDS</div>
+
 
     <div class="hero-section">
         <div class="hero-content">
@@ -179,10 +179,26 @@
 
         </div>
 
-        <div class="hero-image-container">
-            <img src="{{ url_for('static', filename='images/robot-hand1.png') }}" alt="SafeMinds AI">
-        </div>
+
     </div>
 
+    <div id="emergency" style="padding: 60px 8%; max-width: 1600px; margin: 0 auto; text-align: center; border-top: 1px solid var(--glass-border);">
+        <h2 style="color: #ef4444; margin-bottom: 20px;">Emergency Help (Available 24/7)</h2>
+        <p style="margin-bottom: 20px;">If you are in distress, please reach out to one of these free, confidential helplines immediately:</p>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 15px 25px; border-radius: 8px;">
+                <strong>Tele-MANAS</strong><br><a href="tel:14416" style="color: #fff; text-decoration: none; font-size: 1.2rem; font-weight: bold;">14416</a>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 15px 25px; border-radius: 8px;">
+                <strong>iCall</strong><br><a href="tel:9152987821" style="color: #fff; text-decoration: none; font-size: 1.2rem; font-weight: bold;">9152987821</a>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 15px 25px; border-radius: 8px;">
+                <strong>Vandrevala</strong><br><a href="tel:9999666555" style="color: #fff; text-decoration: none; font-size: 1.2rem; font-weight: bold;">9999666555</a>
+            </div>
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); padding: 15px 25px; border-radius: 8px;">
+                <strong>AASRA</strong><br><a href="tel:9820466726" style="color: #fff; text-decoration: none; font-size: 1.2rem; font-weight: bold;">9820466726</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
